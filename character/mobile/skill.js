@@ -7267,10 +7267,10 @@ const skills = {
 	//全琮
 	sbyaoming: {
 		audio: 2,
-		chargeSkill: true,
+		chargeSkill: 4,
 		enable: "phaseUse",
 		filter: function (event, player) {
-			return player.countMark("charge") > 0;
+			return player.countCharge() > 0;
 		},
 		filterTarget: true,
 		prompt: function () {
@@ -7281,7 +7281,7 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			player.removeMark("charge", 1);
+			player.removeCharge();
 			var num = target.countCards("h"),
 				num2 = player.countCards("h");
 			if (num == num2 && target.countCards("he") > 0) {
@@ -7298,7 +7298,7 @@ const skills = {
 				player.discardPlayerCard(target, true, "he");
 			} else target.draw();
 			if (typeof player.storage.sbyaoming_status == "number" && result.index != player.storage.sbyaoming_status) {
-				player.addMark("charge", 1);
+				player.gainCharge();
 				delete player.storage.sbyaoming_status;
 			} else {
 				player.storage.sbyaoming_status = result.index;
@@ -7331,10 +7331,9 @@ const skills = {
 				direct: true,
 				content: function () {
 					"step 0";
-					var num = Math.min(trigger.num, 4 - player.countMark("charge"));
-					if (num > 0) {
+					if (player.countCharge(true)) {
 						player.logSkill("sbyaoming_damage");
-						player.addMark("charge", num);
+						player.gainCharge(trigger.num);
 						game.delayx();
 					}
 					"step 1";
@@ -7356,10 +7355,10 @@ const skills = {
 				forced: true,
 				locked: false,
 				filter: function (event, player) {
-					return (event.name != "phase" || game.phaseNumber == 0) && player.countMark("charge") < 4;
+					return (event.name != "phase" || game.phaseNumber == 0) && player.countCharge(true);
 				},
 				content: function () {
-					player.addMark("charge", Math.min(2, 4 - player.countMark("charge")));
+					player.gainCharge(2);
 				},
 			},
 		},

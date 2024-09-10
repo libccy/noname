@@ -422,12 +422,12 @@ const skills = {
 			global: "roundStart",
 		},
 		filter(event, player) {
-			return player.hasMark("charge");
+			return player.countCharge();
 		},
-		chargeSkill: true,
+		chargeSkill: 4,
 		group: "sbyicong_init",
 		async cost(event, trigger, player) {
-			const len = player.countMark("charge");
+			const len = player.countCharge();
 			const numbers = Array.from({ length: len }, (_, i) => get.cnNumber(i + 1, true));
 			if (_status.connectMode) {
 				game.broadcastAll(() => {
@@ -469,35 +469,33 @@ const skills = {
 					.chooseControl(["选项一", "选项二", "返回"])
 					.set("prompt", "义从：请选择一项")
 					.set("choiceList", [
-						`你于本轮内至其他角色的距离-1${
-							player.countCards("s", card => {
-								return card.hasGaintag("sbyicong");
-							}) >= 4
-								? ""
-								: `，将牌堆中的${get.cnNumber(
-										Math.min(
-											num,
-											4 -
-												player.countCards("s", card => {
-													return card.hasGaintag("sbyicong");
-												})
-										)
-								  )}张【杀】置于你的武将牌上，称为“扈”`
+						`你于本轮内至其他角色的距离-1${player.countCards("s", card => {
+							return card.hasGaintag("sbyicong");
+						}) >= 4
+							? ""
+							: `，将牌堆中的${get.cnNumber(
+								Math.min(
+									num,
+									4 -
+									player.countCards("s", card => {
+										return card.hasGaintag("sbyicong");
+									})
+								)
+							)}张【杀】置于你的武将牌上，称为“扈”`
 						}`,
-						`其他角色于本轮内至你的距离+1${
-							player.countCards("s", card => {
-								return card.hasGaintag("sbyicong");
-							}) >= 4
-								? ""
-								: `，将牌堆中的${get.cnNumber(
-										Math.min(
-											num,
-											4 -
-												player.countCards("s", card => {
-													return card.hasGaintag("sbyicong");
-												})
-										)
-								  )}张【闪】置于你的武将牌上，称为“扈”`
+						`其他角色于本轮内至你的距离+1${player.countCards("s", card => {
+							return card.hasGaintag("sbyicong");
+						}) >= 4
+							? ""
+							: `，将牌堆中的${get.cnNumber(
+								Math.min(
+									num,
+									4 -
+									player.countCards("s", card => {
+										return card.hasGaintag("sbyicong");
+									})
+								)
+							)}张【闪】置于你的武将牌上，称为“扈”`
 						}`,
 					])
 					.set("ai", () => {
@@ -525,7 +523,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const { num, choice } = event.cost_data;
 			const skill = choice === 0 ? "sbyicong_to" : "sbyicong_from";
-			player.removeMark("charge", num);
+			player.removeCharge(num);
 			player.addTempSkill(skill, "roundStart");
 			player.addMark(skill, 1, false);
 			let cards = [];
@@ -579,7 +577,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				async content(event, trigger, player) {
-					player.addMark("charge", 2);
+					player.gainCharge(2);
 				},
 			},
 			to: {
@@ -620,11 +618,19 @@ const skills = {
 		},
 		filter(event, player) {
 			if (!event.card || event.card.name !== "sha") return false;
-			return player.hasSkill("sbyicong", null, false, false);
+			if (!player.hasSkill("sbyicong", null, false, false)) return false;
+			if (player.countCharge(true)) return true;
+			if (event.player.isIn() && event.player.countDiscardableCards(player, "hej")) return true;
+			return false;
 		},
 		async cost(event, trigger, player) {
-			const list = ["蓄力", "cancel2"];
+			const list = ["cancel2"];
 			const choiceList = [`弃置${get.translation(trigger.player)}区域里的一张牌，你摸一张牌`, `获得3点蓄力值`];
+			if (player.countCharge(true)) {
+				list.unshift("蓄力");
+			} else {
+				choiceList[1] = `<span style="opacity:0.5">${choiceList[1]}</span>`;
+			}
 			if (trigger.player.isIn() && trigger.player.countDiscardableCards(player, "hej")) {
 				list.unshift("弃牌");
 			} else {
@@ -640,9 +646,13 @@ const skills = {
 				.set(
 					"choice",
 					(() => {
-						if (!list.includes("弃牌")) return "蓄力";
 						const eff = get.effect(trigger.player, { name: "guohe" }, player, player);
-						if (player.countMark("charge") >= 2 && eff >= 0) return "弃牌";
+						if (list.length == 2) {
+							if (!list.includes("弃牌")) return "蓄力";
+							if (eff >= 0) return "弃牌";
+							return "cancel2";
+						}
+						if (player.countCharge() >= 2 && eff >= 0) return "弃牌";
 						return "蓄力";
 					})()
 				)
@@ -663,8 +673,7 @@ const skills = {
 				await player.discardPlayerCard(trigger.player, "hej", true);
 				await player.draw();
 			} else {
-				const num = Math.min(3, 4 - player.countMark("charge"));
-				if (num > 0) player.addMark("charge", num);
+				player.gainCharge(3);
 			}
 		},
 		ai: {
@@ -3160,9 +3169,9 @@ const skills = {
 		trigger: {
 			player: "phaseDiscardEnd",
 		},
-		chargeSkill: true,
-		filter: function (event, player) {
-			return player.hasMark("charge");
+		chargeSkill: 7,
+		filter(event, player) {
+			return player.countCharge();
 		},
 		group: "sbzaiqi_backflow",
 		direct: true,
@@ -3179,7 +3188,7 @@ const skills = {
 				targets.sortBySeat();
 				event.targets = targets;
 				player.logSkill("sbzaiqi", targets);
-				player.removeMark("charge", targets.length);
+				player.removeCharge(targets.length);
 			} else event.finish();
 			"step 2";
 			var target = targets.shift();
@@ -3222,7 +3231,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				content: function () {
-					player.addMark("charge", trigger.name == "damage" ? 1 : 3);
+					player.gainCharge(trigger.name == "damage" ? 1 : 3)
 				},
 			},
 		},
@@ -4484,13 +4493,13 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
-		chargeSkill: true,
+		chargeSkill: 4,
 		filter: function (event, player) {
-			return player.hasMark("charge");
+			return player.countCharge();
 		},
 		filterTarget: lib.filter.notMe,
 		selectTarget: function () {
-			return [1, _status.event.player.countMark("charge")];
+			return [1, _status.event.player.countCharge()];
 		},
 		multiline: true,
 		group: "sbtiaoxin_backflow",
@@ -4521,7 +4530,7 @@ const skills = {
 			}
 		},
 		contentAfter: function () {
-			player.removeMark("charge", targets.length);
+			player.removeCharge(targets.length);
 		},
 		ai: {
 			threaten: 1.2,
@@ -4551,7 +4560,7 @@ const skills = {
 				},
 				forced: true,
 				filter: function (event, player) {
-					if (player.countMark("charge") >= 4) return false;
+					if (!player.countCharge(true)) return false;
 					if (event.name.indexOf("lose") == 0) {
 						if (event.type != "discard") return false;
 						var evt = event.getParent("phaseDiscard");
@@ -4561,8 +4570,7 @@ const skills = {
 					}
 				},
 				content: function () {
-					var num = Math.min(4 - player.countMark("charge"), trigger.name.indexOf("lose") == 0 ? trigger.getl(player).cards2.length : 4);
-					if (num > 0) player.addMark("charge", num);
+					player.gainCharge(trigger.name.indexOf("lose") == 0 ? trigger.getl(player).cards2.length : 4);
 				},
 			},
 		},
@@ -5004,9 +5012,9 @@ const skills = {
 	sblongdan: {
 		audio: 2,
 		enable: ["chooseToUse", "chooseToRespond"],
-		chargeSkill: true,
+		chargeSkill: 3,
 		filter: function (event, player) {
-			if (event.type == "wuxie" || !player.hasMark("charge")) return false;
+			if (event.type == "wuxie" || !player.countCharge()) return false;
 			var marked = player.hasSkill("sblongdan_mark", null, null, false);
 			for (var name of lib.inpile) {
 				if (!marked && name != "sha" && name != "shan") continue;
@@ -5060,7 +5068,7 @@ const skills = {
 						return 6 / Math.max(1, get.value(card));
 					},
 					precontent: function () {
-						player.removeMark("charge", 1);
+						player.removeCharge();
 						player.addTempSkill("sblongdan_draw");
 					},
 				};
@@ -5077,7 +5085,7 @@ const skills = {
 			},
 		},
 		hiddenCard: function (player, name) {
-			if (get.type(name) != "basic" || !player.hasMark("charge")) return false;
+			if (get.type(name) != "basic" || !player.countCharge()) return false;
 			var marked = player.hasSkill("sblongdan_mark", null, null, false);
 			if (!marked && name != "sha" && name != "shan") return false;
 			return player.hasCard(lib.skill.sblongdan.getFilter(name, player), "hs");
@@ -5131,11 +5139,11 @@ const skills = {
 				},
 				forced: true,
 				filter: function (event, player, name) {
-					if (player.countMark("charge") > 2) return false;
+					if (!player.countCharge(true)) return false;
 					return name != "phaseBefore" || game.phaseNumber == 0;
 				},
 				content: function () {
-					player.addMark("charge", 1);
+					player.gainCharge();
 				},
 			},
 		},
