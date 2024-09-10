@@ -172,7 +172,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				async content(event, trigger, player) {
-					player.gainCharge();
+					player.addCharge();
 				},
 			},
 		},
@@ -207,7 +207,7 @@ const skills = {
 			const target = event.targets[0];
 			const cards = trigger.getl(player).cards2;
 			await target.draw(cards.length);
-			if (cards.some(card => get.type(card) != "basic") && target.countCharge(true)) target.gainCharge();
+			if (cards.some(card => get.type(card) != "basic") && target.countCharge(true)) target.addCharge();
 		},
 		subSkill: {
 			used: {
@@ -791,7 +791,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				async content(event, trigger, player) {
-					player.gainCharge(2);
+					player.addCharge(2);
 				},
 			},
 			to: {
@@ -887,7 +887,7 @@ const skills = {
 				await player.discardPlayerCard(trigger.player, "hej", true);
 				await player.draw();
 			} else {
-				player.gainCharge(3);
+				player.addCharge(3);
 			}
 		},
 		ai: {
@@ -3445,7 +3445,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				content: function () {
-					player.gainCharge(trigger.name == "damage" ? 1 : 3)
+					player.addCharge(trigger.name == "damage" ? 1 : 3)
 				},
 			},
 		},
@@ -4784,7 +4784,7 @@ const skills = {
 					}
 				},
 				content: function () {
-					player.gainCharge(trigger.name.indexOf("lose") == 0 ? trigger.getl(player).cards2.length : 4);
+					player.addCharge(trigger.name.indexOf("lose") == 0 ? trigger.getl(player).cards2.length : 4);
 				},
 			},
 		},
@@ -5357,7 +5357,7 @@ const skills = {
 					return name != "phaseBefore" || game.phaseNumber == 0;
 				},
 				content: function () {
-					player.gainCharge();
+					player.addCharge();
 				},
 			},
 		},

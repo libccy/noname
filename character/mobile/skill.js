@@ -182,7 +182,8 @@ const skills = {
 				})
 			) {
 				const num = player.getAllHistory("custom", evt => evt.name == "mbquchong").length;
-				return num < 4 && player.countMark("mbquchong") >= [0, 5, 10, 10][num];
+				const list = get.mode() == "identity" ? [0, 5, 10, 10] : [0, 2, 5, 5];
+				return num < 4 && player.countMark("mbquchong") >= list[num];
 			}
 			return player.canMoveCard(
 				null,
@@ -228,7 +229,8 @@ const skills = {
 					.set("logSkill", ["mbquchong", null, null, null, [4]]);
 			} else {
 				const numbers = Array.from({ length: 13 }).map((_, i) => get.strNumber(i + 1));
-				const costMark = [0, 5, 10, 10][player.getAllHistory("custom", evt => evt.name == "mbquchong").length];
+				const list = get.mode() == "identity" ? [0, 5, 10, 10] : [0, 2, 5, 5];
+				const costMark = list[player.getAllHistory("custom", evt => evt.name == "mbquchong").length];
 				const result = await player
 					.chooseButton(
 						[
@@ -260,7 +262,7 @@ const skills = {
 					const card = game.createCard(equips[0], equips[1], get.numString(equips[2]));
 					if (!card.storage) card.storage = {};
 					if (typeof card.storage.mbquchong != "number") {
-						card.storage.mbquchong = card.name == "dagongche_attack" ? 1 : 3;
+						card.storage.mbquchong = card.name == "dagongche_attack" ? 2 : 4;
 					}
 					lib.skill.mbquchong.broadcast(card);
 					const resultx = await player
@@ -7298,7 +7300,7 @@ const skills = {
 				player.discardPlayerCard(target, true, "he");
 			} else target.draw();
 			if (typeof player.storage.sbyaoming_status == "number" && result.index != player.storage.sbyaoming_status) {
-				player.gainCharge();
+				player.addCharge();
 				delete player.storage.sbyaoming_status;
 			} else {
 				player.storage.sbyaoming_status = result.index;
@@ -7333,7 +7335,7 @@ const skills = {
 					"step 0";
 					if (player.countCharge(true)) {
 						player.logSkill("sbyaoming_damage");
-						player.gainCharge(trigger.num);
+						player.addCharge(trigger.num);
 						game.delayx();
 					}
 					"step 1";
@@ -7358,7 +7360,7 @@ const skills = {
 					return (event.name != "phase" || game.phaseNumber == 0) && player.countCharge(true);
 				},
 				content: function () {
-					player.gainCharge(2);
+					player.addCharge(2);
 				},
 			},
 		},

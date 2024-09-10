@@ -5156,14 +5156,14 @@ export class Game extends GameCompatible {
 			nature = lib.card[name].cardnature;
 		}
 		if (typeof suit != "string") {
-			suit = ["heart", "diamond", "club", "spade"].randomGet();
+			suit = "none";
 		} else if (suit == "black") {
 			suit = Math.random() < 0.5 ? "club" : "spade";
 		} else if (suit == "red") {
 			suit = Math.random() < 0.5 ? "diamond" : "heart";
 		}
 		if (typeof number != "number" && typeof number != "string") {
-			number = Math.ceil(Math.random() * 13);
+			number = 0;
 		}
 		let card;
 		if (noclick) {

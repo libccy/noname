@@ -10318,6 +10318,7 @@ const skills = {
 					return player.canUse({ name: "sha", nature: "thunder", isCard: true }, target, false);
 				})
 				.set("selectTarget", [1, 3])
+				.set("complexTarget", true)
 				.set("ai", target => {
 					const player = get.player();
 					if (player.hp <= 1) return 0;
@@ -10380,7 +10381,7 @@ const skills = {
 			return player.canCompare(target);
 		},
 		filter(event, player) {
-			return player.countCards("h") > 0 && game.hasPlayer(current => lib.skill.jsrgbeizhi.filterTarget(null, player, target));
+			return player.countCards("h") > 0 && game.hasPlayer(current => lib.skill.jsrgbeizhi.filterTarget(null, player, current));
 		},
 		async content(event, trigger, player) {
 			const result = await player.chooseToCompare(event.target).forResult();

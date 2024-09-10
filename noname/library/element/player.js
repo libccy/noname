@@ -3616,7 +3616,7 @@ export class Player extends HTMLDivElement {
 	 * @param { number } [num = 1] 获得蓄力点数
 	 * @param { boolean } [log] false: 不进行广播
 	 */
-	gainCharge(num, log) {
+	addCharge(num, log) {
 		if (typeof num != "number" || !num) num = 1;
 		let maxCharge = this.getMaxCharge();
 		num = Math.min(num, maxCharge - this.countMark("charge"));
