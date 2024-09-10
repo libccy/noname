@@ -37,7 +37,7 @@ const skills = {
 							.chooseCardTarget({
 								prompt: "弃置任意张牌并选择等量角色",
 								position: "he",
-								filterCard: card => lib.filter.cardDiscardable(card, player, "jsrgqiluan"),
+								filterCard: card => lib.filter.cardDiscardable(card, get.player(), "jsrgqiluan"),
 								filterTarget: lib.filter.notMe,
 								selectCard: [1, Infinity],
 								selectTarget: [1, Infinity],
@@ -5072,6 +5072,9 @@ const skills = {
 			} else {
 				player.removeSkill("jsrgmanjuan_in");
 			}
+		},
+		onremove(player) {
+			player.removeSkill("jsrgmanjuan_in");
 		},
 		subSkill: {
 			in: {

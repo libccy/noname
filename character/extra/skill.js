@@ -2805,12 +2805,14 @@ const skills = {
 			effect: {
 				mod: {
 					targetInRange(card, player, target) {
+						if (get.suit(card) == "unsure") return true;
 						if (!card.cards) return;
 						for (var i of card.cards) {
 							if (i.hasGaintag("dctuoyu_qingqu_tag")) return true;
 						}
 					},
 					cardUsable(card, player, num) {
+						if (get.suit(card) == "unsure") return Infinity;
 						if (!card.cards) return;
 						for (var i of card.cards) {
 							if (i.hasGaintag("dctuoyu_qingqu_tag")) return Infinity;
