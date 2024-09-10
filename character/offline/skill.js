@@ -5226,12 +5226,14 @@ const skills = {
 			player: "phaseJieshuBegin",
 		},
 		check(event, player) {
+			if (game.countPlayer() > 4) return true;
 			return event.player.hp + player.countCards("h") < 4;
 		},
 		async content(event, trigger, player) {
+			const num = game.countPlayer();
 			await player.turnOver();
-			await player.draw(game.countPlayer());
-			let eff = 0;
+			await player.draw(num);
+			let eff = num > 4 ? 4 * (4 - num) : 0;
 			for (const current of game.players) {
 				eff += get.sgnAttitude(player, current) * (current.countCards("e") + 3 + current.isTurnedOver() ? 5 : -5);
 			}
