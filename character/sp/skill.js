@@ -1352,8 +1352,14 @@ const skills = {
 					if (!result || !result.bool) return;
 					let hs = result.moved[0].reverse();
 					game.addVideo("lose", player, [get.cardsInfo(hs), [], [], []]);
-					hs.forEach(i => i.goto(ui.special));
-					player.directgain(hs, false);
+					game.broadcastAll(
+						function (hs, player) {
+							hs.forEach(i => i.goto(ui.special));
+							player.directgain(cards, false);
+						},
+						hs,
+						player
+					);
 				},
 				ai: {
 					order: 10,

@@ -5919,7 +5919,7 @@ export class Player extends HTMLDivElement {
 			this.update();
 		}
 		if (broadcast !== false)
-			game.broadcastAll(
+			game.broadcast(
 				function (player, cards) {
 					player.directgain(cards);
 				},
@@ -5971,7 +5971,7 @@ export class Player extends HTMLDivElement {
 			this.update();
 		}
 		if (broadcast !== false)
-			game.broadcastAll(
+			game.broadcast(
 				function (player, cards, gaintag) {
 					player.directgains(cards, null, gaintag);
 				},
