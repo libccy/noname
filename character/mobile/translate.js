@@ -605,7 +605,7 @@ const translates = {
 	jiebing: "借兵",
 	jiebing_info: "锁定技。当你受到伤害后，你选择来源外的一名其他角色，随机获得其一张牌并展示。若此牌为装备牌，你使用之。",
 	hannan: "扞难",
-	hannan_info: "出牌阶段限一次。你可以与一名角色拼点，赢的角色对没赢的角色造成2点伤害。",
+	hannan_info: "出牌阶段限一次。你可以与一名角色拼点，赢的角色对没赢的角色造成1点伤害。",
 	xin_wuyi: "手杀界吴懿",
 	xin_wuyi_prefix: "手杀界",
 	sbbenxi: "奔袭",

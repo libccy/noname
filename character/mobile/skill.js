@@ -6564,7 +6564,7 @@ const skills = {
 				var players = [player, target];
 				if (result.bool) players.reverse();
 				players[1].line(players[0], "thunder");
-				players[0].damage(players[1], 2);
+				players[0].damage(players[1], 1);
 			}
 		},
 		ai: {
