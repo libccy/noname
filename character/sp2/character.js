@@ -50,7 +50,7 @@ const characters = {
 	re_dongcheng: ["male", "qun", 4, ["xuezhao"]],
 	tangji: ["female", "qun", 3, ["kangge", "jielie"], ["name:唐|null"]],
 	zhangheng: ["male", "qun", 8, ["dangzai", "liangjue"]],
-	duanwei: ["male", "qun", 4, ["langmie"]],
+	duanwei: ["male", "qun", 4, ["junklangmie"]],
 	re_niujin: ["male", "wei", 4, ["recuorui", "reliewei"]],
 	zhangmiao: ["male", "qun", 4, ["mouni", "zongfan"]],
 	liangxing: ["male", "qun", 4, ["lulve", "lxzhuixi"]],

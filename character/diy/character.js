@@ -91,7 +91,7 @@ const characters = {
 	junk_liubei: ["male", "shu", 4, ["junkrende", "jijiang"], ["zhu"]],
 	junk_huangyueying: ["female", "shu", 3, ["junkjizhi", "junkqicai"]],
 	junk_lidian: ["male", "wei", 3, ["xunxun", "junkwangxi"]],
-	junk_duanwei: ["male", "qun", 4, ["junklangmie"]],
+	junk_duanwei: ["male", "qun", 4, ["langmie"]],
 	junk_xuyou: ["male", "qun", 3, ["nzry_chenglve", "junkshicai", "nzry_cunmu"]],
 	junk_zhangjiao: ["male", "shen", 3, ["yizhao", "junksijun", "tianjie"], ["qun", "die:shen_zhangjiao"]],
 	junk_guanyu: ["male", "shu", 4, ["olsbfumeng", "olsbguidao"]],
