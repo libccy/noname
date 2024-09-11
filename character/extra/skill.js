@@ -7386,12 +7386,14 @@ const skills = {
 				var player = _status.event.player;
 				var result = trigger.judge(card) - trigger.judge(trigger.player.judging[0]);
 				var attitude = get.attitude(player, trigger.player);
+				let val = get.value(card);
+				if (get.subtype(card) == "equip2") val /= 2;
+				else val /= 4;
 				if (attitude == 0 || result == 0) return 0;
 				if (attitude > 0) {
-					return result - get.value(card) / 2;
-				} else {
-					return -result - get.value(card) / 2;
+					return result - val;
 				}
+				return -result - val;
 			};
 			"step 1";
 			if (result.bool) {

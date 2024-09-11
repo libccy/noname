@@ -11815,11 +11815,14 @@ const skills = {
 						}
 						return 0;
 					}
+					let val = get.value(card);
+					if (get.subtype(card) == "equip2") val /= 2;
+					else val /= 7;
+					if (attitude == 0 || result == 0) return 0;
 					if (attitude > 0) {
-						return result;
-					} else {
-						return -result;
+						return result - val;
 					}
+					return -result - val;
 				})
 				.set("judging", trigger.player.judging[0]);
 			"step 1";
@@ -13572,13 +13575,14 @@ const skills = {
 					var player = _status.event.player;
 					var judging = _status.event.judging;
 					var result = trigger.judge(card) - trigger.judge(judging);
-					var attitude = get.attitude(player, trigger.player);
+					var attitude = get.attitude(player, trigger.player);let val = get.value(card);
+					if (get.subtype(card) == "equip2") val /= 2;
+					else val /= 4;
 					if (attitude == 0 || result == 0) return 0;
 					if (attitude > 0) {
-						return result - get.value(card) / 2;
-					} else {
-						return -result - get.value(card) / 2;
+						return result - val;
 					}
+					return -result - val;
 				})
 				.set("judging", trigger.player.judging[0]);
 			"step 1";
