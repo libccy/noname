@@ -4053,6 +4053,7 @@ const skills = {
 		group: "jishi_draw",
 		subSkill: {
 			draw: {
+				audio: "jishi",
 				trigger: {
 					global: ["gainAfter", "cardsDiscardAfter"],
 				},

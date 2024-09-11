@@ -7923,6 +7923,7 @@ const skills = {
 				forced: true,
 				firstDo: true,
 				charlotte: true,
+				popup: false,
 				onremove: function (player) {
 					delete player.storage.sbliegong_block;
 					delete player.storage.sbliegong_blocker;
@@ -7951,6 +7952,8 @@ const skills = {
 					target: "useCardToTargeted",
 				},
 				forced: true,
+				locked: false,
+				popup: false,
 				filter: function (event, player, name) {
 					if (name != "useCard" && player == event.player) return false;
 					var suit = get.suit(event.card);

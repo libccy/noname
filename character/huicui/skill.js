@@ -10661,6 +10661,7 @@ const skills = {
 		group: "fuping_mark",
 		subSkill: {
 			mark: {
+				audio: "fuping",
 				trigger: { global: "useCardAfter" },
 				filter: function (event, player) {
 					return player != event.player && event.targets.includes(player) && player.hasEnabledSlot() && !player.getStorage("fuping").includes(event.card.name);
@@ -12573,6 +12574,7 @@ const skills = {
 		group: "fengxiang_draw",
 		subSkill: {
 			draw: {
+				audio: "fengxiang",
 				trigger: {
 					global: ["equipAfter", "addJudgeAfter", "loseAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 				},

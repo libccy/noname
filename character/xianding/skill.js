@@ -6064,7 +6064,7 @@ const skills = {
 				player.logSkill("dccaixia");
 				var num = result.index + 1;
 				player.draw(num);
-				player.addMark("dccaixia_clear", num);
+				player.addMark("dccaixia_clear", num, false);
 				player.addSkill("dccaixia_clear");
 			}
 		},
@@ -6085,7 +6085,7 @@ const skills = {
 				popup: false,
 				charlotte: true,
 				content: function () {
-					player.removeMark("dccaixia_clear", 1);
+					player.removeMark("dccaixia_clear", 1, false);
 				},
 				intro: {
 					name: "才瑕",

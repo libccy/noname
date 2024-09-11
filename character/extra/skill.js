@@ -164,8 +164,7 @@ const skills = {
 								game.resume();
 								_status.imchoosing = false;
 								resolve(event._result);
-							}
-							else if (event.control2) event.control2.open();
+							} else if (event.control2) event.control2.open();
 						}
 					});
 					list.push(num_px);
@@ -343,37 +342,42 @@ const skills = {
 			let result = await player
 				.chooseControlList(list)
 				.set("ai", function () {
-					let player = get.event("player"), damaged = player.getDamagedHp();
-					if (damaged) damaged += 0.6 * (player.countCards("hs", card => {
-						if (card.name == "sha" || !get.tag(card, "damage")) return 0;
-						let info = get.info(card);
-						if (!info || info.type != "trick") return false;
-						if (info.notarget) return false;
-						if (info.selectTarget != undefined) {
-							if (Array.isArray(info.selectTarget)) {
-								if (info.selectTarget[1] == -2) return 1;
-								if (info.selectTarget[1] == -1) {
-									let func = info.filterTarget;
-									if (typeof func != "function") func = () => true;
-									return game.countPlayer(cur => {
-										return func(card, player, cur);
-									});
+					let player = get.event("player"),
+						damaged = player.getDamagedHp();
+					if (damaged)
+						damaged +=
+							0.6 *
+							(player.countCards("hs", card => {
+								if (card.name == "sha" || !get.tag(card, "damage")) return 0;
+								let info = get.info(card);
+								if (!info || info.type != "trick") return false;
+								if (info.notarget) return false;
+								if (info.selectTarget != undefined) {
+									if (Array.isArray(info.selectTarget)) {
+										if (info.selectTarget[1] == -2) return 1;
+										if (info.selectTarget[1] == -1) {
+											let func = info.filterTarget;
+											if (typeof func != "function") func = () => true;
+											return game.countPlayer(cur => {
+												return func(card, player, cur);
+											});
+										}
+										return Math.max(1, info.selectTarget[0], info.selectTarget[1]);
+									} else {
+										if (info.selectTarget == -2) return 1;
+										if (info.selectTarget == -1) {
+											let func = info.filterTarget;
+											if (typeof func != "function") func = () => true;
+											return game.countPlayer(cur => {
+												return func(card, player, cur);
+											});
+										}
+										return Math.max(1, info.selectTarget);
+									}
 								}
-								return Math.max(1, info.selectTarget[0], info.selectTarget[1]);
-							} else {
-								if (info.selectTarget == -2) return 1;
-								if (info.selectTarget == -1) {
-									let func = info.filterTarget;
-									if (typeof func != "function") func = () => true;
-									return game.countPlayer(cur => {
-										return func(card, player, cur);
-									});
-								}
-								return Math.max(1, info.selectTarget);
-							}
-						}
-						return 1;
-					}) + Math.max(player.getCardUsable("sha"), player.countCards("hs", "sha")));
+								return 1;
+							}) +
+								Math.max(player.getCardUsable("sha"), player.countCards("hs", "sha")));
 					if (damaged > player.hp) return "选项二";
 					return "选项一";
 				})
@@ -420,7 +424,7 @@ const skills = {
 				forced: true,
 				charlotte: true,
 				content: async function (event, trigger, player) {
-					if(player.isDamaged()) player.recover(trigger.num);
+					if (player.isDamaged()) player.recover(trigger.num);
 					player.removeSkill(event.name);
 				},
 			},
@@ -738,7 +742,7 @@ const skills = {
 			},
 		},
 		ai: {
-			combo: "xinjilve"
+			combo: "xinjilve",
 		},
 	},
 	xinbaiyin: {
@@ -927,7 +931,7 @@ const skills = {
 			},
 		},
 		ai: {
-			notemp: true
+			notemp: true,
 		},
 	},
 	//十周年神华佗
@@ -3604,8 +3608,10 @@ const skills = {
 				},
 			},
 		},
+		mark: true,
 		intro: {
-			content: "发动次数上限+#",
+			markcount: (storage = 0) => storage + 1,
+			content: (storage = 0) => "当前最大发动次数：" + (storage + 1),
 		},
 	},
 	xunshi: {
@@ -5098,6 +5104,7 @@ const skills = {
 		},
 		subSkill: {
 			usea: {
+				audio: "scfuhai",
 				trigger: { player: "useCardAfter" },
 				forced: true,
 				filter(event, player) {
@@ -5121,6 +5128,7 @@ const skills = {
 				},
 			},
 			die: {
+				audio: "scfuhai",
 				trigger: { global: "die" },
 				forced: true,
 				filter(event, player) {
@@ -5217,7 +5225,7 @@ const skills = {
 		group: "tianzuo_remove",
 		subSkill: {
 			remove: {
-				audio: 2,
+				audio: "tianzuo",
 				trigger: { target: "useCardToBefore" },
 				forced: true,
 				priority: 15,
@@ -6467,7 +6475,7 @@ const skills = {
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
 		ai: {
-			notemp: true
+			notemp: true,
 		},
 	},
 	dengji: {
@@ -7788,7 +7796,7 @@ const skills = {
 		},
 		group: ["qixing2"],
 		ai: {
-			notemp: true
+			notemp: true,
 		},
 	},
 	qixing2: {
@@ -7886,7 +7894,7 @@ const skills = {
 			player.loseToDiscardpile(result.links);
 		},
 		ai: {
-			combo: "qixing"
+			combo: "qixing",
 		},
 	},
 	dawu2: {
@@ -7958,7 +7966,7 @@ const skills = {
 			player.loseToDiscardpile(result.links);
 		},
 		ai: {
-			combo: "qixing"
+			combo: "qixing",
 		},
 	},
 	kuangfeng2: {
@@ -9017,7 +9025,7 @@ const skills = {
 			}
 		},
 		ai: {
-			notemp: true
+			notemp: true,
 		},
 	},
 	nzry_dinghuo: {

@@ -11450,8 +11450,6 @@ const skills = {
 		trigger: { player: "useCardAfter" },
 		locked: false,
 		filter: function (event, player) {
-			var color = get.color(event.card);
-			if (color == "none") return false;
 			if (
 				!player.hasHistory("lose", function (evt) {
 					return evt.hs.length > 0 && evt.getParent() == event;
@@ -11462,9 +11460,7 @@ const skills = {
 			var history = game.getGlobalHistory("useCard");
 			var index = history.indexOf(event);
 			if (index < 1) return false;
-			var evt = history[index - 1],
-				color2 = get.color(evt.card);
-			return color != color2 && color2 != "none";
+			return get.color(event.card) != get.color(history[index - 1].card);
 		},
 		prompt2: event => "将" + get.translation(event.cards.filterInD("oe")) + "置于武将牌上",
 		check: function (event, player) {
@@ -11503,7 +11499,7 @@ const skills = {
 					var history = game.getGlobalHistory("useCard");
 					if (!history.length) return;
 					var evt = history[history.length - 1];
-					if (evt && evt.card && get.color(evt.card) != "none" && get.color(card) != "none" && get.color(evt.card) != get.color(card)) {
+					if (evt && evt.card && get.color(evt.card) != get.color(card)) {
 						return num + 4;
 					}
 				}
@@ -14144,6 +14140,7 @@ const skills = {
 			counter: {
 				trigger: { global: "damageBegin1" },
 				forced: true,
+				popup: false,
 				charlotte: true,
 				filter: function (event, player) {
 					var evt = event.getParent();

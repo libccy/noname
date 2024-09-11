@@ -1489,7 +1489,7 @@ const skills = {
 		},
 	},
 	new_juexiang: {
-		audio: "qingxian_jilie",
+		audio: "juexiang",
 		trigger: {
 			player: "die",
 		},
