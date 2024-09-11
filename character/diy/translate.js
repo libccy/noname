@@ -418,8 +418,6 @@ const translates = {
 	junkshicai_info: "当你使用牌结束完毕后，若此牌与你本回合使用的牌类型均不同，则你可以将此牌置于牌堆顶，然后摸一张牌。",
 	junk_zhangrang: "新杀张让",
 	junk_zhangrang_prefix: "新杀",
-	ol_guohuai: "OL郭淮",
-	ol_guohuai_prefix: "OL",
 	old_bulianshi: "RE步练师",
 	old_bulianshi_prefix: "RE",
 	ol_maliang: "OL马良",

@@ -3,7 +3,7 @@ const characters = {
 	guanzhang: ["male", "shu", 4, ["fuhun"], ["name:关|兴-张|苞"]],
 	wangyi: ["female", "wei", 3, ["zhenlie", "miji"]],
 	caozhang: ["male", "wei", 4, ["new_jiangchi"]],
-	guohuai: ["male", "wei", 4, ["rejingce"]],
+	guohuai: ["male", "wei", 3, ["rejingce"]],
 	zhangchunhua: ["female", "wei", 3, ["jueqing", "shangshi"]],
 	caozhi: ["male", "wei", 3, ["luoying", "jiushi"]],
 	caochong: ["male", "wei", 3, ["chengxiang", "renxin"]],
