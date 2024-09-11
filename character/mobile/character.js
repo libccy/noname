@@ -39,7 +39,7 @@ const characters = {
 	wangjun: ["male", "qun", 4, ["zhujian", "duansuo"], ["border:jin"]],
 	xin_zhuzhi: ["male", "wu", 4, ["sbanguo"]],
 	xin_wuyi: ["male", "shu", 4, ["sbbenxi"]],
-	yangfu: ["male", "wei", 4, ["jiebing", "hannan"]],
+	yangfu: ["male", "wei", 3, ["jiebing", "hannan"]],
 	sp_caosong: ["male", "wei", 3, ["yijin", "guanzong"]],
 	re_liru: ["male", "qun", 3, ["rejuece", "remieji", "xinfencheng"]],
 	re_dianwei: ["male", "wei", 4, ["reqiangxi"]],
