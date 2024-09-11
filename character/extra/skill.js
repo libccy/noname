@@ -6798,6 +6798,11 @@ const skills = {
 		trigger: {
 			player: "damageEnd",
 		},
+		filter(event, player) {
+			return game.hasPlayer(cur => {
+				return cur !== player && cur.countCards("hej") > 0;
+			});
+		},
 		check(event, player) {
 			if (player.isTurnedOver() || event.num > 1) return true;
 			var num = game.countPlayer(function (current) {
@@ -7663,6 +7668,11 @@ const skills = {
 	guixin: {
 		audio: 2,
 		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			return game.hasPlayer(cur => {
+				return cur !== player && cur.countCards("hej") > 0;
+			});
+		},
 		check(event, player) {
 			if (player.isTurnedOver() || event.num > 1) return true;
 			var num = game.countPlayer(function (current) {
