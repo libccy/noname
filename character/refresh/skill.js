@@ -13619,18 +13619,29 @@ const skills = {
 	refankui: {
 		audio: 2,
 		trigger: { player: "damageEnd" },
-		direct: true,
 		filter: function (event, player) {
 			return event.source && event.source.countGainableCards(player, event.source != player ? "he" : "e") && event.num > 0;
 		},
-		content: function () {
-			"step 0";
-			event.count = trigger.num;
-			"step 1";
-			event.count--;
-			player.gainPlayerCard(get.prompt("refankui", trigger.source), trigger.source, get.buttonValue, trigger.source != player ? "he" : "e").set("logSkill", [event.name, trigger.source]);
-			"step 2";
-			if (result.bool && event.count > 0 && trigger.source.countGainableCards(player, trigger.source != player ? "he" : "e") > 0 && player.hasSkill(event.name)) event.goto(1);
+		async cost(event, trigger, player) {
+			event.result = await player.choosePlayerCard(
+					get.prompt("refankui", trigger.source),
+					trigger.source,
+					trigger.source != player ? "he" : "e"
+				)
+				.set("ai", button => {
+					let val = get.buttonValue(button);
+					if (get.event("att") > 0) return 1 - val;
+					return val;
+				})
+				.set("att", get.attitude(player, trigger.source))
+				.forResult();
+		},
+		logTarget: "source",
+		getIndex(event, player) {
+			return event.num;
+		},
+		async content(event, trigger, player) {
+			await player.gain(event.cards, trigger.source, "giveAuto", "bySelf");
 		},
 		ai: {
 			maixie_defend: true,

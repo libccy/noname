@@ -6815,17 +6815,15 @@ const skills = {
 			});
 			return num >= 2;
 		},
-		content() {
-			"step 0";
-			var targets = game.filterPlayer();
+		getIndex(event, player) {
+			return event.num;
+		},
+		async content(event, trigger, player) {
+			let targets = game.filterPlayer();
 			targets.remove(player);
 			targets.sort(lib.sort.seat);
-			event.targets = targets;
-			event.count = trigger.num;
-			"step 1";
-			event.num = 0;
 			player.line(targets, "green");
-			player
+			const control = await player
 				.chooseControl("手牌区", "装备区", "判定区")
 				.set("ai", function () {
 					if (
@@ -6836,45 +6834,25 @@ const skills = {
 						return 2;
 					return Math.floor(Math.random() * 3);
 				})
-				.set("prompt", "请选择优先获得的区域");
-			"step 2";
-			event.range = {
+				.set("prompt", "请选择优先获得的区域")
+				.forResult();
+			const range = {
 				手牌区: ["h", "e", "j"],
 				装备区: ["e", "h", "j"],
 				判定区: ["j", "h", "e"],
-			}[result.control || "手牌区"];
-			"step 3";
-			if (num < event.targets.length) {
-				var target = event.targets[num];
-				var range = event.range;
+			}[control.control || "手牌区"];
+			while (targets.length > 0) {
+				const target = targets.shift();
 				for (var i = 0; i < range.length; i++) {
 					var cards = target.getCards(range[i]);
 					if (cards.length) {
 						var card = cards.randomGet();
-						player.gain(card, target, "giveAuto", "bySelf");
+						await player.gain(card, target, "giveAuto", "bySelf");
 						break;
 					}
 				}
-				event.num++;
 			}
-			"step 4";
-			if (num < event.targets.length) event.goto(3);
-			"step 5";
-			player.turnOver();
-			"step 6";
-			event.count--;
-			if (event.count && player.hasSkill("new_guixin")) {
-				player.chooseBool(get.prompt2("new_guixin")).ai = function () {
-					return lib.skill.new_guixin.check({ num: event.count }, player);
-				};
-			} else {
-				event.finish();
-			}
-			"step 7";
-			if (event.count && result.bool) {
-				player.logSkill("new_guixin");
-				event.goto(1);
-			}
+			await player.turnOver();
 		},
 		ai: {
 			maixie: true,
@@ -7687,22 +7665,14 @@ const skills = {
 			});
 			return num >= 2;
 		},
-		content() {
-			"step 0";
-			event.count = trigger.num;
-			"step 1";
-			var targets = game.filterPlayer(current => current != player).sortBySeat();
-			player.line(targets);
-			player.gainMultiple(targets, "hej");
-			"step 2";
-			player.turnOver();
-			"step 3";
-			event.count--;
-			if (event.count && player.hasSkill("guixin")) {
-				player.chooseBool(get.prompt2("guixin"));
-			} else event.finish();
-			"step 4";
-			if (event.count && result.bool) event.goto(1);
+		getIndex(event, player) {
+			return event.num;
+		},
+		async content(event, trigger, player) {
+			let targets = game.filterPlayer(current => current != player).sortBySeat();
+			player.line(targets, "green");
+			await player.gainMultiple(targets, "hej");
+			await player.turnOver();
 		},
 		ai: {
 			maixie: true,
