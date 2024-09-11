@@ -115,7 +115,7 @@ const characters = {
 	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"], ["name:null|null"]],
 	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"], ["die:zhaoyun"]],
 	liuxie: ["male", "qun", 3, ["tianming", "mizhao", "twzhuiting"], ["zhu"]],
-	zhugejin: ["male", "wu", 3, ["olhuanshi", "olhongyuan", "olmingzhe"], ["name:诸葛|瑾"]],
+	zhugejin: ["male", "wu", 3, ["huanshi", "olhongyuan", "olmingzhe"], ["name:诸葛|瑾"]],
 	zhugeke: ["male", "wu", 3, ["aocai", "duwu"], ["name:诸葛|恪"]],
 	guanyinping: ["female", "shu", 3, ["huxiao", "xueji", "wuji"]],
 	simalang: ["male", "wei", 3, ["junbing", "quji"], ["name:司马|朗"]],

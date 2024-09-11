@@ -647,6 +647,9 @@ const skills = {
 		locked: false,
 		audio: 2,
 		audioname: ["sb_zhenji"],
+		audioname2: {
+			re_zhenji: "reqingguo",
+		},
 		enable: ["chooseToRespond", "chooseToUse"],
 		filterCard(card) {
 			return get.color(card) == "black";
