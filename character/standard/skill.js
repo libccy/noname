@@ -266,13 +266,14 @@ const skills = {
 					const player = _status.event.player;
 					const judging = _status.event.judging;
 					const result = trigger.judge(card) - trigger.judge(judging);
-					const attitude = get.attitude(player, trigger.player);
+					const attitude = get.attitude(player, trigger.player);let val = get.value(card);
+					if (get.subtype(card) == "equip2") val /= 2;
+					else val /= 4;
 					if (attitude == 0 || result == 0) return 0;
 					if (attitude > 0) {
-						return result - get.value(card) / 2;
-					} else {
-						return -result - get.value(card) / 2;
+						return result - val;
 					}
+					return -result - val;
 				})
 				.set("judging", trigger.player.judging[0])
 				.setHiddenSkill("guicai");
