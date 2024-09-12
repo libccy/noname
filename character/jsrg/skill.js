@@ -5159,8 +5159,9 @@ const skills = {
 					for (var card of trigger.cards) {
 						var cardx = cards.find(cardx => cardx.cardid == card._cardid);
 						if (cardx) cards2.push(cardx);
+						else cards2.push(card);
 					}
-					var cards3 = trigger.cards.slice();
+					var cards3 = trigger.cards.slice().filter(card => card.hasGaintag("jsrgmanjuan"));
 					trigger.cards = cards2;
 					trigger.card.cards = cards2;
 					if (player.isOnline2()) {
@@ -9584,24 +9585,7 @@ const skills = {
 				if (get.type(card) === "basic") return num + 10;
 			},
 			aiValue(player, card, num) {
-				if (card.name === "zhangba") {
-					let fact = n => {
-							if (n > 1) return n * fact(n - 1);
-							return 1;
-						},
-						basic = 0;
-					return fact(
-						Math.min(
-							player.countCards("hs", i => {
-								if (get.tag(i, "multitarget")) return 2;
-								if (!["shan", "tao", "jiu"].includes(card.name)) return 1;
-								basic++;
-							}) /
-								(1 + basic),
-							player.getCardUsable("sha")
-						)
-					);
-				}
+				if (card.name === "zhangba") return 114514;
 				if (["shan", "tao", "jiu"].includes(card.name)) {
 					if (player.getEquip("zhangba") && player.countCards("hs") > 1) return 0.01;
 					return num / 2;
@@ -9609,6 +9593,7 @@ const skills = {
 				if (get.tag(card, "multitarget")) return num + game.players.length;
 			},
 			aiUseful(player, card, num) {
+				if (card.name === "zhangba") return 114514;
 				if (get.name(card, player) === "shan") {
 					if (
 						player.countCards("hs", i => {
@@ -9748,21 +9733,26 @@ const skills = {
 		audio: 4,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
+			let bool = function (target) {
+				if (game.hasPlayer(current => current.getSeatNum() > 0)) return target.getSeatNum() == 1;
+				return target == _status.roundStart;
+			};
 			return game
 				.filterPlayer(target => {
 					switch (get.mode()) {
 						case "identity":
 							return target.isZhu;
 						case "guozhan":
-							get.is.jun(target);
+							return get.is.jun(target);
 						case "versus": {
 							if (["three", "four", "guandu"].includes(_status.mode)) return target.identity == "zhu";
+							return bool(target);
 						}
 						case "doudizhu":
 						case "boss":
 							return target.identity == "zhu";
 						default:
-							return true;
+							return bool(target);
 					}
 				})
 				.includes(event.player);

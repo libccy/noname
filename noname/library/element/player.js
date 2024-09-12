@@ -5863,7 +5863,7 @@ export class Player extends HTMLDivElement {
 	}
 	directequip(cards) {
 		for (var i = 0; i < cards.length; i++) {
-			this.addVirtualEquip(cards[i]);
+			this.addVirtualEquip(cards[i], cards[i].cards);
 		}
 		if (!_status.video) {
 			game.addVideo("directequip", this, get.cardsInfo(cards));

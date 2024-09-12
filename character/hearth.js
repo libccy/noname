@@ -882,7 +882,7 @@ game.import("character", function () {
 							return event.player != player;
 						},
 						content() {
-							player.insertPhase(null, true);
+							player.insertPhase();
 						},
 					},
 				},

@@ -813,7 +813,7 @@ const skills = {
 					eff += get.effect(event.targets[i], event.card, event.player, player);
 				}
 			}
-			return eff <= 0;
+			return eff < 0;
 		},
 		logTarget: "player",
 		async content(event, trigger, player) {
@@ -6952,19 +6952,18 @@ const skills = {
 			expose: 0.05,
 			result: {
 				target: function (player, target) {
-					var att = get.attitude(player, target);
-					var targets = game.filterPlayer(i => i != player);
+					let targets = game.filterPlayer(i => i != player);
 					targets.sortBySeat(player);
-					var targets2 = targets.reverse();
-					var sum = 0;
-					var maxSum = -Infinity,
+					let targets2 = targets.slice(0).reverse();
+					let sum = 0;
+					let maxSum = -Infinity,
 						maxIndex = -1;
-					var maxSum2 = -Infinity,
+					let maxSum2 = -Infinity,
 						maxIndex2 = -1;
-					for (var i = 0; i < targets.length; i++) {
-						var current = targets[i];
-						var att = -get.attitude(player, current) - 0.1;
-						var val = Math.sqrt(i + 1) * att;
+					for (let i = 0; i < targets.length; i++) {
+						let current = targets[i];
+						let att = -get.attitude(player, current) - 0.1;
+						let val = Math.sqrt(i + 1) * att;
 						val /= 0.01 + Math.max(3, current.countCards("h") / 2);
 						sum += val;
 						if (sum > maxSum) {
@@ -6972,11 +6971,11 @@ const skills = {
 							maxIndex = i;
 						}
 					}
-					var sum = 0;
-					for (var i = 0; i < targets2.length; i++) {
-						var current = targets[i];
-						var att = -get.attitude(player, current) - 0.1;
-						var val = Math.sqrt(i + 1) * att;
+					sum = 0;
+					for (let i = 0; i < targets2.length; i++) {
+						let current = targets[i];
+						let att = -get.attitude(player, current) - 0.1;
+						let val = Math.sqrt(i + 1) * att;
 						val /= 0.01 + Math.max(3, current.countCards("h") / 2);
 						sum += val;
 						if (sum > maxSum2) {

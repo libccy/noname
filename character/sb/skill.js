@@ -4010,9 +4010,7 @@ const skills = {
 				temp;
 			for (let i of game.players) {
 				if (player === i) continue;
-				let vplayer = ui.create.player(i);
-				temp = get.effect(i, new lib.element.VCard({ name: "juedou", isCard: true }), vplayer, i);
-				vplayer.remove();
+				temp = get.effect(i, new lib.element.VCard({ name: "juedou", isCard: true }), i, i);
 				if (temp) {
 					let att = get.attitude(event.player, i);
 					if ((!att && sbbiyue) || att * temp > 0) targets.push([i, temp, att]);

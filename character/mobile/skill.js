@@ -1800,14 +1800,30 @@ const skills = {
 				event.target = target;
 				player.logSkill("mbcmqingzheng", target);
 				player.discard(cards);
-				var list = [];
-				var dialog = ["清正：弃置" + get.translation(target) + "一种花色的所有牌"];
-				for (var suit of lib.suit.concat("none")) {
-					if (target.countCards("h", { suit: suit })) {
-						dialog.push('<div class="text center">' + get.translation(suit + "2") + "牌</div>");
-						dialog.push(target.getCards("h", { suit: suit }));
-						list.push(suit);
-					}
+				var list = lib.suit
+					.slice()
+					.reverse()
+					.concat("none")
+					.filter(i => target.hasCard({ suit: i }, "h"));
+				var dialog = ui.create.dialog("清正：弃置" + get.translation(target) + "一种花色的所有牌");
+				dialog.addNewRow(
+					{ item: get.translation('heart'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'heart' }), ratio: 3 },
+					{ item: get.translation('diamond'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'diamond' }), ratio: 3 },
+				);
+				dialog.addNewRow(
+					{ item: get.translation('spade'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'spade' }), ratio: 3 },
+					{ item: get.translation('club'), retio: 1 },
+					{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
+				);
+				if (list.includes("none")) {
+					dialog.classList.add("fullheight");
+					dialog.addNewRow(
+						{ item: get.translation('none'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
+					);
 				}
 				if (list.length) {
 					player
@@ -9775,8 +9791,15 @@ const skills = {
 				return num + player.getExpansions("quanji").length;
 			},
 			aiOrder(player, card, num) {
-				if (num <= 0 || typeof card !== "object" || !player.isPhaseUsing() || !player.hasSkill("zili") || player.needsToDiscard()) return num;
-				if (player.getExpansions("quanji").length < 3 && player.getUseValue(card) < Math.min(4, (player.hp * player.hp) / 4)) return 0;
+				if (num <= 0 || typeof card !== "object" || !player.isPhaseUsing()) return num;
+				if (player.countCards("h") > (player.hp + 1)) return num;
+				if (!player.hasSkill("zili") || player.hasSkill("paiyi")) return num;
+				if (player.getExpansions("quanji").length < 3) {
+					if (get.type(card) == "equip" && !["equip2", "equip3"].includes(get.subtype(card))) return 0;
+					let eff = 6 + player.hp;
+					if (!get.tag(card, "gain") && !get.tag(card, "draw")) eff += 3;
+					if (player.getUseValue(card) < eff) return 0;
+				}
 			},
 		},
 		onremove: function (player, skill) {
@@ -14458,15 +14481,13 @@ const skills = {
 	rangjie: {
 		audio: 2,
 		trigger: { player: "damageEnd" },
-		direct: true,
-		content: function () {
-			"step 0";
-			event.count = trigger.num;
-			"step 1";
-			event.count--;
-			var choiceList = ["获得一张指定类型的牌"];
+		getIndex(event) {
+			return event.num;
+		},
+		async cost(event, trigger, player) {
+			let choiceList = ["获得一张指定类型的牌"];
 			if (player.canMoveCard()) choiceList.push("移动场上的一张牌");
-			player
+			const result = await player
 				.chooseControl("cancel2")
 				.set("choiceList", choiceList)
 				.set("prompt", get.prompt("rangjie"))
@@ -14474,34 +14495,33 @@ const skills = {
 					var player = _status.event.player;
 					if (player.canMoveCard(true)) return 1;
 					return 0;
+				})
+				.forResult();
+			event.result = {
+				bool: result.control != "cancel2",
+				cost_data: result.index,
+			};
+		},
+		async content(event, trigger, player) {
+			if (event.cost_data) {
+				player.moveCard(true);
+			} else {
+				const result = await player
+					.chooseControl("basic", "trick", "equip")
+					.set("prompt", "选择获得一种类型的牌")
+					.set("ai", function () {
+						var player = _status.event.player;
+						if (player.hp <= 3 && !player.countCards("h", { name: ["shan", "tao"] })) return "basic";
+						if (player.countCards("he", { type: "equip" }) < 2) return "equip";
+						return "trick";
+					})
+					.forResult();
+				const card = get.cardPile(function (card) {
+					return get.type(card, "trick") == result.control;
 				});
-			"step 2";
-			if (result.control == "cancel2") event.finish();
-			else {
-				player.logSkill("rangjie");
-				player.draw();
-				if (result.index == 0) {
-					player
-						.chooseControl("basic", "trick", "equip")
-						.set("prompt", "选择获得一种类型的牌")
-						.set("ai", function () {
-							var player = _status.event.player;
-							if (player.hp <= 3 && !player.countCards("h", { name: ["shan", "tao"] })) return "basic";
-							if (player.countCards("he", { type: "equip" }) < 2) return "equip";
-							return "trick";
-						});
-				} else {
-					player.moveCard(true);
-					event.goto(4);
-				}
+				if (card) await player.gain(card, "gain2", "log");
 			}
-			"step 3";
-			var card = get.cardPile(function (card) {
-				return get.type(card, "trick") == result.control;
-			});
-			if (card) player.gain(card, "gain2", "log");
-			"step 4";
-			if (event.count > 0 && player.hasSkill("rangjie")) event.goto(1);
+			await player.draw();
 		},
 		ai: {
 			maixie: true,
