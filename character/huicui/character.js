@@ -17,7 +17,7 @@ const characters = {
 	kuaiqi: ["male", "wei", 3, ["dcliangxiu", "dcxunjie"]],
 	yue_caiyong: ["male", "qun", 3, ["dcjiaowei", "dcfeibai"]],
 	pangshanmin: ["male", "wei", 3, ["dccaisi", "dczhuoli"]],
-	dc_jiachong: ["male", "wei", 3, ["dcbeini", "dcshizong"]],
+	dc_jiachong: ["male", "wei", 3, ["dcbeini", "dcshizong"], ["border:jin"]],
 	dc_sunchen: ["male", "wu", 4, ["dczigu", "dczuowei"]],
 	dc_zhangmancheng: ["male", "qun", 4, ["dclvecheng", "dczhongji"]],
 	yue_zhoufei: ["female", "wu", 3, ["dclingkong", "dcxianshu"], ["name:周|null"]],
