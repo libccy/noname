@@ -4568,7 +4568,7 @@ const skills = {
 				target: (card, player, target) => {
 					if (!get.tag(card, "damage")) return;
 					if (target.hp + target.hujia < 2 || player.hasSkillTag("jueqing", false, target)) return 1.8;
-					if (target.countMark("xindanxin") > 1) return [1, 1];
+					if (!target.hasSkill("jiaozhao") || target.countMark("xindanxin") > 1) return [1, 1];
 					return [1, 0.8 * target.hp - 0.5];
 				},
 			},
