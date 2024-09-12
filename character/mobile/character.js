@@ -1,7 +1,7 @@
 const characters = {
 	mb_sp_zhenji: ["female", "qun", 3, ["mbbojian", "mbjiwei"]],
 	mb_zhangfen: ["male", "wu", 4, ["mbquchong", "mbxunjie"]],
-	mb_jiachong: ["male", "qun", 3, ["mbbeini", "mbdingfa"], ["character:jiachong", "die:jiachong"]],
+	mb_jiachong: ["male", "qun", 3, ["mbbeini", "mbdingfa"], ["die:jiachong"]],
 	mb_simazhou: ["male", "wei", 4, ["mbbifeng", "mbsuwang"], ["name:司马|伷"]],
 	mb_wenqin: ["male", "wei", 4, ["mbbeiming", "mbchoumang"]],
 	mb_simafu: ["male", "wei", 3, ["mbpanxiang", "mbchenjie"], ["name:司马|孚"]],
