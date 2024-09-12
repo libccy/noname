@@ -24,8 +24,10 @@ const skills = {
 			},
 			check(button) {
 				const player = get.player();
-				if (player.countCards("he") && button.link == "draw") return 0;
-				return 2;
+				if (button.link == "discard") return 2;
+				let bool = card => get.type(card) == "trick" && get.tag(card, "damage");
+				if (player.countCards("h", "sha") > 1 && player.countCards("h", bool) > 1) return 1;
+				return 3;
 			},
 			backup(links) {
 				return get.copy(lib.skill["olrenxia_" + links[0]]);
@@ -81,7 +83,7 @@ const skills = {
 			},
 		},
 		ai: {
-			order: 2,
+			order: 1,
 			result: {
 				player: 1,
 			},
@@ -32037,24 +32039,7 @@ const skills = {
 				if (get.type(card) === "basic") return num + 10;
 			},
 			aiValue(player, card, num) {
-				if (card.name === "zhangba") {
-					let fact = n => {
-							if (n > 1) return n * fact(n - 1);
-							return 1;
-						},
-						basic = 0;
-					return fact(
-						Math.min(
-							player.countCards("hs", i => {
-								if (get.tag(i, "multitarget")) return 2;
-								if (!["shan", "tao", "jiu"].includes(card.name)) return 1;
-								basic++;
-							}) /
-								(1 + basic),
-							player.getCardUsable("sha")
-						)
-					);
-				}
+				if (card.name === "zhangba") return 114514;
 				if (["shan", "tao", "jiu"].includes(card.name)) {
 					if (player.getEquip("zhangba") && player.countCards("hs") > 1) return 0.01;
 					return num / 2;
@@ -32062,6 +32047,7 @@ const skills = {
 				if (get.tag(card, "multitarget")) return num + game.players.length;
 			},
 			aiUseful(player, card, num) {
+				if (card.name === "zhangba") return 114514;
 				if (get.name(card, player) === "shan") {
 					if (
 						player.countCards("hs", i => {
@@ -32176,7 +32162,9 @@ const skills = {
 		ai: {
 			result: {
 				target(player, target) {
+					if (player.countCards("hes", "zhangba")) return player.countCards("h", {type: "basic"});
 					let res = lib.card.lebu.ai.result.target(player, target);
+					if (player.countCards("hs", "sha") >= player.hp) res++;
 					if (target.isDamaged()) return res + 2 * Math.abs(get.recoverEffect(target, player, target));
 					return res;
 				},
