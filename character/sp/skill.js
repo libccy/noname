@@ -3448,7 +3448,7 @@ const skills = {
 			);
 		},
 		direct: true,
-		//limited:true,
+		limited:true,
 		//skillAnimation:true,
 		//animationColor:'orange',
 		content: function () {
@@ -3478,7 +3478,7 @@ const skills = {
 				.set("logSkill", "olfeiyang");
 			"step 1";
 			if (result.bool) {
-				//player.awakenSkill('olfeiyang');
+				player.awakenSkill('olfeiyang');
 				player.discardPlayerCard(player, "j", true);
 			}
 		},

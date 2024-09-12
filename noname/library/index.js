@@ -6047,7 +6047,7 @@ export class Library {
 					name: "四号位获得【飞扬】",
 					init: true,
 					frequent: true,
-					intro: "最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）",
+					intro: "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
 				},
 				connect_choice_num: {
 					name: "侯选武将数",
@@ -6325,7 +6325,7 @@ export class Library {
 					name: "四号位获得【飞扬】",
 					init: true,
 					frequent: true,
-					intro: "最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）",
+					intro: "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
 				},
 				replace_character_two: {
 					name: "替补模式",
