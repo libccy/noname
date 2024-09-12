@@ -9733,21 +9733,26 @@ const skills = {
 		audio: 4,
 		trigger: { global: "phaseEnd" },
 		filter: function (event, player) {
+			let bool = function (target) {
+				if (game.hasPlayer(current => current.getSeatNum() > 0)) return target.getSeatNum() == 1;
+				return target == _status.roundStart;
+			};
 			return game
 				.filterPlayer(target => {
 					switch (get.mode()) {
 						case "identity":
 							return target.isZhu;
 						case "guozhan":
-							get.is.jun(target);
+							return get.is.jun(target);
 						case "versus": {
 							if (["three", "four", "guandu"].includes(_status.mode)) return target.identity == "zhu";
+							return bool(target);
 						}
 						case "doudizhu":
 						case "boss":
 							return target.identity == "zhu";
 						default:
-							return true;
+							return bool(target);
 					}
 				})
 				.includes(event.player);
