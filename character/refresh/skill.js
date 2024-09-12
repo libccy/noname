@@ -8007,7 +8007,7 @@ const skills = {
 				.chooseTarget(get.prompt2("decadexuanfeng"), (card, player, target) => {
 					if (player == target) return false;
 					return target.countDiscardableCards(player, "he");
-				})
+				}, [1, 2])
 				.set("ai", target => {
 					let player = get.event("player"),
 						att = get.attitude(player, target),
