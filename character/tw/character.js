@@ -118,7 +118,7 @@ const characters = {
 	yuejiu: ["male", "qun", 4, ["cuijin"]],
 	wuban: ["male", "shu", 4, ["jintao"], ["clan:陈留吴氏"]],
 	duosidawang: ["male", "qun", "4/5", ["equan", "manji"], ["name:null|null"]],
-	jiachong: ["male", "qun", 3, ["beini", "dingfa"]],
+	jiachong: ["male", "qun", 3, ["beini", "dingfa"], ["border:jin"]],
 	tw_dongzhao: ["male", "wei", 3, ["twmiaolve", "twyingjia"]],
 	tw_gexuan: ["male", "qun", 3, ["twdanfa", "twlingbao", "twsidao"]],
 	tw_beimihu: ["female", "qun", 3, ["zongkui", "guju", "baijia", "bingzhao"], ["zhu", "name:卑弥|呼"]],

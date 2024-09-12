@@ -7056,20 +7056,28 @@ const skills = {
 			var cards = player.getExpansions(skill);
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
+		mark: true,
 		marktext: "经",
 		intro: {
 			name: "六经",
 			markcount: "expansion",
 			content: "expansion",
-			mark: function (dialog, storage, player) {
+			mark(dialog, storage, player) {
+				let list1 = [],
+					list2 = [];
 				var list = ["《诗经》", "《尚书》", "《仪礼》", "《易经》", "《乐经》", "《春秋》"];
 				var desc = ["伤害类锦囊牌", "基本牌", "无懈可击", "无中生有", "乐不思蜀", "装备牌"];
+				const addNewRow = lib.element.dialog.addNewRow.bind(dialog);
+				dialog.css({ width: "60%" });
 				for (var i = 0; i < 6; i++) {
-					dialog.addText(list[i]);
 					var card = lib.skill.chengye.getLiujing(player, i);
-					if (!card) dialog.addText("（缺少 " + desc[i] + "）");
-					else dialog.addSmall([card]);
+					(i <= 2 ? list1 : list2).addArray([
+						{ item: list[i] + '<div class="text center">' + desc[i] + "</div>", ratio: 6 },
+						{ item: card ? [card] : [], ratio: 6 },
+					]);
 				}
+				addNewRow(...list1);
+				addNewRow(...list2);
 			},
 		},
 		group: "chengye_gain",
