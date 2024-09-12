@@ -15658,7 +15658,7 @@ const skills = {
 				game.loseAsync({
 					gain_list: list,
 					giver: player,
-					animate: "gain2",
+					animate: "draw",
 				}).setContent("gaincardMultiple");
 			}
 		},
