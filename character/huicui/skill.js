@@ -2270,7 +2270,7 @@ const skills = {
 			const {
 				result: { bool },
 			} = await target
-				.chooseToDiscard("名士：弃置一张手牌，或防止对" + get.translation(player) + "造成的伤害")
+				.chooseToDiscard("名士：弃置一张手牌，或令对" + get.translation(player) + "造成的伤害-1")
 				.set("ai", card => {
 					if (get.event("goon")) return 0;
 					return 6 - get.value(card);
@@ -2569,7 +2569,7 @@ const skills = {
 				game.filterPlayer(i => i != target),
 				target,
 				"canReplace"
-			);
+			).set("nojudge", true);
 			const leaveSomeone = inRangeList.some(current => !current.inRange(target));
 			if (leaveSomeone) player.draw();
 		},
