@@ -4469,7 +4469,7 @@ const skills = {
 				target: (card, player, target) => {
 					if (!get.tag(card, "damage")) return;
 					if (target.hp + target.hujia < 2 || player.hasSkillTag("jueqing", false, target)) return 2;
-					if (target.countMark("redanxin") > 1) return [1, 1];
+					if (!target.hasSkill("rejiaozhao") || target.countMark("redanxin") > 1) return [1, 1];
 					return [1, 0.8 * target.hp - 0.4];
 				},
 			},
@@ -7955,11 +7955,40 @@ const skills = {
 	decadexuanfeng: {
 		audio: "xuanfeng",
 		audioname: ["boss_lvbu3", "re_heqi", "xin_lingtong"],
+		mod: {
+			aiOrder(player, card, num) {
+				if (
+					num <= 0 ||
+					!player.isPhaseUsing() ||
+					player.needsToDiscard() !== 2 ||
+					!card.cards ||
+					!card.cards.some(i => {
+						return get.position(i) === "h";
+					}) ||
+					get.tag(card, "draw") ||
+					get.tag(card, "gain")
+				) return;
+				if (
+					get.type(card) == "equip" &&
+					player.hasCard(cardx => (
+						card != cardx &&
+						(!card.cards || !card.cards.includes(cardx)) &&
+						(player.hasSkill("yongjin") || get.subtype(card) == get.subtype(cardx)) &&
+						(get.position(cardx) == "e" || player.canUse(cardx, player))
+					), "hes")
+				) return;
+				if (!game.hasPlayer(current => (
+					get.attitude(player, current) < 0 &&
+					current.countDiscardableCards(player, "he") > 0 &&
+					get.damageEffect(current, player, player) > 0
+				))) return;
+				return 0;
+			}
+		},
 		trigger: {
 			player: ["loseAfter", "phaseDiscardEnd"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
 		},
-		direct: true,
 		filter: function (event, player) {
 			if (_status.dying.length) return false;
 			if (event.name == "phaseDiscard") {
@@ -7973,80 +8002,63 @@ const skills = {
 				return evt && evt.es && evt.es.length > 0;
 			}
 		},
-		content: function () {
-			"step 0";
-			event.count = 2;
-			event.targets = [];
-			event.logged = false;
-			"step 1";
-			event.count--;
-			player
-				.chooseTarget(get.prompt("decadexuanfeng"), "弃置一名其他角色的一张牌", function (card, player, target) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2("decadexuanfeng"), (card, player, target) => {
 					if (player == target) return false;
 					return target.countDiscardableCards(player, "he");
 				})
-				.set("ai", function (target) {
-					return -get.attitude(_status.event.player, target);
-				});
-			"step 2";
-			if (result.bool) {
-				if (!event.logged) {
-					player.logSkill("decadexuanfeng", result.targets);
-					event.logged = true;
-				} else player.line(result.targets[0], "green");
-				targets.add(result.targets[0]);
-				player.discardPlayerCard(result.targets[0], "he", true);
-			} else if (!targets.length) event.finish();
-			"step 3";
-			if (event.count) event.goto(1);
-			else if (player == _status.currentPhase) {
-				player
-					.chooseTarget("是否对一名目标角色造成1点伤害", function (card, player, target) {
-						return _status.event.targets.includes(target);
-					})
-					.set("targets", targets)
-					.set("ai", function (target) {
-						var player = _status.event.player;
-						return get.damageEffect(target, player, player);
-					});
-			} else event.finish();
-			"step 4";
+				.set("ai", target => {
+					let player = get.event("player"),
+						att = get.attitude(player, target),
+						hs = target.countCards("h"),
+						es = target.countCards("e");
+					if (
+						hs && target.hasSkillTag("noh") ||
+						es && target.hasSkillTag("noe")
+					) att *= 0.8;
+					else att = -att;
+					if (ui.selected.targets.length) {
+						let pre = ui.selected.targets[0], damage = get.event("damage");
+						if (
+							get.attitude(player, pre) < 0 &&
+							(damage ? get.damageEffect(pre, player, player) > 0 : true) &&
+							pre.countCards("he") >= 2
+						) return 0;
+						if (damage) return att + get.damageEffect(target, player, player);
+					}
+					return att;
+				})
+				.set("damage", player == _status.currentPhase)
+				.set("complexTarget", true)
+				.forResult();
+		},
+		locked: false,
+		async content(event, trigger, player) {
+			const targets = event.targets;
+			let num = 2 / targets.length;
+			for (const target of targets) {
+				if (get.mode() !== "identity" || player.identity !== "nei") player.addExpose(0.2);
+				await player.discardPlayerCard(target, "he", num, true);
+			}
+			if (player !== _status.currentPhase) return;
+			const result = await player
+				.chooseTarget("是否对一名目标角色造成1点伤害？", (card, player, target) => {
+					return _status.event.targets.includes(target);
+				})
+				.set("targets", targets)
+				.set("ai", target => {
+					const player = get.event("player");
+					return get.damageEffect(target, player, player);
+				})
+				.forResult();
 			if (result.bool) {
 				player.line(result.targets[0], "thunder");
-				result.targets[0].damage();
+				await result.targets[0].damage();
 			}
 		},
 		ai: {
 			effect: {
-				player: function (card, player, target) {
-					if (
-						player == target &&
-						get.type(card) == "equip" &&
-						player.countCards("hes", function (cardx) {
-							return card != cardx && (!card.cards || !card.cards.includes(cardx)) && (player.hasSkill("yongjin") || get.subtype(card) == get.subtype(cardx)) && (get.position(cardx) == "e" || player.canUse(cardx, player));
-						}) > 0
-					)
-						return;
-					if (
-						!game.hasPlayer(function (current) {
-							return get.attitude(player, current) < 0 && current.countDiscardableCards(player, "he") > 0 && get.damageEffect(current, player, player) > 0;
-						})
-					)
-						return;
-					if (
-						typeof card == "object" &&
-						player.isPhaseUsing() &&
-						player.needsToDiscard() == 2 &&
-						card.cards &&
-						card.cards.filter(function (i) {
-							return get.position(i) == "h";
-						}).length > 0 &&
-						!get.tag(card, "draw") &&
-						!get.tag(card, "gain") &&
-						!(get.tag(card, "discard") && target == player && player.countCards("e") > 0)
-					)
-						return "zeroplayertarget";
-				},
 				target: function (card, player, target, current) {
 					if (get.type(card) == "equip" && !get.cardtag(card, "gifts")) return [1, 3];
 					if (get.tag(card, "damage") && target.hp > 2) {
@@ -8056,12 +8068,19 @@ const skills = {
 						if (num1 == num2) return [1.1, _status.event.player == target ? 3 : 0.5];
 						if (num1 == num2 - 1) return [0.1, _status.event.player == target ? 4.5 : 0.1];
 					}
-					if (typeof card == "object" && (card.name == "shunshou" || card.name == "guohe" || card.name == "zhujinqiyuan") && target.countCards("h") > 0 && get.attitude(player, target) < 0) return [1, -1];
+					if (typeof card !== "object") return;
+					if (
+						(get.tag(card, "discard") || get.tag(card, "loseCard")) &&
+						target.countCards("h") > 0 &&
+						get.attitude(player, target) < 0
+					) return [1, -1];
 				},
 			},
 			reverseEquip: true,
 			noe: true,
-			expose: 0.2,
+			threaten(player, target) {
+				return target.countCards("e") + target.countCards("h") / 3;
+			}
 		},
 	},
 	oltuntian: {

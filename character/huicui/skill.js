@@ -2270,13 +2270,13 @@ const skills = {
 			const {
 				result: { bool },
 			} = await target
-				.chooseToDiscard("名士：弃置一张手牌，或防止对" + get.translation(player) + "造成的伤害")
+				.chooseToDiscard("名士：弃置一张手牌，或令对" + get.translation(player) + "造成的伤害-1")
 				.set("ai", card => {
 					if (get.event("goon")) return 0;
 					return 6 - get.value(card);
 				})
 				.set("goon", get.damageEffect(player, target, target) <= 0);
-			if (!bool) trigger.cancel();
+			if (!bool) trigger.num--;
 		},
 		ai: {
 			effect: {
@@ -2569,7 +2569,7 @@ const skills = {
 				game.filterPlayer(i => i != target),
 				target,
 				"canReplace"
-			);
+			).set("nojudge", true);
 			const leaveSomeone = inRangeList.some(current => !current.inRange(target));
 			if (leaveSomeone) player.draw();
 		},
@@ -11627,7 +11627,8 @@ const skills = {
 		},
 		logTarget: "source",
 		check: function (event, player) {
-			return get.attitude(player, event.source) < 0;
+			if (get.attitude(player, event.source) <= 0) return true;
+			return event.source.countCards("h") < Math.sqrt(event.source.getHp());
 		},
 		content: function () {
 			"step 0";
@@ -11641,9 +11642,20 @@ const skills = {
 				target
 					.chooseControl()
 					.set("choiceList", list)
-					.set("ai", function () {
-						return get.rand(0, 2);
-					});
+					.set("ai", () => get.event("idx"))
+					.set("idx", function () {
+						let att = get.sgn(get.attitude(target, player)),
+							use = 2 * att,
+							suits = {};
+						target.countCards("h", i => {
+							let suit = get.suit(i, target), val = target.getUseValue(i, null, true);
+							if (suits[suit]) suits[suit]++;
+							else suits[suit] = 1;
+							if (val > 1) use -= Math.sqrt(Math.abs(val));
+						});
+						const res = [use, (att - 1) * Math.min(...Object.values(suits)), -event.num];
+						return res.indexOf(Math.max(...res));
+					}());
 			} else event._result = { index: 0 };
 			"step 1";
 			switch (result.index) {

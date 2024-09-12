@@ -10532,7 +10532,7 @@ const skills = {
 			"step 1";
 			if (result.bool) {
 				var card = result.links[0];
-				player.gain(card, "gain2");
+				player.gain(card, "draw");
 				event.cards.remove(card);
 				if (event.cards.length) {
 					player
@@ -15658,7 +15658,7 @@ const skills = {
 				game.loseAsync({
 					gain_list: list,
 					giver: player,
-					animate: "gain2",
+					animate: "draw",
 				}).setContent("gaincardMultiple");
 			}
 		},
