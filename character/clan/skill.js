@@ -3466,7 +3466,7 @@ const skills = {
 					) {
 						var num1 = player.countCards("h"),
 							num2 = player.getHandcardLimit();
-						if (num1 < num2) player.draw(Math.min(5, num2 - num1));
+						if (num1 < num2) player.draw(num2 - num1);
 					} else if (trigger.addCount !== false) {
 						trigger.addCount = false;
 						player.getStat().card.sha--;
@@ -3522,7 +3522,7 @@ const skills = {
 			if (num1 > num2) {
 				str += "弃置" + get.cnNumber(num1 - num2) + "张牌，然后手牌上限+1。";
 			} else {
-				str += "摸" + get.cnNumber(Math.min(8, num2 - num1)) + "张牌，然后手牌上限-1。";
+				str += "摸" + get.cnNumber(num2 - num1) + "张牌，然后手牌上限-1。";
 			}
 			str += "<br>※当前手牌上限：" + num2;
 			var num3 = (_status.event.getParent().phaseIndex || 0) + 1;
@@ -3540,7 +3540,7 @@ const skills = {
 			} else {
 				var num1 = player.countCards("h"),
 					num2 = player.getHandcardLimit();
-				if (num1 < num2) player.draw(Math.min(8, num2 - num1));
+				if (num1 < num2) player.draw(num2 - num1);
 			}
 			"step 1";
 			lib.skill.chenliuwushi.change(player, -1);

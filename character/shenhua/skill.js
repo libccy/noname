@@ -5415,9 +5415,11 @@ const skills = {
 		audio: 2,
 		forced: true,
 		firstDo: true,
-		filter(event, player, card) {
-			if (get.color(event.card) != "black") return false;
-			return (event.card.name == "nanman" && player != event.player) || (event.card.name == "wanjian" && player != event.player) || (event.card.name == "taoyuan" && player.hp < player.maxHp) || event.card.name == "wugu";
+		filter(event, player) {
+			if (event.player == player) return false;
+			if (get.color(event.card) != "black" || get.type(event.card) != "trick") return false;
+			var info = lib.card[event.card.name];
+			return info && info.selectTarget && info.selectTarget == -1 && !info.toself;
 		},
 		async content() {},
 		mod: {
@@ -7307,7 +7309,8 @@ const skills = {
 					const player = _status.event.player;
 					const judging = _status.event.judging;
 					let result = trigger.judge(card) - trigger.judge(judging);
-					const attitude = get.attitude(player, trigger.player);let val = get.value(card);
+					const attitude = get.attitude(player, trigger.player);
+					let val = get.value(card);
 					if (get.subtype(card) == "equip2") val /= 2;
 					else val /= 6;
 					if (attitude == 0 || result == 0) return 0;

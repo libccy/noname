@@ -17783,6 +17783,7 @@ const skills = {
 		group: "polu_damage",
 		subSkill: {
 			damage: {
+				audio: "polu",
 				trigger: { player: "damageEnd" },
 				forced: true,
 				filter: function (event, player) {

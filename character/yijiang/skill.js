@@ -1489,7 +1489,7 @@ const skills = {
 		},
 	},
 	new_juexiang: {
-		audio: "qingxian_jilie",
+		audio: "juexiang",
 		trigger: {
 			player: "die",
 		},
@@ -7724,6 +7724,9 @@ const skills = {
 		skillAnimation: true,
 		animationColor: "thunder",
 		audio: 2,
+		audioname2: {
+			re_caorui: "rexingshuai",
+		},
 		trigger: { player: "dying" },
 		//priority:6,
 		zhuSkill: true,
@@ -11164,6 +11167,9 @@ const skills = {
 	shangshi: {
 		audio: 2,
 		audioname: ["ol_zhangchunhua"],
+		audioname2: {
+			re_zhangchunhua: "reshangshi",
+		},
 		trigger: {
 			player: ["loseAfter", "changeHp", "gainMaxHpAfter", "loseMaxHpAfter"],
 			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],

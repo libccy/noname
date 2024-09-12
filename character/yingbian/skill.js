@@ -660,6 +660,7 @@ const skills = {
 		group: "jianhui_draw",
 		subSkill: {
 			draw: {
+				audio: "jianhui",
 				trigger: { source: "damageSource" },
 				forced: true,
 				logTarget: "player",
@@ -769,6 +770,7 @@ const skills = {
 				},
 			},
 			die: {
+				audio: "huaiyuan",
 				trigger: { player: "die" },
 				direct: true,
 				forceDie: true,
@@ -925,6 +927,7 @@ const skills = {
 		group: "weishu_discard",
 		subSkill: {
 			discard: {
+				audio: "weishu",
 				trigger: {
 					player: "loseAfter",
 					global: "loseAsyncAfter",
@@ -3093,7 +3096,7 @@ const skills = {
 				player.recover(num);
 			}
 			"step 1";
-			if (player.countCards("h") < player.maxHp) player.drawTo(Math.min(player.maxHp, 5 + player.countCards("h"))).gaintag = ["tairan"];
+			if (player.countCards("h") < player.maxHp) player.drawTo(player.maxHp).gaintag = ["tairan"];
 		},
 	},
 	tairan2: {

@@ -5454,6 +5454,7 @@ const skills = {
 		subSkill: {
 			block: { charlotte: true },
 			draw: {
+				audio: "tianze",
 				trigger: { global: "judgeEnd" },
 				forced: true,
 				locked: false,
@@ -10052,7 +10053,7 @@ const skills = {
 			player: "cangchuAwaken",
 		},
 		forced: true,
-		audio: 1,
+		audio: false,
 		logTarget: function (event, player) {
 			if (event.name == "phaseDraw") return event.player;
 			return game.filterPlayer(function (current) {

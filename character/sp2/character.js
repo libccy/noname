@@ -32,7 +32,7 @@ const characters = {
 	qinyilu: ["male", "qun", 3, ["piaoping", "tuoxian", "chuaili"]],
 	yanrou: ["male", "wei", 4, ["choutao", "xiangshu"]],
 	dc_zhuling: ["male", "wei", 4, ["dczhanyi"]],
-	licaiwei: ["female", "wei", 3, ["yijiao", "qibie"]],
+	licaiwei: ["female", "qun", 3, ["yijiao", "qibie"], ["border:wei"]],
 	yanfuren: ["female", "qun", 3, ["channi", "nifu"], ["name:严|null"]],
 	haomeng: ["male", "qun", 7, ["xiongmang"]],
 	re_pangdegong: ["male", "qun", 3, ["heqia", "yinyi"]],

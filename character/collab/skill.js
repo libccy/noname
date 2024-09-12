@@ -387,16 +387,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			let result = await player
-				.chooseButton(
-					[
-						get.prompt2("dchuiwan"),
-						[
-							lib.skill.dchuiwan.gainCards(player),
-							"vcard",
-						],
-					],
-					[1, trigger.num]
-				)
+				.chooseButton([get.prompt2("dchuiwan"), [lib.skill.dchuiwan.gainCards(player), "vcard"]], [1, trigger.num])
 				.set("ai", button => {
 					if (!get.cardPile2(button.link[2])) return 0;
 					return get.value({ name: button.link[2] }, get.event("player"));
@@ -1237,6 +1228,7 @@ const skills = {
 			await player.draw(player.countMark("dcjianxiong") + 1, "nodelay");
 			if (player.countMark("dcjianxiong") < 4) player.addMark("dcjianxiong", 1, false);
 		},
+		mark: true,
 		marktext: "雄",
 		intro: {
 			markcount(storage, player) {
@@ -1398,13 +1390,12 @@ const skills = {
 			if (
 				get.position(card) == "h" &&
 				!player.countCards("h", "du") &&
-				(
-					player.hp > 2 ||
+				(player.hp > 2 ||
 					!player.countCards("h", i => {
 						return get.value(i) >= 8;
-					})
-				)
-			) return 1;
+					}))
+			)
+				return 1;
 			if (get.position(card) == "e") {
 				let subs = get.subtypes(card);
 				if (subs.includes("equip2") || subs.includes("equip3")) return player.getHp() - get.value(card);
@@ -1436,11 +1427,14 @@ const skills = {
 				forced: true,
 				locked: false,
 				filter(event, player) {
+					if (event.player == player) return false;
 					return !player.getStorage("dczhiheng_hit").includes(event.player);
 				},
+				logTarget: "player",
 				content() {
 					player.addTempSkill("dczhiheng_hit");
 					player.markAuto("dczhiheng_hit", [trigger.player]);
+					game.log(player, "#g【制衡】", "可发动次数", "#y+1");
 				},
 			},
 			hit: {
@@ -1545,6 +1539,7 @@ const skills = {
 		},
 		subSkill: {
 			refresh: {
+				audio: "dcbianzhuang",
 				trigger: { player: "useCardAfter" },
 				forced: true,
 				filter(event, player) {
@@ -1553,6 +1548,7 @@ const skills = {
 				content() {
 					var stat = player.getStat("skill");
 					delete stat.dcbianzhuang;
+					game.log(player, "重置了技能", "#g【变装】");
 				},
 			},
 		},
