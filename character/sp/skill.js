@@ -5333,122 +5333,66 @@ const skills = {
 		},
 		hiddenCard(player, name) {
 			if (player.isTempBanned("olxiaofan")) return false;
-			return name != "wuxie" && lib.inpile.includes(name);
+			return lib.inpile.includes(name);
 		},
 		getNum(player) {
 			return player.getHistory("useCard").reduce((list, evt) => list.add(get.type2(evt.card)), []).length;
 		},
 		filter(event, player) {
-			if (!Array.isArray(event.olxiaofan_cards) || event.responded || event.type == "wuxie" || event.olxiaofan) return false;
-			return lib.inpile.some(i => i != "wuxie" && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event));
+			if (!Array.isArray(event.olxiaofan_cards) || event.responded || event.olxiaofan) return false;
+			return lib.inpile.some(i => event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event));
 		},
-		delay: false,
-		async content(event, trigger, player) {
-			const evt = event.getParent(2);
-			const cardsx = evt.olxiaofan_cards.slice().map(card => {
-				const cardx = ui.create.card();
-				cardx.init(get.cardInfo(card));
-				cardx._cardid = card.cardid;
-				return cardx;
-			});
-			if (!event.isMine() || _status.connectMode) evt.set("olxiaofan", true);
-			player.directgains(cardsx, null, "olxiaofan_hs");
-			const result = await player
-				.chooseCard(
-					"嚣翻：选择要使用的牌",
-					(card, player) => {
-						return get.event().cards.includes(card);
+		chooseButton: {
+			dialog(event, player) {
+				return ui.create.dialog("嚣翻", event.olxiaofan_cards, "hidden");
+			},
+			filter(button, player) {
+				const evt = _status.event.getParent();
+				return evt.filterCard(button.link, player, evt);
+			},
+			check(button) {
+				const card = button.link,
+					player = get.player();
+				if (get.type(card) == "equip") return 0;
+				return player.getUseValue(card);
+			},
+			backup(links, player) {
+				return {
+					filterCard: function () {
+						return false;
 					},
-					"s"
-				)
-				.set(
-					"cards",
-					cardsx.filter(card => {
-						if (player.hasSkill("aozhan") && card.name == "tao") {
-							return (
-								evt.filterCard(
-									{
-										name: "sha",
-										isCard: true,
-										cards: [card],
-									},
-									evt.player,
-									evt
-								) ||
-								evt.filterCard(
-									{
-										name: "shan",
-										isCard: true,
-										cards: [card],
-									},
-									evt.player,
-									evt
-								)
-							);
-						}
-						return evt.filterCard(card, evt.player, evt);
-					})
-				)
-				.set("ai", card => {
-					if (get.type(card) == "equip") return 0;
-					const evt = get.event().getParent(3),
-						player = get.event().player;
-					if (evt.type == "phase" && !player.hasValueTarget(card, null, true)) return 0;
-					if (evt && evt.ai) {
-						const tmp = _status.event;
-						_status.event = evt;
-						const result = (evt.ai || event.ai1)(card, player, evt);
-						_status.event = tmp;
-						return result;
-					}
-					return 1;
-				})
-				.forResult();
-			let card;
-			if (result.bool) {
-				card = evt.olxiaofan_cards.find(card => card.cardid === result.cards[0]._cardid);
-			}
-			const cards2 = player.getCards("s", card => card.hasGaintag("olxiaofan_hs"));
-			if (player.isOnline2()) {
-				player.send(
-					(cards, player) => {
-						cards.forEach(i => i.delete());
-						if (player == game.me) ui.updatehl();
+					selectCard: -1,
+					viewAs: links[0],
+					card: links[0],
+					async precontent(event, trigger, player) {
+						const card = lib.skill.olxiaofan_backup.card;
+						event.result.cards = [card];
+						event.result.card = get.autoViewAs(card, [card]);
+						event.result.card.olxiaofan = true;
+						player
+							.when("useCardAfter")
+							.filter(evt => evt.card.olxiaofan)
+							.then(() => {
+								let num = lib.skill.olxiaofan.getNum(player),
+									pos = "jeh".slice(0, num);
+								if (num > 0 && player.countCards(pos) > 0) {
+									event.maxNum = Math.min(3, num);
+									event.num = 0;
+								} else event.finish();
+							})
+							.then(() => {
+								let pos = "jeh"[event.num],
+									hs = player.countCards(pos);
+								if (hs > 0) player.chooseToDiscard(hs, pos, true);
+								event.num++;
+								if (event.num < event.maxNum) event.redo();
+							});
 					},
-					cards2,
-					player
-				);
-			}
-			cards2.forEach(i => i.delete());
-			if (player == game.me) ui.updatehl();
-			if (card) {
-				let name = card.name,
-					aozhan = player.hasSkill("aozhan") && name == "tao";
-				if (aozhan) {
-					name = evt.filterCard(
-						{
-							name: "sha",
-							isCard: true,
-							cards: [card],
-						},
-						evt.player,
-						evt
-					)
-						? "sha"
-						: "shan";
-				}
-				game.broadcastAll(
-					(result, name) => {
-						lib.skill.olxiaofan_backup.viewAs = { name: name, cards: [result], isCard: true };
-					},
-					card,
-					name
-				);
-				evt.set("_backupevent", "olxiaofan_backup");
-				evt.set("openskilldialog", "请选择" + get.translation(card) + "的目标");
-				evt.backup("olxiaofan_backup");
-			}
-			evt.goto(0);
+				};
+			},
+			prompt(links, player) {
+				return "嚣翻：是否使用" + get.translation(links[0]) + "？";
+			},
 		},
 		ai: {
 			effect: {
@@ -5467,44 +5411,6 @@ const skills = {
 				},
 			},
 		},
-	},
-	olxiaofan_backup: {
-		sourceSkill: "olxiaofan",
-		precontent: function () {
-			delete event.result.skill;
-			var name = event.result.card.name,
-				cards = event.result.card.cards.slice(0);
-			event.result.cards = cards;
-			var rcard = cards[0],
-				card;
-			if (rcard.name == name) card = get.autoViewAs(rcard);
-			else card = get.autoViewAs({ name, isCard: true });
-			event.result.card = card;
-			var id = get.id();
-			player
-				.when("chooseToUseAfter")
-				.filter(evt => evt == event.getParent())
-				.then(() => {
-					var num = lib.skill.olxiaofan.getNum(player),
-						pos = "jeh".slice(0, num);
-					if (num > 0 && player.countCards(pos) > 0) {
-						event.maxNum = Math.min(3, num);
-						event.num = 0;
-					} else event.finish();
-				})
-				.then(() => {
-					var pos = "jeh"[event.num],
-						hs = player.countCards(pos);
-					if (hs > 0) player.chooseToDiscard(hs, pos, true);
-					event.num++;
-					if (event.num < event.maxNum) event.redo();
-				})
-				.translation("嚣翻");
-		},
-		filterCard: function () {
-			return false;
-		},
-		selectCard: -1,
 	},
 	oltuishi: {
 		audio: 2,
