@@ -5159,8 +5159,9 @@ const skills = {
 					for (var card of trigger.cards) {
 						var cardx = cards.find(cardx => cardx.cardid == card._cardid);
 						if (cardx) cards2.push(cardx);
+						else cards2.push(card);
 					}
-					var cards3 = trigger.cards.slice();
+					var cards3 = trigger.cards.slice().filter(card => card.hasGaintag("jsrgmanjuan"));
 					trigger.cards = cards2;
 					trigger.card.cards = cards2;
 					if (player.isOnline2()) {

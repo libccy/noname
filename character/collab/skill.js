@@ -797,6 +797,7 @@ const skills = {
 					delete player.storage.dcbenxi_pending;
 				}
 			}
+			player.markSkill(event.name);
 		},
 		onremove(player) {
 			delete player.storage.dcbenxi;
