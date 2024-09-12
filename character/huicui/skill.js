@@ -2276,7 +2276,7 @@ const skills = {
 					return 6 - get.value(card);
 				})
 				.set("goon", get.damageEffect(player, target, target) <= 0);
-			if (!bool) trigger.cancel();
+			if (!bool) trigger.num--;
 		},
 		ai: {
 			effect: {
