@@ -8036,10 +8036,32 @@ const skills = {
 		locked: false,
 		async content(event, trigger, player) {
 			const targets = event.targets;
-			let num = 2 / targets.length;
 			for (const target of targets) {
+				let num = targets.length > 1 ? 1 : 2;
 				if (get.mode() !== "identity" || player.identity !== "nei") player.addExpose(0.2);
-				await player.discardPlayerCard(target, "he", num, true);
+				for (let i = 0; i < num; i++) {
+					if (!target.countDiscardableCards(player, "he")) break;
+					if (i) {
+						const bool = await player
+							.chooseBool("是否继续发动〖旋风〗弃置" + get.translation(target) + "一张牌？")
+							.set("ai", () => get.event("bool"))
+							.set("bool", function () {
+								let att = get.attitude(player, target) > 0,
+									hs = target.getCards("h"),
+									es = target.getCards("e");
+								if (att && es.some(i => {
+									return get.value(i, target) < 0;
+								})) return true;
+								return (
+									hs.length && (att == target.hasSkillTag("noh")) ||
+									es.length && (att == target.hasSkillTag("noe"))
+								);
+							}())
+							.forResultBool();
+						if (!bool) break;
+					}
+					await player.discardPlayerCard(target, "he", true);
+				}
 			}
 			if (player !== _status.currentPhase) return;
 			const result = await player
