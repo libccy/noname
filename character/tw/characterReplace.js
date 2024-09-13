@@ -8,6 +8,7 @@ const characterReplaces = {
 	liwei: ["liwei", "tw_liwei"],
 	tw_jiling: ["jiling", "dc_jiling", "tw_jiling"],
 	tw_zhangji: ["tw_zhangji", "ol_tw_zhangji"],
+	yuejiu: ["yuejiu", "dc_yuejiu"],
 };
 
 export default characterReplaces;
