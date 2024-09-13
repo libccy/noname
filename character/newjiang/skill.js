@@ -281,6 +281,7 @@ const skills = {
 	},
 	lunshi: {
 		audio: 2,
+		audioname: ["yj_sb_guojia_shadow"],
 		position: "hs",
 		enable: "chooseToUse",
 		filter(event, player) {
