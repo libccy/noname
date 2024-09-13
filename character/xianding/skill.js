@@ -9914,14 +9914,14 @@ const skills = {
 		},
 		trigger: {
 			player: ["loseAfter", "phaseDiscardBefore"],
-			global: "loseAfter",
 			target: "useCardToTargeted",
 		},
 		filter: function (event, player, name) {
 			if (event.name == "phaseDiscard") return ui.cardPile.childNodes.length > 40;
 			if (name == "useCardToTargeted") return ui.cardPile.childNodes.length < 40 && get.suit(event.card) == "spade";
-			if (event.getParent(2).name != "dcluochong") return false;
-			if (event.name == "lose" && !event.getl(player).cards.length) return false;
+			const evt = event.getParent(2);
+			if (evt.name != "dcluochong" || evt.player != player || player.hasHistory("lose", evtx => evtx.getParent("dcluochong", true) == evt && evtx != event)) return false;
+			if (!event.getl(player).cards.length) return false;
 			return ui.cardPile.childNodes.length > 80;
 		},
 		forced: true,
