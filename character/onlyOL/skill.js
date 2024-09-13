@@ -2999,7 +2999,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.target;
 			const result = await player.chooseToCompare(target).forResult();
-			if (result.bool) player.addTempSkill("qiaoshui3", { player: "phaseUseAfter" });
+			if (result.bool) player.addTempSkill("qiaoshui3");
 			else {
 				player.addTempSkill("qiaoshui2");
 				player.addTempSkill("olqiaoshui_used");
