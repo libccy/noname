@@ -12707,6 +12707,7 @@ const skills = {
 				mod: { targetInRange: () => true },
 			},
 			add: {
+				audio: "guowu",
 				charlotte: true,
 				trigger: { player: "useCard1" },
 				direct: true,
