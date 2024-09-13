@@ -269,6 +269,7 @@ const skills = {
 	},
 	//幻陆逊
 	twlifeng: {
+		audio: 2,
 		enable: "phaseUse",
 		filter(event, player) {
 			if (!player.countCards("he")) return false;
@@ -364,6 +365,7 @@ const skills = {
 		},
 	},
 	twniwo: {
+		audio: 2,
 		trigger: {
 			player: "phaseUseBegin",
 		},
@@ -579,6 +581,7 @@ const skills = {
 		},
 	},
 	twyanzuo: {
+		audio: 2,
 		trigger: { global: "damageSource" },
 		filter(event, player) {
 			if (event.getParent("phase").skill !== "twrenxian_phase") return false;
