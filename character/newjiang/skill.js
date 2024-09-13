@@ -9,6 +9,12 @@ const skills = {
 		locked: false,
 		filter(event, player) {
 			if (!player.countCards("h")) return false;
+			let cards = player.getCards("h"),
+				types = [];
+			for (let i = 0; i < cards.length; i++) {
+				if (!types.includes(get.type2(cards[i], false))) types.push(get.type2(cards[i], false));
+			}
+			if (types.length == 1 && types[0] == "equip") return false;
 			for (let i = 0; i <= 5; i++){
 				if (player.hasEquipableSlot(i)) return true;
 			}
@@ -16,7 +22,7 @@ const skills = {
 		},
 		chooseButton: {
 			dialog(event, player){
-				return ui.create.dialog("###工巧###你可将一张手牌置于你的任意装备栏内（可替换原装备牌）");
+				return ui.create.dialog("###工巧###你可将一张非装备牌置于你的任意装备栏内（可替换原装备牌）");
 			},
 			chooseControl(event, player){
 				const choices = [];
@@ -30,7 +36,9 @@ const skills = {
 				return {
 					audio: "yjgongqiao",
 					slot: result.control,
-					filterCard: true,
+					filterCard: function (card) {
+						return get.type2(card, false) != "equip";
+					},
 					position: "h",
 					discard: false,
 					lose: false,
