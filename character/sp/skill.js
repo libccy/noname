@@ -9803,7 +9803,7 @@ const skills = {
 			target.chooseCard("he", true, "铸币：请重铸一张牌", lib.filter.cardRecastable);
 			"step 1";
 			if (result.bool) {
-				target.recast(result.cards, null, player => (player.draw().set("log", false).gaintag = ["olzhubi_tag"]));
+				target.recast(result.cards, void 0, player => (player.draw().set("log", false).gaintag = ["olzhubi_tag"]));
 			}
 		},
 		ai: {
