@@ -430,7 +430,7 @@ const skills = {
 			},
 		},
 	},
-	//应天司马懿！肯定又要修改
+	//应天司马懿！别肘
 	jilin: {
 		audio: 5,
 		trigger: {
@@ -444,7 +444,7 @@ const skills = {
 		locked: false,
 		logAudio: () => 1,
 		async content(event, trigger, player) {
-			const cards = get.cards(get.mode() == "doudizhu" ? 1 : 2);
+			const cards = get.cards(3);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
 			await next;
@@ -829,7 +829,7 @@ const skills = {
 				length: limit,
 			}).map((_, i) => [i, get.cnNumber(i + 1, true)]);
 			const history = game.getAllGlobalHistory("everything", evt => evt.name == "xinjilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
-			const num = history.length + 1;
+			const num = Math.max(2, history.length + 1);
 			const skills = get
 				.info("xinbaiyin")
 				.derivation.removeArray(["xinjilve", "reguicai"])
@@ -897,7 +897,7 @@ const skills = {
 				await player.draw(choice + 1);
 			} else if (get.info("xinbaiyin").derivation.includes(choice[0])) {
 				const history = game.getAllGlobalHistory("everything", evt => evt.name == "xinjilve" && evt.player == player && Array.isArray(evt.cost_data) && get.info("xinbaiyin").derivation.includes(evt.cost_data[0]));
-				const num = history.length;
+				const num = Math.max(2, history.length);
 				player.removeMark("xinrenjie", num);
 				await player.addSkills(choice[0]);
 			} else {

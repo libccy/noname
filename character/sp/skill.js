@@ -2537,38 +2537,37 @@ const skills = {
 			return (event.card.name == "sha" || get.type(event.card) == "trick") && event.targets.length == 1;
 		},
 		usable: 1,
-		direct: true,
 		locked: false,
-		async content(event, trigger, player) {
+		async cost(event, trigger, player) {
 			const num = Math.max(1, player.getDamagedHp());
-			const {
-				result: { bool, targets },
-			} = await player
+			event.result = await player
 				.chooseTarget(get.prompt("olpijing"), [1, num], (card, player, target) => {
 					const trigger = get.event().getTrigger();
+					if (target == player) return false;
 					if (trigger.targets.includes(target)) return true;
-					return target != player && lib.filter.targetEnabled2(trigger.card, player, target) && lib.filter.targetInRange(trigger.card, player, target);
+					return lib.filter.targetEnabled2(trigger.card, player, target) && lib.filter.targetInRange(trigger.card, player, target);
 				})
 				.set("ai", target => {
 					const player = get.event("player"),
 						trigger = get.event().getTrigger();
 					return (trigger.targets.includes(target) ? -1 : 1) * get.effect(target, trigger.card, player, player) * (target.getStorage("olpijing_effect").includes(player) ? 2 : 1) + get.effect(target, { name: "shunshou_copy2" }, player, player);
 				})
-				.set("prompt2", "令至多" + get.cnNumber(num) + "名角色成为或取消成为" + get.translation(trigger.card) + "的目标并随机交给你一张牌");
-			if (bool) {
-				player.logSkill("olpijing", targets);
-				for (const i of targets) {
-					trigger.targets[!trigger.targets.includes(i) ? "add" : "remove"](i);
+				.set("prompt2", "令至多" + get.cnNumber(num) + "名角色成为或取消成为" + get.translation(trigger.card) + "的目标并随机交给你一张牌")
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const targets = event.targets;
+			for (const i of targets) {
+				trigger.targets[!trigger.targets.includes(i) ? "add" : "remove"](i);
+			}
+			for (const target of targets) {
+				target.addSkill("olpijing_effect");
+				target.markAuto("olpijing_effect", [player]);
+				const cards = target.getGainableCards(player, "he");
+				if (cards.length) {
+					await target.give(cards.randomGets(1), player);
 				}
-				for (const target of targets) {
-					target.addSkill("olpijing_effect");
-					target.markAuto("olpijing_effect", [player]);
-					const cards = target.getGainableCards(player, "he");
-					if (cards.length) {
-						await target.give(cards.randomGets(1), player);
-					}
-				}
-			} else player.storage.counttrigger.olpijing--;
+			}
 		},
 		mod: {
 			aiOrder(player, card, num) {
