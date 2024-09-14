@@ -12486,10 +12486,90 @@ const skills = {
 			"step 0";
 			player.chooseToCompare(target);
 			"step 1";
-			if (result.bool) player.addTempSkill("qiaoshui3", "phaseUseEnd");
+			if (result.bool) player.addTempSkill("xinqiaoshui_target", "phaseUseEnd");
 			else {
 				player.addTempSkill("qiaoshui2", "phaseUseEnd");
 			}
+		},
+		subSkill: {
+			target: {
+				audio: "xinqiaoshui",
+				inherit: "qiaoshui3",
+				sourceSkill: "xinqiaoshui",
+				content: function () {
+					"step 0";
+					player.removeSkill("xinqiaoshui_target");
+					var goon = false;
+					var info = get.info(trigger.card);
+					if (trigger.targets && !info.multitarget) {
+						var players = game.filterPlayer();
+						for (var i = 0; i < players.length; i++) {
+							if (lib.filter.targetEnabled2(trigger.card, player, players[i]) && !trigger.targets.includes(players[i])) {
+								goon = true;
+								break;
+							}
+						}
+					}
+					if (goon) {
+						player
+							.chooseTarget("巧说：是否额外指定一名" + get.translation(trigger.card) + "的目标？", function (card, player, target) {
+								var trigger = _status.event;
+								if (trigger.targets.includes(target)) return false;
+								return lib.filter.targetEnabled2(trigger.card, _status.event.player, target);
+							})
+							.set("ai", function (target) {
+								var trigger = _status.event.getTrigger();
+								var player = _status.event.player;
+								return get.effect(target, trigger.card, player, player);
+							})
+							.set("targets", trigger.targets)
+							.set("card", trigger.card);
+					} else {
+						if (!info.multitarget && trigger.targets && trigger.targets.length > 1) {
+							event.goto(3);
+						}
+					}
+					"step 1";
+					if (result.bool) {
+						if (!event.isMine()) game.delayx();
+						event.target = result.targets[0];
+					} else {
+						event.finish();
+					}
+					"step 2";
+					if (event.target) {
+						player.logSkill("xinqiaoshui_target", event.target);
+						trigger.targets.add(event.target);
+					}
+					event.finish();
+					"step 3";
+					player
+						.chooseTarget("巧说：是否减少一名" + get.translation(trigger.card) + "的目标？", function (card, player, target) {
+							return _status.event.targets.includes(target);
+						})
+						.set("ai", function (target) {
+							var trigger = _status.event.getTrigger();
+							return -get.effect(target, trigger.card, trigger.player, _status.event.player);
+						})
+						.set("targets", trigger.targets);
+					"step 4";
+					if (result.bool) {
+						event.targets = result.targets;
+						if (event.isMine()) {
+							player.logSkill("xinqiaoshui_target", event.targets);
+							event.finish();
+						}
+						for (var i = 0; i < result.targets.length; i++) {
+							trigger.targets.remove(result.targets[i]);
+						}
+						game.delay();
+					} else {
+						event.finish();
+					}
+					"step 5";
+					player.logSkill("xinqiaoshui_target", event.targets);
+				},
+			},
 		},
 		ai: {
 			order: function (item, player) {
@@ -12508,7 +12588,7 @@ const skills = {
 							return player.hasValueTarget(card);
 						})
 					) {
-						if (player.hasSkill("qiaoshui3")) return 0;
+						if (player.hasSkill("xinqiaoshui_target")) return 0;
 						var nd = !player.needsToDiscard();
 						if (
 							player.hasCard(function (card) {
