@@ -4675,7 +4675,8 @@ const skills = {
 		logTarget(event, player, triggername, target) {
 			return target;
 		},
-		forced: true,
+		logAudio: index => (typeof index === "number" ? "sbenyuan" + index + ".mp3" : 2),
+		direct: true,
 		async content(event, trigger, player) {
 			const target = event.targets[0];
 			target.clearMark("sbxuanhuo_mark");
@@ -4688,6 +4689,7 @@ const skills = {
 				}
 			}
 			const num = lib.skill.sbxuanhuo.getNum(target, player, "sbxuanhuo_mark");
+			player.logSkill("sbenyuan", target, null, null, [num >= 3 ? 1 : 2]);
 			if (num >= 3) {
 				const num = Math.min(player.countCards("he"), 3);
 				if (num) await player.chooseToGive(target, `恩怨：交给${get.translation(target)}${get.cnNumber(num)}张牌`, true, num, "he");
