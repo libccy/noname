@@ -2973,7 +2973,7 @@ const skills = {
 					return 7.5 - get.value(card);
 				})
 				.set("goon", get.effect(player, trigger.card, target, target) > 0);
-			if (!result.bool) trigger.getParent().excluded.add(player);
+			if (!result || !result.bool) trigger.getParent().excluded.add(player);
 		},
 		ai: {
 			effect: {
