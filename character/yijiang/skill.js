@@ -9025,11 +9025,18 @@ const skills = {
 			"step 0";
 			player.chooseToCompare(target);
 			"step 1";
-			if (result.bool) player.addTempSkill("qiaoshui3");
+			if (result.bool) player.addTempSkill("reqiaoshui_target", "phaseUseEnd");
 			else {
 				player.addTempSkill("qiaoshui4");
 				event.getParent(3).skipped = true;
 			}
+		},
+		subSkill: {
+			target: {
+				audio: "reqiaoshui",
+				inherit: "qiaoshui3",
+				sourceSkill: "reqiaoshui",
+			},
 		},
 		ai: {
 			order: function (item, player) {
@@ -9048,7 +9055,7 @@ const skills = {
 							return player.hasValueTarget(card);
 						})
 					) {
-						if (player.hasSkill("qiaoshui3")) return 0;
+						if (player.hasSkill("reqiaoshui_target")) return 0;
 						var nd = !player.needsToDiscard();
 						if (
 							player.hasCard(function (card) {
@@ -9120,11 +9127,6 @@ const skills = {
 	qiaoshui3: {
 		charlotte: true,
 		audio: "qiaoshui",
-		audioname2: {
-			re_jianyong: "reqiaoshui",
-			xin_jianyong: "xinqiaoshui",
-			ol_jianyong: "olqiaoshui",
-		},
 		trigger: { player: "useCard2" },
 		sourceSkill: "qiaoshui",
 		filter: function (event, player) {
@@ -9134,7 +9136,7 @@ const skills = {
 		direct: true,
 		content: function () {
 			"step 0";
-			player.removeSkill("qiaoshui3");
+			player.removeSkill(event.name);
 			var goon = false;
 			var info = get.info(trigger.card);
 			if (trigger.targets && !info.multitarget) {
@@ -9176,7 +9178,7 @@ const skills = {
 			}
 			"step 2";
 			if (event.target) {
-				player.logSkill("qiaoshui3", event.target);
+				player.logSkill(event.name, event.target);
 				trigger.targets.add(event.target);
 			}
 			event.finish();
@@ -9194,7 +9196,7 @@ const skills = {
 			if (result.bool) {
 				event.targets = result.targets;
 				if (event.isMine()) {
-					player.logSkill("qiaoshui3", event.targets);
+					player.logSkill(event.name, event.targets);
 					event.finish();
 				}
 				for (var i = 0; i < result.targets.length; i++) {
@@ -9205,7 +9207,7 @@ const skills = {
 				event.finish();
 			}
 			"step 5";
-			player.logSkill("qiaoshui3", event.targets);
+			player.logSkill(event.name, event.targets);
 		},
 	},
 	qiaoshui4: {

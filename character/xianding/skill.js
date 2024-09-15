@@ -9823,12 +9823,11 @@ const skills = {
 				});
 			const lose_list = [];
 			let num = 4 - player.countMark("dcluochong");
+			let log = false;
 			while (num > 0) {
 				const result = await player
 					.chooseTarget(get.prompt("dcluochong"), `弃置任意名角色区域内的累计至多${num}张牌`, (card, player, target) => {
 						return target.hasCard(card => {
-							const discarded = _status.event.lose_list.find(item => item[0] == target);
-							if (discarded && discarded[1].includes(card)) return false;
 							return lib.filter.canBeDiscarded(card, player, target, "dcluochong");
 						}, "hej");
 					})
@@ -9849,6 +9848,10 @@ const skills = {
 					.set("lose_list", lose_list)
 					.forResult();
 				if (result.bool) {
+					if (!log) {
+						player.logSkill("dcluochong");
+						log = true;
+					}
 					const target = result.targets[0];
 					const cards = await player
 						.choosePlayerCard(target, true, "hej", [1, num], `选择弃置${get.translation(target)}区域内的牌`)
@@ -9856,8 +9859,6 @@ const skills = {
 							const card = button.link,
 								target = _status.event.target,
 								player = get.player();
-							const discarded = _status.event.lose_list.find(item => item[0] == target);
-							if (discarded && discarded[1].includes(card)) return false;
 							return lib.filter.canBeDiscarded(card, player, target, "dcluochong");
 						})
 						.set("lose_list", lose_list)
@@ -9875,6 +9876,7 @@ const skills = {
 					} else {
 						index[1].addArray(cards);
 					}
+					await target.discard(cards, "notBySelf").set("discarder", player);
 				} else {
 					break;
 				}
@@ -9885,28 +9887,9 @@ const skills = {
 					game.stopCountChoose();
 				});
 			}
-			if (lose_list.length > 0) {
-				lib.tempSortSeat = trigger.player;
-				lose_list.sort((a, b) => {
-					return lib.sort.seat(a[0], b[0]);
-				});
-				delete lib.tempSortSeat;
-				player.logSkill(
-					"dcluochong",
-					lose_list.map(i => i[0])
-				);
-				if (lose_list.some(i => i[1].length > 2)) {
-					game.log(player, "可弃置牌数", "#g-1");
-					player.addMark("dcluochong", 1, false);
-				}
-				if (lose_list[0].length == 1) {
-					lose_list[0][0].discard(lose_list[0][1]);
-				} else {
-					game.loseAsync({
-						lose_list: lose_list,
-						discarder: player,
-					}).setContent("discardMultiple");
-				}
+			if (lose_list.length > 0 && lose_list.some(i => i[1].length > 2)) {
+				game.log(player, "可弃置牌数", "#g-1");
+				player.addMark("dcluochong", 1, false);
 			}
 		},
 		ai: {
@@ -9931,14 +9914,14 @@ const skills = {
 		},
 		trigger: {
 			player: ["loseAfter", "phaseDiscardBefore"],
-			global: "loseAsyncAfter",
 			target: "useCardToTargeted",
 		},
 		filter: function (event, player, name) {
 			if (event.name == "phaseDiscard") return ui.cardPile.childNodes.length > 40;
 			if (name == "useCardToTargeted") return ui.cardPile.childNodes.length < 40 && get.suit(event.card) == "spade";
-			if (event.getParent().name != "dcluochong") return false;
-			if (event.name == "loseAsync" && !event.getl(player).cards.length) return false;
+			const evt = event.getParent(2);
+			if (evt.name != "dcluochong" || evt.player != player || player.hasHistory("lose", evtx => evtx.getParent("dcluochong", true) == evt && evtx != event)) return false;
+			if (!event.getl(player).cards.length) return false;
 			return ui.cardPile.childNodes.length > 80;
 		},
 		forced: true,

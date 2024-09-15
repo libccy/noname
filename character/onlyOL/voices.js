@@ -1,4 +1,11 @@
 export default {
+	"#jueqing_ol_zhangchunhua1": "情丝如雪，难当暖阳。",
+	"#jueqing_ol_zhangchunhua2": "有情总被无情负，绝情方无软肋生。",
+	"#shangshi_ol_zhangchunhua1": "伤我最深的，竟是你司马懿。",
+	"#shangshi_ol_zhangchunhua2": "世间刀剑数万，何以情字伤人？",
+	"#oljianmie1": "莫说是你，天潢贵胄亦可杀得！",
+	"#oljianmie2": "你我不到黄泉，不复相见！",
+	"#ol_zhangchunhua:die": "我不负懿，懿负我。",
 	"#olchengxiang1": "谁知道称大象需要几步？",
 	"#olchengxiang2": "象虽大，然可并舟称之。",
 	"#olrenxin1": "待三日中，然后自归。",

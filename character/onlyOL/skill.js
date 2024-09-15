@@ -2999,7 +2999,7 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = event.target;
 			const result = await player.chooseToCompare(target).forResult();
-			if (result.bool) player.addTempSkill("qiaoshui3");
+			if (result.bool) player.addTempSkill("olqiaoshui_target", { player: "phaseUseAfter" });
 			else {
 				player.addTempSkill("qiaoshui2");
 				player.addTempSkill("olqiaoshui_used");
@@ -3012,6 +3012,11 @@ const skills = {
 				mark: true,
 				marktext: '<span style="text-decoration: line-through;">说</span>',
 				intro: { content: "被迫闭嘴" },
+			},
+			target: {
+				audio: "olqiaoshui",
+				inherit: "qiaoshui3",
+				sourceSkill: "olqiaoshui",
 			},
 		},
 	},

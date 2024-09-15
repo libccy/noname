@@ -816,7 +816,7 @@ const skills = {
 		},
 	},
 	xinjilve: {
-		audio: "jilue",
+		audio: 2,
 		trigger: {
 			player: "phaseUseBegin",
 		},
@@ -908,6 +908,7 @@ const skills = {
 		group: "xinjilve_gain",
 		subSkill: {
 			gain: {
+				audio: "xinjilve",
 				trigger: {
 					player: "changeSkillsAfter",
 				},

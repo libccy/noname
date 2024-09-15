@@ -1,4 +1,6 @@
 export default {
+	"#xinjilve1": "运筹成略，统军持国！",
+	"#xinjilve2": "英雄皆殁，天命终归吾司马一族！",
 	"#wansha_new_simayi1": "连诛其族，剪其党羽，以夷后患！",
 	"#wansha_new_simayi2": "绝汝生死，断汝轮回！",
 	"#lianpo_new_simayi1": "能战当战，不能战当死尔！",

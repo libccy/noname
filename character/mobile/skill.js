@@ -12486,10 +12486,17 @@ const skills = {
 			"step 0";
 			player.chooseToCompare(target);
 			"step 1";
-			if (result.bool) player.addTempSkill("qiaoshui3", "phaseUseEnd");
+			if (result.bool) player.addTempSkill("xinqiaoshui_target", "phaseUseEnd");
 			else {
 				player.addTempSkill("qiaoshui2", "phaseUseEnd");
 			}
+		},
+		subSkill: {
+			target: {
+				audio: "xinqiaoshui",
+				inherit: "qiaoshui3",
+				sourceSkill: "xinqiaoshui",
+			},
 		},
 		ai: {
 			order: function (item, player) {
@@ -12508,7 +12515,7 @@ const skills = {
 							return player.hasValueTarget(card);
 						})
 					) {
-						if (player.hasSkill("qiaoshui3")) return 0;
+						if (player.hasSkill("xinqiaoshui_target")) return 0;
 						var nd = !player.needsToDiscard();
 						if (
 							player.hasCard(function (card) {
