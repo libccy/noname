@@ -1226,8 +1226,18 @@ const skills = {
 			"step 0";
 			player.judge();
 			"step 1";
-			if (result.color == "black") target.draw(3);
-			else target.moveCard();
+			switch (result.color) {
+				case "black":
+					target.draw(3);
+					break;
+
+				case "red":
+					target.moveCard();
+					break;
+
+				default:
+					break;
+			}
 		},
 		ai: {
 			order: 10,
@@ -1547,9 +1557,9 @@ const skills = {
 		},
 		check: function (event, player) {
 			var card = {
-					name: "sha",
-					cards: event.cards.filterInD(),
-				},
+				name: "sha",
+				cards: event.cards.filterInD(),
+			},
 				target = event.source;
 			return !player.canUse(card, target, false) || get.effect(target, card, player, player) > 0;
 		},
@@ -5873,12 +5883,12 @@ const skills = {
 					return (
 						num +
 						0.6 *
-							(_status.event.name == "chooseToUse" &&
+						(_status.event.name == "chooseToUse" &&
 							player.hasHistory("useCard", function (evt) {
 								return evt.card.name == "sha" && evt.cards.length == 1;
 							})
-								? 1
-								: -1)
+							? 1
+							: -1)
 					);
 			},
 		},
@@ -6135,7 +6145,7 @@ const skills = {
 								target.countCards("h", function (card) {
 									return target.hasValueTarget(card) && get.effect(player, card, target, target) > 0;
 								}) *
-									Math.sqrt(target.countCards("h")))
+								Math.sqrt(target.countCards("h")))
 						);
 					return (
 						0.3 *
@@ -6143,7 +6153,7 @@ const skills = {
 							target.countCards("h", function (card) {
 								return target.hasValueTarget(card) && get.effect(player, card, target, target) > 0;
 							}) *
-								Math.sqrt(target.countCards("h")))
+							Math.sqrt(target.countCards("h")))
 					);
 				},
 			},

@@ -13234,11 +13234,15 @@ const skills = {
 		},
 		callback() {
 			var evt = event.getParent(2);
-			if (event.judgeResult.color == "black") {
-				//game.cardsDiscard(card);
-				evt._trigger.num++;
-			} else {
-				evt._trigger.source.gain(card, "gain2");
+			switch (event.judgeResult.color) {
+				case "black":
+					evt._trigger.num++;
+					break;
+
+				case "red":
+					evt._trigger.source.gain(card, "gain2");
+				default:
+					break;
 			}
 		},
 	},
