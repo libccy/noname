@@ -1539,9 +1539,9 @@ game.import("character", function () {
 							return player != target;
 						})
 						.set("du", du).ai = function (target) {
-						var att = get.attitude(_status.event.player, target);
-						return att * _status.event.du;
-					};
+							var att = get.attitude(_status.event.player, target);
+							return att * _status.event.du;
+						};
 					"step 2";
 					if (result.bool) {
 						var target = result.targets[0];
@@ -2643,10 +2643,17 @@ game.import("character", function () {
 					"step 0";
 					player.judge();
 					"step 1";
-					if (result.color == "red") {
-						trigger.directHit = true;
-					} else {
-						player.discardPlayerCard(trigger.target);
+					switch (result.color) {
+						case "red":
+							trigger.directHit = true;
+							break;
+
+						case "black":
+							player.discardPlayerCard(trigger.target);
+							break;
+
+						default:
+							break;
 					}
 				},
 				ai: {
@@ -2696,7 +2703,7 @@ game.import("character", function () {
 							next.set("_backupevent", "miaobix");
 							next.set("custom", {
 								add: {},
-								replace: { window: function () {} },
+								replace: { window: function () { } },
 							});
 							next.backup("miaobix");
 						}

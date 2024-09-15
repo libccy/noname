@@ -13765,12 +13765,20 @@ const skills = {
 				return 0;
 			});
 			"step 2";
-			if (result.color == "black") {
-				if (trigger.source.countCards("he")) {
-					player.discardPlayerCard(trigger.source, "he", true);
-				}
-			} else if (trigger.source.isIn()) {
-				trigger.source.damage();
+			switch (result.color) {
+				case "black":
+					if (trigger.source.countCards("he")) {
+						player.discardPlayerCard(trigger.source, "he", true);
+					}
+					break;
+			
+				case "red":
+					if (trigger.source.isIn()) {
+						trigger.source.damage();
+					}
+					break;
+				default:
+					break;
 			}
 			event.num--;
 			if (event.num > 0 && player.hasSkill("reganglie")) {

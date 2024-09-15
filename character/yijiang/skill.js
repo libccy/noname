@@ -7939,12 +7939,17 @@ const skills = {
 				event.finish();
 			}
 			"step 2";
-			if (result.color) {
-				if (result.color == "red") {
+			switch (result.color) {
+				case "red":
 					if (event.target.hp < event.target.maxHp) event.target.recover();
-				} else {
+					break;
+			
+				case "black":
 					event.target.draw(trigger.num);
-				}
+					break;
+					
+				default:
+					break;
 			}
 		},
 		ai: {
@@ -9537,6 +9542,9 @@ const skills = {
 					break;
 				case "red":
 					player.turnOver();
+					break;
+				
+				default:
 					break;
 			}
 		},

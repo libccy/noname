@@ -169,9 +169,9 @@ const skills = {
 		},
 		callback() {
 			var list = [
-					[player, event.num1],
-					[target, event.num2],
-				],
+				[player, event.num1],
+				[target, event.num2],
+			],
 				evt = event.getParent(2);
 			for (var i of list) {
 				if (i[1] > evt.max_num) {
@@ -281,8 +281,8 @@ const skills = {
 						list.removeArray(list2);
 						if (!list.length) return 0;
 						var num1 = player.countCards("hs", function (card) {
-								return get.type(card) != "basic" && player.hasValueTarget(card, null, true);
-							}),
+							return get.type(card) != "basic" && player.hasValueTarget(card, null, true);
+						}),
 							num2 = player.getHandcardLimit();
 						if (player.countCards("h", list) <= num2 - num1) return 0;
 						return 1;
@@ -1760,7 +1760,7 @@ const skills = {
 			next.set("_backupevent", "nsdaizhanx");
 			next.set("custom", {
 				add: {},
-				replace: { window() {} },
+				replace: { window() { } },
 			});
 			next.backup("nsdaizhanx");
 		},
@@ -3866,7 +3866,7 @@ const skills = {
 					if (
 						ui.selected.targets.length &&
 						Math.abs(target.hp - ui.selected.targets[0].hp) === 1
-					) return get.effect(player, {name: "losehp"}, player, player) / 10;
+					) return get.effect(player, { name: "losehp" }, player, player) / 10;
 					return 0;
 				},
 				target(player, target) {
@@ -4328,19 +4328,26 @@ const skills = {
 				event.goto(1);
 			}
 			"step 3";
-			if (result.color == "black") {
-				var name = get.translation(event.current.name);
-				var att = 0;
-				if (event.current.needsToDiscard()) {
-					att = 1;
-				}
-				player
-					.chooseControlList(["令" + name + "摸一张牌展示", "令" + name + "手牌上永久+1", "弃置一张牌并令" + name + "获得一张本回合进入弃牌堆的牌"], function () {
-						return _status.event.att;
-					})
-					.set("att", att);
-			} else {
-				event.goto(1);
+			switch (key) {
+				case "black":
+					var name = get.translation(event.current.name);
+					var att = 0;
+					if (event.current.needsToDiscard()) {
+						att = 1;
+					}
+					player
+						.chooseControlList(["令" + name + "摸一张牌展示", "令" + name + "手牌上永久+1", "弃置一张牌并令" + name + "获得一张本回合进入弃牌堆的牌"], function () {
+							return _status.event.att;
+						})
+						.set("att", att);
+					break;
+
+				case "red":
+					event.goto(1);
+					break;
+
+				default:
+					break;
 			}
 			"step 4";
 			switch (result.index) {
@@ -5703,14 +5710,14 @@ const skills = {
 			chosen: {},
 			leftdist: {
 				mod: {
-					globalFrom(from, to, distance) {},
-					globalTo(from, to, distance) {},
+					globalFrom(from, to, distance) { },
+					globalTo(from, to, distance) { },
 				},
 			},
 			rightdist: {
 				mod: {
-					globalFrom(from, to, distance) {},
-					globalTo(from, to, distance) {},
+					globalFrom(from, to, distance) { },
+					globalTo(from, to, distance) { },
 				},
 			},
 			swap: {
