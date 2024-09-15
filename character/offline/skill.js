@@ -1500,7 +1500,7 @@ const skills = {
 				direct: true,
 				filter(event, player) {
 					if (player == event.player) return false;
-					if (event.cards.length) {
+					if (event.cards?.length) {
 						if (event.getParent().name == "draw") return false;
 						for (var i = 0; i < event.cards.length; i++) if (get.position(event.cards[i]) != "c" || (!get.position(event.cards[i]) && event.cards[i].original != "c")) return true;
 					}

@@ -363,7 +363,7 @@ const skills = {
 			const { result } = await player.chooseButton([get.prompt("spzhengjun"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
 			event.result = {
 				bool: result.bool,
-				cost_data: result.links[0][2],
+				cost_data: result.links?.[0][2],
 			};
 		},
 		logAudio: () => 1,
@@ -778,7 +778,7 @@ const skills = {
 			const { result } = await player.chooseButton([get.prompt("spyanji"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
 			event.result = {
 				bool: result.bool,
-				cost_data: result.links[0][2],
+				cost_data: result.links?.[0][2],
 			};
 		},
 		async content(event, trigger, player) {

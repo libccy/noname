@@ -17,10 +17,22 @@ const skills = {
 			const control = await player
 				.chooseControl(list, () => {
 					const player = _status.event.player;
-					if (game.hasPlayer(current => {
-						if (get.attitude(player, current) > 0) return current.countCards("j", card => (card.viewAs || card.name) != "jsrg_xumou");
-						return current.countCards("ej", card => player.getUseValue(card) > 4);
-					})) return "场上";
+					let cards = game.filterPlayer().reduce((arr, current) => {
+						if (current.countCards("ej")) arr.addArray(current.getCards("ej"));
+						return arr;
+					}, []).sort((a, b) => get.number(a, false) - get.number(b, false));
+					if (!cards.length) return "牌堆";
+					if ((player.maxHp < 2 || player.hp < 1) && get.number(cards[0], false) > 1) return "牌堆";
+					cards = cards.filter(card => get.number(card, false) == get.number(cards[0], false));
+					let valueCards = cards.filter(card => {
+						let owner = get.owner(card);
+						if (!owner) return false;
+						let att = get.attitude(player, owner);
+						if (get.position(card) == "j" && (card.viewAs || card.name) == "jsrg_xumou") att *= -1;
+						if (get.position(card) == "e" && get.equipValue(card, owner) > 0) att*= -1;
+						return att > 0;
+					});
+					if(valueCards.length * 2 >= cards.length) return "场上";
 					return "牌堆";
 				})
 				.set("prompt", get.prompt2("dcchaozhen"))
@@ -54,7 +66,7 @@ const skills = {
 			}
 			if (card) {
 				await player.gain(card, get.owner(card) ? "give" : "gain2");
-				if (num == 1) {
+				if (get.number(card) == 1) {
 					await player.recover();
 					player.tempBanSkill("dcchaozhen");
 				}
@@ -78,6 +90,13 @@ const skills = {
 				return get.number(card, player) < num;
 			}) || !player.countCards("h")) return false;
 			return !player.getStorage("dclianjie_used").includes(num);
+		},
+		check(event, player) {
+			if (player.countCards("h") < 2 || !player.isPhaseUsing()) return true;
+			if (player.countCards("h", card => player.hasValueTarget(card) && !player.countCards("h", cardx =>{
+				return get.number(cardx, player) < get.number(card, player);
+			})) && !player.getStorage("dclianjie_used").includes(get.number(card, player))) return false;
+			return true;
 		},
 		async content(event, trigger, player) {
 			player.addTempSkill("dclianjie_used");
@@ -18162,7 +18181,7 @@ const skills = {
 					if (player.hasSkillTag("viewHandcard", null, i, true)) dialog.push(i.getCards("h"));
 					else dialog.push([i.getCards("h"), "blank"]);
 				}
-				const result2 = await player
+				const result3 = await player
 					.chooseButton([1, 2], true)
 					.set("createDialog", dialog)
 					.set("color", get.color(card))
@@ -18176,10 +18195,10 @@ const skills = {
 						return color ? Math.random() : 0.35;
 					})
 					.forResult();
-				await player.showCards(result2.links);
+				await player.showCards(result3.links);
 				let map = {};
 				let map2 = {};
-				for (let i of result2.links) {
+				for (let i of result3.links) {
 					let id = get.owner(i).playerid;
 					if (!map[id]) map[id] = [];
 					map[id].push(i);
@@ -18211,7 +18230,7 @@ const skills = {
 						})
 					);
 				}
-				const result2 = await player
+				const result3 = await player
 					.chooseButton([1, 2], true)
 					.set("createDialog", dialog)
 					.set("filterButton", button => {
@@ -18225,7 +18244,7 @@ const skills = {
 					})
 					.forResult();
 				let map = {};
-				for (let i of result2.links) {
+				for (let i of result3.links) {
 					if (get.color(i) != get.color(card)) continue;
 					let id = get.owner(i).playerid;
 					if (!map[id]) map[id] = [];
