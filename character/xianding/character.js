@@ -17,7 +17,7 @@ const characters = {
 	dc_sb_caoang: ["male", "wei", 4, ["dcsbfengmin", "dcsbzhiwang"]],
 	dc_sb_dianwei: ["male", "wei", "4/5", ["dcsbkuangzhan", "dcsbkangyong"]],
 	dc_caoshuang: ["male", "wei", 4, ["dcjianzhuan", "dcfanshi"]],
-	dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"], ["name:司马|师"]],
+	dc_simashi: ["male", "wei", 3, ["dcsanshi", "dczhenrao", "dcchenlve"], ["name:司马|师", "border:jin"]],
 	dc_wangling: ["male", "wei", 4, ["dcjichou", "dcmouli"], ["clan:太原王氏"]],
 	dc_jiangji: ["male", "wei", 3, ["dcshiju", "dcyingshi"]],
 	dc_sb_zhugejin: ["male", "wu", 3, ["dcsbtaozhou", "dcsbhoude"], ["name:诸葛|瑾"]],

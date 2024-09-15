@@ -9150,7 +9150,7 @@ const skills = {
 			}
 			if (goon) {
 				player
-					.chooseTarget("巧说：是否额外指定一名" + get.translation(trigger.card) + "的目标？", function (card, player, target) {
+					.chooseTarget("巧说：是否为" + get.translation(trigger.card) + "额外指定一名目标？", function (card, player, target) {
 						var trigger = _status.event;
 						if (trigger.targets.includes(target)) return false;
 						return lib.filter.targetEnabled2(trigger.card, _status.event.player, target);
@@ -9171,6 +9171,8 @@ const skills = {
 			if (result.bool) {
 				if (!event.isMine()) game.delayx();
 				event.target = result.targets[0];
+			} else if (!get.info(trigger.card).multitarget && trigger.targets && trigger.targets.length > 1) {
+				event.goto(3);
 			} else {
 				event.finish();
 			}

@@ -6,7 +6,7 @@ const translates = {
 	ol_jianyong: "OL界简雍",
 	ol_jianyong_prefix: "OL界",
 	olqiaoshui: "巧说",
-	olqiaoshui_info: "出牌阶段，你可与一名其他角色拼点。若你赢，你使用的下一张基本牌或普通锦囊牌可以额外指定任意一名其他角色为目标或减少指定一个目标；若你没赢，此技能于本回合失效且本回合你不能使用锦囊牌。",
+	olqiaoshui_info: "出牌阶段，你可与一名其他角色拼点。若你赢，你本回合使用下一张基本牌或普通锦囊牌时，可以为此牌增加或减少一个目标；若你没赢，此技能于本回合失效且本回合你不能使用锦囊牌。",
 	ol_caozhang: "OL界曹彰",
 	ol_caozhang_prefix: "OL界",
 	oljiangchi: "将驰",
