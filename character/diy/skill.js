@@ -2024,9 +2024,13 @@ const skills = {
 	//手杀削弱版许攸
 	junkshicai: {
 		audio: "nzry_shicai_2",
-		trigger: { player: "useCardAfter" },
-		filter(event, player) {
+		trigger: { player: ["useCardAfter", "useCard1"] },
+		filter(event, player, name) {
 			if (player.getHistory("useCard", evt => get.type2(evt.card) == get.type2(event.card)).indexOf(event) !== 0) return false;
+			if (name === "useCard1") {
+				lib.skill.nzry_shicai.init(player);
+				return false;
+			}
 			return event.cards.someInD("oe");
 		},
 		prompt2(event, player) {
@@ -2069,6 +2073,12 @@ const skills = {
 			game.cardsGotoPile(cards, "insert");
 			game.log(player, "将", cards, "置于了牌堆顶");
 			player.draw();
+		},
+		init(player) {
+			lib.skill.nzry_shicai.init(player);
+		},
+		onremove(player) {
+			player.removeSkill("nzry_shicai_2");
 		},
 		ai: {
 			reverseOrder: true,
