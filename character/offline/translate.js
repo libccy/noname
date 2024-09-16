@@ -663,7 +663,7 @@ const translates = {
 	tyliebao_info: "手牌数最少的角色成为【杀】的目标后，你可以摸一张牌并代替其成为目标，若你未因此【杀】受到伤害，其回复一点体力。",
 	ty_zhaorong: "赵融",
 	tyyuantao: "援讨",
-	tyyuantao_info: "每回合限一次，一名角色使用基本牌时，你可以令此牌额外使用一次，然后你于当前回合结束时失去一点体力。",
+	tyyuantao_info: "每回合限一次，一名角色使用基本牌时，你可以令此牌额外结算一次，然后你于当前回合结束时失去一点体力。",
 	ty_zhangnan: "桃张南",
 	ty_zhangnan_prefix: "桃",
 	tyfenwu: "奋武",

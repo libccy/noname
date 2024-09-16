@@ -3238,7 +3238,7 @@ const skills = {
 			mark: {
 				charlotte: true,
 				onremove: true,
-				intro: { content: "手牌上限+#" },
+				intro: { content: "本回合手牌上限+#" },
 				charlotte: true,
 				onremove: true,
 				mod: {

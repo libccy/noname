@@ -6231,7 +6231,7 @@ const skills = {
 			if (type && result2.bool && result2.targets && result2.targets.length) {
 				player.line(result2.targets, "green");
 				if (type == "equip") {
-					player.discardPlayerCard(result.targets[0], "e", true);
+					player.discardPlayerCard(result2.targets[0], "e", true);
 				} else {
 					player.discardPlayerCard(result2.targets[0], "j", true);
 				}

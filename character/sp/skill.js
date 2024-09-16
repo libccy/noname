@@ -26971,18 +26971,16 @@ const skills = {
 		audio: 2,
 		audioname: ["sp_mushun"],
 		trigger: { player: "useCardToPlayered" },
-		direct: true,
 		filter: function (event, player) {
 			return event.card.name == "sha";
 		},
-		content: function () {
-			"step 0";
-			var controls = ["draw_card"];
+		async cost(event, trigger, player) {
+			const controls = ["draw_card"];
 			if (trigger.target.countCards("he")) {
 				controls.push("discard_card");
 			}
 			controls.push("cancel");
-			player
+			const result = await player
 				.chooseControl(controls)
 				.set("ai", function () {
 					var trigger = _status.event.getTrigger();
@@ -26992,17 +26990,23 @@ const skills = {
 						return "draw_card";
 					}
 				})
-				.set("prompt", get.prompt2("moukui"));
-			"step 1";
-			if (result.control == "draw_card") {
-				player.draw();
-				player.logSkill("moukui");
-			} else if (result.control == "discard_card" && trigger.target.countCards("he")) {
-				player.discardPlayerCard(trigger.target, "he", true).logSkill = ["moukui", trigger.target];
-			} else event.finish();
-			"step 2";
-			player.addTempSkill("moukui2", "shaEnd");
+				.set("prompt", get.prompt2("moukui", trigger.target));
+			event.result = {
+				bool: result.control != "cancel",
+				targets: [trigger.target],
+				cost_data: result.control,
+			};
 		},
+		async content(event, trigger, player) {
+			const result = event.cost_data;
+			if (result == "draw_card") {
+				await player.draw();
+			} else if (trigger.target.countCards("he")) {
+				await player.discardPlayerCard(trigger.target, "he", true);
+			}
+			player.markAuto("moukui2", trigger.target);
+		},
+		group: "moukui2",
 		ai: {
 			expose: 0.1,
 		},
@@ -27012,11 +27016,15 @@ const skills = {
 		trigger: { player: "shaMiss" },
 		forced: true,
 		sourceSkill: "moukui",
-		filter: function (event, player) {
+		onremove: true,
+		filter(event, player) {
+			if (!player.getStorage("moukui2").includes(event.target)) return false;
 			return player.countCards("he") > 0;
 		},
-		content: function () {
+		content() {
+			trigger.target.line(player, "green");
 			trigger.target.discardPlayerCard(player, true);
+			player.unmarkAuto("moukui2", [trigger.target]);
 		},
 	},
 	shenxian: {
