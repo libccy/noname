@@ -1033,7 +1033,7 @@ export const Content = {
 			.slice()
 			.filter(i => i != "others")
 			.sort((a, b) => event[b].length - event[a].length);
-		opinion = event[event.opinions[0]].length > event[event.opinions[1]].length ? event.opinions[0] : null;
+		opinion = event[opinions[0]].length > event[opinions[1]].length ? opinions[0] : null;
 		if (opinion) game.log(player, "本次发起的议事结果为", opinion == "red" ? '<span class="firetext">红色</span>' : "#g" + get.translation(opinion));
 		else game.log(player, "本次发起的议事无结果");
 		event.result = {
