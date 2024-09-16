@@ -30,7 +30,7 @@ const characterReplaces = {
 	ol_mengda: ["ol_mengda", "dc_mengda", "pe_mengda"],
 	jsp_guanyu: ["jsp_guanyu", "dc_jsp_guanyu", "tw_jsp_guanyu", "jsrg_guanyu"],
 	mushun: ["mushun", "sp_mushun"],
-	wangjun: ["dc_wangjun", "wangjun"],
+	wangjun: ["dc_wangjun", "wangjun", "jsrg_wangjun"],
 	re_zoushi: ["yue_zoushi", "re_zoushi", "jsrg_zoushi"],
 	dc_zhangmancheng: ["dc_zhangmancheng", "tw_zhangmancheng"],
 	xf_huangquan: ["xf_huangquan", "dc_huangquan"],

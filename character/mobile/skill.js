@@ -1805,30 +1805,37 @@ const skills = {
 					.reverse()
 					.concat("none")
 					.filter(i => target.hasCard({ suit: i }, "h"));
-				var dialog = ui.create.dialog("清正：弃置" + get.translation(target) + "一种花色的所有牌");
-				dialog.addNewRow(
-					{ item: get.translation('heart'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'heart' }), ratio: 3 },
-					{ item: get.translation('diamond'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'diamond' }), ratio: 3 },
-				);
-				dialog.addNewRow(
-					{ item: get.translation('spade'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'spade' }), ratio: 3 },
-					{ item: get.translation('club'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
-				);
-				if (list.includes("none")) {
-					dialog.classList.add("fullheight");
+				event.videoId = lib.status.videoId++;
+				function createDialog(target, id) {
+					var dialog = ui.create.dialog("清正：弃置" + get.translation(target) + "一种花色的所有牌");
 					dialog.addNewRow(
-						{ item: get.translation('none'), retio: 1 },
-						{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
+						{ item: get.translation('heart'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'heart' }), ratio: 3 },
+						{ item: get.translation('diamond'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'diamond' }), ratio: 3 },
 					);
-				}
+					dialog.addNewRow(
+						{ item: get.translation('spade'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'spade' }), ratio: 3 },
+						{ item: get.translation('club'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
+					);
+					if (target.hasCard({suit:"none"},'h')) {
+						dialog.classList.add('fullheight');
+						dialog.addNewRow(
+							{ item: get.translation('none'), retio: 1 },
+							{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
+						);
+					}
+					dialog.css({height:"60%"});
+					dialog.videoId = id;
+				};
+				if (event.isMine()) createDialog(target, event.videoId);
+				else if (player.isOnline2()) player.send(createDialog, target, event.videoId);
 				if (list.length) {
 					player
 						.chooseControl(list)
-						.set("dialog", dialog)
+						.set("dialog", get.idDialog(event.videoId))
 						.set("ai", () => {
 							return _status.event.control;
 						})
@@ -1844,6 +1851,7 @@ const skills = {
 				}
 			} else event.finish();
 			"step 3";
+			game.broadcastAll("closeDialog", event.videoId);
 			var cards2 = target.getCards("h", { suit: result.control });
 			event.cards2 = cards2;
 			target.discard(cards2, "notBySelf").set("discarder", player);

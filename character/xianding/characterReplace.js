@@ -1,5 +1,5 @@
 const characterReplaces = {
-	wenyang: ["wenyang", "db_wenyang", "diy_wenyang", "std_db_wenyang"],
+	wenyang: ["wenyang", "db_wenyang", "diy_wenyang", "std_db_wenyang", "jsrg_wenyang"],
 	gexuan: ["gexuan", "tw_gexuan"],
 	panshu: ["panshu", "re_panshu"],
 	yangwan: ["yangwan", "sp_yangwan", "jd_sp_yangwan"],
