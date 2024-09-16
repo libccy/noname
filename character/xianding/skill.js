@@ -1107,9 +1107,10 @@ const skills = {
 				})
 				.set("ai", target => {
 					const player = get.event().player,
-						cards = get.event().getTrigger().cards.filterInD();
-					return cards.reduce((sum, card) => sum + get.value(card, target) * get.value(card, player), 0);
+						cards = get.event().cards;
+					return get.attitude(player, target) * cards.reduce((sum, card) => sum + get.value(card, target), 0);
 				})
+				.set("cards", trigger.cards.filterInD())
 				.forResult();
 		},
 		usable: 1,
