@@ -5366,12 +5366,16 @@ const skills = {
 				ai: {
 					effect: {
 						player_use(card, player, target) {
+							if (typeof card !== "object") return;
 							let num = 0,
 								nohave = true;
 							game.countPlayer(i => {
 								if (i.hasSkill("lingce", null, null, false)) {
 									nohave = false;
-									if (i.isIn() && lib.skill.lingce.filter({ card: card }, i)) num += get.sgnAttitude(player, i);
+									if (i.isIn() && lib.skill.lingce.filter({
+										card: card,
+										cards: card.cards ? card.cards : [card]
+									}, i)) num += get.sgnAttitude(player, i);
 								}
 							}, true);
 							if (nohave) game.removeGlobalSkill("lingce_global");
