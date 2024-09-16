@@ -66,7 +66,7 @@ const skills = {
 			}
 			if (card) {
 				await player.gain(card, get.owner(card) ? "give" : "gain2");
-				if (get.number(card) == 1) {
+				if (num == 1) {
 					await player.recover();
 					player.tempBanSkill("dcchaozhen");
 				}

@@ -1820,14 +1820,14 @@ const skills = {
 						{ item: get.translation('club'), retio: 1 },
 						{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
 					);
-					if (target.hasCard({suit:"none"},'h')) {
-						dialog.classList.add('fullheight');
+					if (target.hasCard({ suit: "none" }, 'h')) {
+						dialog.classList.add( 'fullheight' );
 						dialog.addNewRow(
 							{ item: get.translation('none'), retio: 1 },
 							{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
 						);
 					}
-					dialog.css({height:"60%"});
+					dialog.css({ height: "60%" });
 					dialog.videoId = id;
 				};
 				if (event.isMine()) createDialog(target, event.videoId);
