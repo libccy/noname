@@ -392,9 +392,14 @@ export class Player extends HTMLDivElement {
 				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
 				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
 				player.tips.get(index).css(css);
+
 				const width = player.node.avatar.clientWidth;
 				let w = width * (player.classList.contains('fullskin2') ? 2 : 1);
 				player.style.setProperty('--w', `${w}px`);
+
+				//检查tip的高度，使其不覆盖装备
+				game.callHook('checkTipBottom', [player]);
+
 			},
 			player,
 			index,
@@ -3540,6 +3545,7 @@ export class Player extends HTMLDivElement {
 			game.addVideo("update", this, [this.countCards("h"), this.hp, this.maxHp, this.hujia]);
 		}
 		this.updateMarks();
+		game.callHook('checkTipBottom', [this]);
 		return this;
 	}
 	/**
@@ -11848,3 +11854,5 @@ export class Player extends HTMLDivElement {
 }
 
 CacheContext.inject(Player.prototype, ["hasCard", "hasValueTarget", "getModableSkills", "getCardIndex", "countCards", "getSkills", "getUseValue", "canUse"]);
+
+

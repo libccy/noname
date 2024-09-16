@@ -142,6 +142,7 @@ export const defaultHookcompatition = {
 	uncheckEnd: new NonameAssembly("uncheckEnd"),
 
 	checkOverflow: new NonameAssembly("checkOverflow"),
+	checkTipBottom: new NonameAssembly("checkTipBottom"),
 
 	checkDamage1: new NonameAssembly("checkDamage1"),
 	checkDamage2: new NonameAssembly("checkDamage2"),

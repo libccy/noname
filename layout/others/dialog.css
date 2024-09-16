@@ -234,29 +234,31 @@
     display: none;
 }
 
-/* 方案一 */
-.player .tipContainer {
+/* ----------tip相关的样式------------------ */
 
+
+.player .tipContainer {
     --bg: #2b2b28;
     position: absolute;
+    box-sizing: border-box;
     width: 100%;
-    bottom: 46%;
+    bottom: max(46%, var(--bottom, 46%));
     height: fit-content;
-    max-height: 80%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    /* z-index: 2; */
+    z-index: 3;
+
 }
 
 .player[data-position="0"] .tipContainer {
-    width: var(--w, 120px)
+    width: var(--w, 120px);
 }
 
 .player .tipContainer>.tip {
     position: relative;
     box-sizing: border-box;
-    width: 99%;
+    width: 100%;
     background: var(--bg);
     border-radius: 5px;
     padding: 3px 3px;
@@ -270,39 +272,20 @@
     text-shadow: none;
 }
 
-/* 人物tip相关的样式 方案二(仿手杀) */
+/* 方案二 */
 /* .player .tipContainer {
-    --bg: #2b2116de;
-    position: absolute;
-    width: 98%;
-    bottom: 46%;
-    height: fit-content;
-    max-height: 80%;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    z-index: 999;
-    border: solid 2px #a2a19d;
+    --bg: #48310cf0;
+    border: solid 3px #a17132;
+    padding: 0;
+    border-radius: 5px;
     box-sizing: border-box;
-    border-radius: 3px;
+
 }
-
-
 
 .player .tipContainer>.tip {
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
-    background: var(--bg);
-    padding: 3px 3px;
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: flex-start;
-    align-items: center;
-    color: #e0dddd;
-    text-shadow: none;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 2px;
+    font-size: 1.1em;
 } */
-
-.player .equips {
-    z-index: 3
-}
