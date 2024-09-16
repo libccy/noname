@@ -1946,21 +1946,21 @@ const skills = {
 		discard: false,
 		lose: false,
 		delay: false,
-		usable: 1,
+		usable: 2,
 		check(card) {
 			if (card.name == "du") return 114514;
 			return 5 - get.value(card);
 		},
 		async content(event, trigger, player) {
 			const target = event.target;
+			await player.showCards(event.cards);
 			await player.give(event.cards, target, "visible");
-			await target
+			if (target.countCards("h")) await target
 				.chooseToGive(
 					player,
 					(card, player) => {
 						return get.type2(card) != get.type2(get.event("cards")[0]);
-					},
-					"he"
+					}
 				)
 				.set("cards", event.cards);
 		},
