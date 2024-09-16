@@ -891,129 +891,160 @@ export const Content = {
 				.set(
 					"ai",
 					event.ai ||
-					function (card) {
-						return Math.random();
-					}
+						function (card) {
+							return Math.random();
+						}
 				)
 				.set(
 					"aiCard",
 					event.aiCard ||
-					function (target) {
-						var hs = target.getCards("h");
-						return { bool: true, cards: [hs.randomGet()] };
-					}
+						function (target) {
+							var hs = target.getCards("h");
+							return { bool: true, cards: [hs.randomGet()] };
+						}
 				);
 			next._args.remove("glow_result");
 		}
 		"step 1";
 		var red = [],
-			black = [];
+			black = [],
+			others = [];
+		event.opinions = ["red", "black"];
 		event.videoId = lib.status.videoId++;
 		for (var i = 0; i < event.targets.length; i++) {
 			var card = result[i].cards[0],
 				target = event.targets[i];
 			if (card == "red" || get.color(card, target) == "red") red.push([target, card]);
-			else black.push([target, card]);
+			else if (card == "black" || get.color(card, target) == "black") black.push([target, card]);
+			else others.push([target, card]);
 		}
-		if(event.fixedResult) {
+		if (event.fixedResult) {
 			for (var i = 0; i < event.fixedResult.length; i++) {
 				var list = event.fixedResult[i];
 				if (list[1] == "red" || get.color(list[1], list[0]) == "red") red.push(list);
-				else black.push(list);
+				else if (list[1] == "black" || get.color(list[1], list[0]) == "black") black.push(list);
+				else others.push(list);
 				event.targets.push(list[0]);
 			}
 		}
 		event.red = red;
 		event.black = black;
+		event.others = others;
+		if (event.debateIgnore !== false) {
+			event.opinions.add("others");
+		} else {
+			var colors = {};
+			for (var list of others) {
+				var color = typeof list[1] == "string" ? list[1] : get.color(list[1], list[0]);
+				if (!colors[color]) colors[color] = [];
+				colors[color].push(list);
+			}
+			for (var color in colors) {
+				event.opinions.add(color);
+				event[color] = colors[color];
+			}
+		}
 		event.trigger("debateShowOpinion");
 		"step 2";
-		var red = event.red,
-			black = event.black;
-		if (red.length) {
-			let cards = red.filter(i => get.itemtype(i[1]) == "card");
-			game.log(
-				red.map(function (i) {
-					return i[0];
-				}).unique(),
-				'意见为<span class="firetext">红色</span>',
-				cards.length ? "，展示了" : "",
-				cards.map(i => i[1]),
-			);
-		} else game.log("#b无人", '意见为<span class="firetext">红色</span>');
-		if (black.length) {
-			let cards = black.filter(i => get.itemtype(i[1]) == "card");
-			game.log(
-				black.map(function (i) {
-					return i[0];
-				}).unique(),
-				"意见为",
-				"#g黑色",
-				cards.length ? "，展示了" : "",
-				cards.map(i => i[1]),
-			);
-		} else game.log("#b无人", "意见为", "#g黑色");
+		for (var color of event.opinions) {
+			if (event[color].length) {
+				let cards = event[color].filter(i => get.itemtype(i[1]) == "card");
+				game.log(
+					event[color]
+						.map(function (i) {
+							return i[0];
+						})
+						.unique(),
+					color == "other" ? "没有意见" : '意见为<span class="firetext">' + get.translation(color) + "</span>",
+					cards.length ? "，展示了" : "",
+					cards.map(i => i[1])
+				);
+			}
+		}
 		game.broadcastAll(
-			function (name, id, redArgs, blackArgs) {
+			function (name, id, event) {
 				var dialog = ui.create.dialog(name + "发起了议事", "hidden", "forcebutton");
 				dialog.videoId = id;
 				dialog.classList.add("scroll1");
 				dialog.classList.add("scroll2");
 				dialog.classList.add("fullwidth");
-				dialog.classList.add("fullheight");
-				dialog.buttonss = [];
-
-				var list = ["意见为红色的角色", "意见为黑色的角色"];
-				for (var i = 0; i < list.length; i++) {
-					dialog.add('<div class="text center">' + list[i] + "</div>");
-					var buttons = ui.create.div(".buttons", dialog.content);
-					dialog.buttonss.push(buttons);
-					buttons.classList.add("popup");
-					buttons.classList.add("guanxing");
-				}
 				var func = function (target) {
 					if (target._tempTranslate) return target._tempTranslate;
 					var name = target.name;
 					if (lib.translate[name + "_ab"]) return lib.translate[name + "_ab"];
 					return get.translation(name);
 				};
-				for (var i = 0; i < redArgs.length; i++) {
-					var list = redArgs[i], button;
-					if (typeof list[1] == 'string') {
-						button = ui.create.button(["", "", list[1]], "vcard", dialog.buttonss[0]);
+				if (event.opinions.includes("others")) {
+					if (event.others.length > 2) {
+						dialog.classList.add("fullheight");
 					}
-					else button = ui.create.button(list[1], "card", dialog.buttonss[0]);
-					button.querySelector(".info").innerHTML = func(list[0]);
-				}
-				for (var i = 0; i < blackArgs.length; i++) {
-					var list = blackArgs[i];
-					if (typeof list[1] == 'string') {
-						button = ui.create.button(["", "", list[1]], "vcard", dialog.buttonss[1]);
+					for (var color of event.opinions) {
+						if (color == "others" && !event.others.length) continue;
+						dialog.addNewRow(
+							{ item: get.translation(color), ratio: 1 },
+							{
+								item: event[color].slice().map(list => {
+									let element = get.copy(list[1]);
+									if (typeof element == "string") {
+										if (!lib.card["debate_" + element]) {
+											game.broadcastAll(element => {
+												lib.card["debate_" + element] = {};
+												lib.translate["debate_" + element] = get.translation(element);
+											}, element);
+										}
+										element = new lib.element.VCard(game.createCard("debate_" + element, " ", " "));
+									}
+									element._custom = button => {
+										button.querySelector(".info").innerHTML = func(list[0]);
+									};
+									return element;
+								}),
+								ratio: 8,
+							}
+						);
 					}
-					else button = ui.create.button(list[1], "card", dialog.buttonss[1]);
-					button.querySelector(".info").innerHTML = func(list[0]);
+				} else {
+					dialog.buttonss = [];
+					dialog.add('<div class="text center">意见</div>');
+					var buttons = ui.create.div(".buttons", dialog.content);
+					dialog.buttonss.push(buttons);
+					buttons.classList.add("popup");
+					buttons.classList.add("guanxing");
+					for (var color of event.opinions) {
+						for (var list of event[color]) {
+							var button;
+							if (typeof list[1] == "string") {
+								button = ui.create.button(["", "", list[1]], "vcard", dialog.buttonss[0]);
+							} else button = ui.create.button(list[1], "card", dialog.buttonss[0]);
+							button.querySelector(".info").innerHTML = func(list[0]);
+						}
+					}
 				}
 				dialog.open();
 			},
 			get.translation(player),
 			event.videoId,
-			red,
-			black
+			event
 		);
 		game.delay(4);
 		"step 3";
 		game.broadcastAll("closeDialog", event.videoId);
-		var opinion = null;
-		if (event.red.length > event.black.length) opinion = "red";
-		else if (event.red.length < event.black.length) opinion = "black";
-		if (opinion) game.log(player, "本次发起的议事结果为", opinion == "red" ? '<span class="firetext">红色</span>' : "#g黑色");
+		var opinion = event.opinions
+			.slice()
+			.filter(i => i != "others")
+			.sort((a, b) => event[b].length - event[a].length);
+		opinion = event[event.opinions[0]].length > event[event.opinions[1]].length ? event.opinions[0] : null;
+		if (opinion) game.log(player, "本次发起的议事结果为", opinion == "red" ? '<span class="firetext">红色</span>' : "#g" + get.translation(opinion));
 		else game.log(player, "本次发起的议事无结果");
 		event.result = {
 			bool: true,
 			opinion: opinion,
-			red: event.red,
-			black: event.black,
+			opinions: event.opinions,
 			targets: event.targets,
 		};
+		for (var color of event.opinions) {
+			event.result[color] = event[color];
+		}
 		"step 4";
 		if (event.callback) {
 			var next = game.createEvent("debateCallback", false);
@@ -1031,9 +1062,9 @@ export const Content = {
 		next.set(
 			"ai",
 			event.ai ||
-			function () {
-				return Math.random();
-			}
+				function () {
+					return Math.random();
+				}
 		);
 		"step 1";
 		if (result.bool) {
@@ -1110,7 +1141,7 @@ export const Content = {
 			var dialog = ui.create.dialog("forcebutton", "hidden");
 			event.dialog = dialog;
 			event.dialog.textPrompt = event.dialog.add('<div class="text center">' + (beatmap.prompt || "在音符滑条和底部判定区重合时点击屏幕！") + "</div>");
-			event.switchToAuto = function () { };
+			event.switchToAuto = function () {};
 			event.dialog.classList.add("fixed");
 			event.dialog.classList.add("scroll1");
 			event.dialog.classList.add("scroll2");
@@ -1472,7 +1503,6 @@ export const Content = {
 			 * @param { TouchEvent | MouseEvent } e
 			 */
 			var onDrag = function (e) {
-
 				if (event.isPlayingAnimation) return;
 				if (e instanceof MouseEvent) {
 					if (e.which != 1) return;
@@ -1506,17 +1536,16 @@ export const Content = {
 					copy.style.transition = "none";
 					copy.style.zIndex = "100";
 					copy.css({
-						boxShadow: '0px 0px 7px 2px rgba(233, 30, 77, 0.95)'
-					})
+						boxShadow: "0px 0px 7px 2px rgba(233, 30, 77, 0.95)",
+					});
 					ui.window.appendChild(copy);
 				}
-				e = e instanceof MouseEvent ? e : e.touches[0]
+				e = e instanceof MouseEvent ? e : e.touches[0];
 
-				const ex = e.clientX / game.documentZoom
-				const ey = e.clientY / game.documentZoom
-				copy.style.left = `${(ex + elementOffsetX)}px`;
-				copy.style.top = `${(ey + elementOffsetY)}px`;
-
+				const ex = e.clientX / game.documentZoom;
+				const ey = e.clientY / game.documentZoom;
+				copy.style.left = `${ex + elementOffsetX}px`;
+				copy.style.top = `${ey + elementOffsetY}px`;
 			};
 
 			var dragEnd = function (e) {
@@ -1694,12 +1723,12 @@ export const Content = {
 				}
 			};
 			event.custom.replace.confirm = function (bool) {
-				if (event.isPlayingAnimation) return
+				if (event.isPlayingAnimation) return;
 				event.buttonss.forEach(btn => {
 					Array.from(btn.children).forEach(element => {
 						if (element.copy && ui.window.contains(element.copy)) {
 							ui.window.removeChild(element.copy);
-							delete element.copy
+							delete element.copy;
 						}
 					});
 				});
@@ -1829,11 +1858,11 @@ export const Content = {
 			next.set(
 				"filterTarget",
 				event.filterTarget ||
-				function (card, player, target) {
-					if (!_status.event.targets.includes(target)) return false;
-					if (!_status.event.nodistance && !lib.filter.targetInRange(card, player, target)) return false;
-					return lib.filter.targetEnabledx(card, player, target);
-				}
+					function (card, player, target) {
+						if (!_status.event.targets.includes(target)) return false;
+						if (!_status.event.nodistance && !lib.filter.targetInRange(card, player, target)) return false;
+						return lib.filter.targetEnabledx(card, player, target);
+					}
 			);
 			next.set("ai", event.ai || get.effect_use);
 			next.set("selectTarget", event.selectTarget || lib.filter.selectTarget);
@@ -1925,7 +1954,7 @@ export const Content = {
 							true,
 						],
 					],
-					function () { },
+					function () {},
 					event.ai
 				)
 				.set("switchToAuto", function () {
@@ -2062,7 +2091,7 @@ export const Content = {
 							true,
 						],
 					],
-					function () { },
+					function () {},
 					function () {
 						return 1 + Math.random();
 					}
@@ -4047,9 +4076,9 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-							function () {
-								return 0;
-							}
+								function () {
+									return 0;
+								}
 						);
 						if (event.id) next._parent_id = event.id;
 						next.type = "chooseToUse_button";
@@ -4060,16 +4089,16 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-							function () {
-								return 1;
-							}
+								function () {
+									return 1;
+								}
 						);
 						next.set(
 							"filterButton",
 							info.chooseButton.filter ||
-							function () {
-								return true;
-							}
+								function () {
+									return true;
+								}
 						);
 						next.set("selectButton", info.chooseButton.select || 1);
 						next.set("complexSelect", info.chooseButton.complexSelect !== false);
@@ -4255,9 +4284,9 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-							function () {
-								return 0;
-							}
+								function () {
+									return 0;
+								}
 						);
 					} else {
 						var next = player.chooseButton(dialog);
@@ -4266,16 +4295,16 @@ export const Content = {
 						next.set(
 							"ai",
 							info.chooseButton.check ||
-							function () {
-								return 1;
-							}
+								function () {
+									return 1;
+								}
 						);
 						next.set(
 							"filterButton",
 							info.chooseButton.filter ||
-							function () {
-								return true;
-							}
+								function () {
+									return true;
+								}
 						);
 						next.set("selectButton", info.chooseButton.select || 1);
 						next.set("filterOk", info.chooseButton.filterOk || (() => true));
@@ -6687,7 +6716,7 @@ export const Content = {
 			return;
 		}
 		var cards = player.getCards("h");
-		player.showCards(cards).setContent(function () { });
+		player.showCards(cards).setContent(function () {});
 		var str = get.translation(player.name) + "的手牌";
 		if (typeof event.prompt == "string") {
 			str = event.prompt;
@@ -6929,13 +6958,13 @@ export const Content = {
 		if (targets.length == 2) {
 			const dialogArgs = ["请选择要移动的牌"];
 			const es = targets[0].getVCards("e", card => {
-				return event.filter(card) && targets[1].canEquip(card, event.canReplace);
-			}),
+					return event.filter(card) && targets[1].canEquip(card, event.canReplace);
+				}),
 				js = event.nojudge
 					? []
 					: targets[0].getVCards("j", card => {
-						return event.filter(card) && targets[1].canAddJudge(card);
-					});
+							return event.filter(card) && targets[1].canAddJudge(card);
+					  });
 			if (es.length) {
 				dialogArgs.push(`<div class="text center">装备区</div>`);
 				dialogArgs.push([es, "vcard"]);
@@ -8896,7 +8925,7 @@ export const Content = {
 				event.num = num;
 			}
 			switch (
-			event.type //log moved here
+				event.type //log moved here
 			) {
 				case "damage":
 					game.log(player, "的护甲抵挡了" + get.cnNumber(-num) + "点伤害");
