@@ -369,7 +369,83 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean }
 	 */
 	removed;
+	/**
+	 * @type {Map<string,HTMLDivElement>}
+	 */
+	tips;
 
+	/**
+	 * 设置提示文字，有则更改，无则加之。
+	 * @param {string} index 给标记起一个名字，名字任意
+	 * @param {string} message 设置提示标记的内容
+	 * @param { SkillTrigger | string | boolean | (event:GameEventPromise, player:Player, name:string) => boolean } isTemp 确定失去的时间阶段，不填则不失去
+	 * @param { object } [css] 自定义的样式
+	 * @returns { HTMLDivElement }
+	 * @author Curpond
+	 */
+	addTip(index, message, isTemp = false, css = {}) {
+		const player = this;
+		game.broadcastAll(
+			(player, index, message, css) => {
+				player.node.tipContainer ??= ui.create.div(".tipContainer", player);
+				player.tips ??= new Map();
+				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
+				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+				player.tips.get(index).css(css);
+				const width = player.node.avatar.clientWidth;
+				let w = width * (player.classList.contains('fullskin2') ? 2 : 1);
+				player.style.setProperty('--w', `${w}px`);
+			},
+			player,
+			index,
+			message,
+			css
+		);
+		if (isTemp && !player.storage[`temp_tip_${index}`]) {
+			player.storage[`temp_tip_${index}`] = true;
+			let expire;
+			if (isTemp === true) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
+			else if (typeof isTemp == "string" || Array.isArray(isTemp)) expire = { global: isTemp };
+			player
+				.when(expire, false)
+				.assign({
+					firstDo: true,
+					priority: Infinity,
+				})
+				.vars({
+					index,
+				})
+				.then(() => {
+					delete player.storage[`temp_tip_${index}`];
+					player.removeTip(index);
+				})
+				.finish();
+		}
+		return player.tips.get(index);
+	}
+	/**
+	 * 清除标记，不传参数可以清空所有标记
+	 * @param {string} [index] 标记的名字，不传则清空所有标记
+	 * @author Curpond
+	 */
+	removeTip(index) {
+		game.broadcastAll(
+			(player, index) => {
+				if (index == undefined) {
+					player.tips?.clear();
+				} else {
+					if (player.tips?.has(index)) {
+						player.tips.get(index).remove();
+						player.tips.delete(index);
+					}
+				}
+				if (!player.tips?.size) player.node.tipContainer?.remove();
+				delete player.node.tipContainer;
+			},
+			this,
+			index
+		);
+	}
 	//新函数
 	/**
 	 * 怒气
@@ -1034,10 +1110,10 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					return num + get.numOf(types, type);
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				return num + get.numOf(types, type);
+			}, 0)
 		);
 	}
 	/**
@@ -1066,11 +1142,11 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
-					return num;
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
+				return num;
+			}, 0)
 		);
 	}
 	/**
@@ -1414,11 +1490,11 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @deprecated
 	 */
-	$disableEquip() {}
+	$disableEquip() { }
 	/**
 	 * @deprecated
 	 */
-	$enableEquip() {}
+	$enableEquip() { }
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");
@@ -2132,10 +2208,10 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
 		const equips1 = from.getVCards("e", function (card) {
-				return !card.cards?.some(card => {
-					return ui.selected.cards?.includes(card);
-				});
-			}),
+			return !card.cards?.some(card => {
+				return ui.selected.cards?.includes(card);
+			});
+		}),
 			equips2 = to.getVCards("e", function (card) {
 				return !card.cards?.some(card => {
 					return ui.selected.cards?.includes(card);
@@ -3620,7 +3696,7 @@ export class Player extends HTMLDivElement {
 		if (typeof num != "number" || !num) num = 1;
 		let maxCharge = this.getMaxCharge();
 		num = Math.min(num, maxCharge - this.countMark("charge"));
-		if(num > 0) this.addMark("charge", num, log);
+		if (num > 0) this.addMark("charge", num, log);
 	}
 	/**
 	 * 移去蓄力点
@@ -3630,7 +3706,7 @@ export class Player extends HTMLDivElement {
 	removeCharge(num, log) {
 		if (typeof num != "number" || !num) num = 1;
 		num = Math.min(num, this.countMark("charge"));
-		if(num > 0) this.removeMark("charge", num, log);
+		if (num > 0) this.removeMark("charge", num, log);
 	}
 	/**
 	 * 返回玩家的蓄力点数
@@ -3638,7 +3714,7 @@ export class Player extends HTMLDivElement {
 	 * @returns { number }
 	 */
 	countCharge(max) {
-		if(max) return this.getMaxCharge() - this.countMark("charge");
+		if (max) return this.getMaxCharge() - this.countMark("charge");
 		return this.countMark("charge");
 	}
 	/**
@@ -3647,9 +3723,9 @@ export class Player extends HTMLDivElement {
 	getMaxCharge() {
 		let skills = game.expandSkills(this.getSkills().concat(lib.skill.global));
 		let max = 0;
-		for(let skill of skills) {
+		for (let skill of skills) {
 			let info = get.info(skill);
-			if(!info.chargeSkill || typeof info.chargeSkill != "number") continue;
+			if (!info.chargeSkill || typeof info.chargeSkill != "number") continue;
 			max += info.chargeSkill;
 		}
 		max = game.checkMod(this, max, "maxCharge", this);
