@@ -9945,7 +9945,7 @@ export class Player extends HTMLDivElement {
 			return false;
 		}).length;
 		if (count && rvt !== "count") return rvt === "odds" ? 1 : true;
-		let hs = this.getCards("hs").filter(i => !cards.includes(i)).length;
+		let hs = this.getCards("hs").filter(i => !cards.includes(i) && !selected.includes(i)).length;
 		if (!hs) {
 			if (rvt === "count") return count;
 			else if (rvt === "odds") return 0;
@@ -9993,7 +9993,7 @@ export class Player extends HTMLDivElement {
 			return false;
 		}).length;
 		if (count && rvt !== "count") return rvt === "odds" ? 1 : true;
-		let hs = this.getCards("hs").filter(i => !cards.includes(i)).length;
+		let hs = this.getCards("hs").filter(i => !cards.includes(i) && !selected.includes(i)).length;
 		if (!hs) {
 			if (rvt === "count") return count;
 			else if (rvt === "odds") return 0;
