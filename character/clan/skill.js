@@ -2009,7 +2009,7 @@ const skills = {
 		},
 		subSkill: { clan_zhonghui: { audio: 6 } },
 	},
-	//族王淩
+	//族王凌
 	clanbolong: {
 		audio: 2,
 		enable: "phaseUse",

@@ -289,7 +289,7 @@ const skills = {
 				target.addTempSkill("houfeng_share", {
 					player: ["phaseDiscardAfter", "phaseAfter"],
 				});
-				target.markAuto("houfeng_share", [player]);
+				target.markAuto("houfeng_share", [[player, name]]);
 				target.addTempSkill(name, { player: ["phaseDiscardAfter", "phaseAfter"] });
 				target.markAuto("houfeng", name);
 				target.popup(name, "thunder");
@@ -300,26 +300,28 @@ const skills = {
 			share: {
 				audio: "houfeng",
 				charlotte: true,
-				onremove: true,
+				onremove: ["houfeng", "houfeng_share"],
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
-				logAudio(event, player) {
-					if (!lib.skill.zhengsu.filterx("houfeng", player)) return "houfeng3.mp3";
+				getIndex(event, player) {
+					return player.getStorage("houfeng");
+				},
+				logAudio(event, player, _3, data) {
+					if (!player.storage[data]) return "houfeng3.mp3";
 					return "houfeng2.mp3";
 				},
 				content: function () {
 					"step 0";
-					if (!lib.skill.zhengsu.filterx("houfeng", player)) {
-						delete player.storage.houfeng;
+					player.unmarkAuto("houfeng", event.indexedData);
+					if (!player.storage[event.indexedData]) {
 						player.popup("整肃失败", "fire");
 						game.log(player, "整肃失败");
 						event.finish();
 						return;
 					}
-					delete player.storage.houfeng;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
-					var list = player.getStorage("houfeng_share").filter(i => i.isIn());
+					var list = player.getStorage("houfeng_share").filter(i => i[1] == event.indexedData && i[0].isIn()).map(i => i[0]);
 					list.unshift(player);
 					event.list = list;
 					if (list.some(i => i.isDamaged())) {
@@ -366,6 +368,7 @@ const skills = {
 				cost_data: result.links?.[0][2],
 			};
 		},
+		onremove: true,
 		logAudio: () => 1,
 		async content(event, trigger, player) {
 			const name = event.cost_data;
@@ -383,20 +386,22 @@ const skills = {
 				charlotte: true,
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
-				logAudio(event, player) {
-					if (!lib.skill.zhengsu.filterx("spzhengjun", player)) return "spzhengjun3.mp3";
+				getIndex(event, player) {
+					return player.getStorage("spzhengjun");
+				},
+				logAudio(event, player, _3, data) {
+					if (!player.storage[data]) return "spzhengjun3.mp3";
 					return "spzhengjun2.mp3";
 				},
 				content: function () {
 					"step 0";
-					if (!lib.skill.zhengsu.filterx("spzhengjun", player)) {
-						delete player.storage.spzhengjun;
+					player.unmarkAuto("spzhengjun", event.indexedData);
+					if (!player.storage[event.indexedData]) {
 						player.popup("整肃失败", "fire");
 						game.log(player, "整肃失败");
 						event.finish();
 						return;
 					}
-					delete player.storage.spzhengjun;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
 					player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力", true);
@@ -773,6 +778,7 @@ const skills = {
 		filter: function (event, player) {
 			return ["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].some(i => !player.hasSkill(i));
 		},
+		onremove: true,
 		logAudio: () => 1,
 		async cost(event, trigger, player) {
 			const { result } = await player.chooseButton([get.prompt("spyanji"), [["zhengsu_leijin", "zhengsu_bianzhen", "zhengsu_mingzhi"].filter(i => !player.hasSkill(i)), "vcard"]]).set("ai", () => Math.random());
@@ -797,19 +803,21 @@ const skills = {
 				charlotte: true,
 				trigger: { player: "phaseDiscardEnd" },
 				forced: true,
-				logAudio(event, player) {
-					if (!lib.skill.zhengsu.filterx("spyanji", player)) return "spyanji3.mp3";
+				getIndex(event, player) {
+					return player.getStorage("spyanji");
+				},
+				logAudio(event, player, _3, data) {
+					if (!player.storage[data]) return "spyanji3.mp3";
 					return "spyanji2.mp3";
 				},
 				content: function () {
-					if (!lib.skill.zhengsu.filterx("spyanji", player)) {
-						delete player.storage.spyanji;
+					player.unmarkAuto("spyanji", event.indexedData);
+					if (!player.storage[event.indexedData]) {
 						player.popup("整肃失败", "fire");
 						game.log(player, "整肃失败");
 						event.finish();
 						return;
 					}
-					delete player.storage.spyanji;
 					player.popup("整肃成功", "wood");
 					game.log(player, "整肃成功");
 					player.chooseDrawRecover(2, "整肃奖励：摸两张牌或回复1点体力");
@@ -2845,7 +2853,7 @@ const skills = {
 			player.storage.counttrigger.dbquedi--;
 		},
 	},
-	//王淩
+	//王凌
 	xingqi: {
 		audio: 2,
 		trigger: { player: "useCard" },

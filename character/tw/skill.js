@@ -7441,7 +7441,7 @@ const skills = {
 			if (num > 0) player.recover(num);
 		},
 	},
-	//王淩
+	//王凌
 	twmibei: {
 		audio: "mibei",
 		trigger: { player: "useCardAfter" },

@@ -13,7 +13,7 @@ const characterReplaces = {
 	caofang: ["caofang", "jsrg_caofang"],
 	caomao: ["caomao", "mb_caomao"],
 	sp_zhenji: ["sp_zhenji", "jsrg_zhenji", "mb_sp_zhenji"],
-	zhugejin: ["zhugejin", "dc_sb_zhugejin"],
+	zhugejin: ["zhugejin", "dc_sb_zhugejin", "sb_zhugejin"],
 	caoang: ["caoang", "dc_sb_caoang"],
 	zhangxiu: ["zhangxiu", "dc_sb_zhangxiu"],
 	yuanji: ["yuanji", "ol_yuanji"],
