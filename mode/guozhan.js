@@ -20449,7 +20449,7 @@ export default () => {
 			gz_xin_zhuran: "朱然",
 			gz_jin_jiachong: "贾充",
 			gz_jin_yanghu: "羊祜",
-			gz_wangling: "王淩",
+			gz_wangling: "王凌",
 			fakequanbian: "权变",
 			fakequanbian_tag: "牌堆顶",
 			fakequanbian_info: "当你于回合内使用或打出牌时，你可以将一张手牌与牌堆顶X张牌的其中一张进行交换（X为你的体力上限）。",

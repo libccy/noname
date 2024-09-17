@@ -71,7 +71,7 @@ const translates = {
 	stdyibing: "益兵",
 	stdyibing_info: "一名角色进入濒死状态时，你可以获得其一张牌。",
 	stdbazhan: "把盏",
-	stdbazhan_info: "出牌阶段限一次，你可以交给一名男性角色一张手牌，然后其可以交给你一张与此牌类别不同的牌。",
+	stdbazhan_info: "出牌阶段限两次，你可以将一张手牌展示并交给一名男性角色，然后其可以展示并交给你一张与此牌类别不同的手牌。",
 	stdzhanying: "醮影",
 	stdzhanying_info: "锁定技，你的回合内，手牌数比回合开始时多的角色不能使用红色牌且受到的伤害+1。",
 	stdtiaohe: "调和",

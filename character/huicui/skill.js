@@ -281,6 +281,12 @@ const skills = {
 	//乐邹氏
 	dcyunzheng: {
 		audio: 2,
+		init() {
+			game.addGlobalSkill("dcyunzheng_global");
+		},
+		onremove() {
+			if (!game.hasPlayer(i => i.hasSkill("dcyunzheng", null, null, false), true)) game.removeGlobalSkill("dcyunzheng_global");
+		},
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -342,6 +348,39 @@ const skills = {
 					for (const target of targets) {
 						target[target.hasSkill("dcyunzheng_block") ? "removeSkill" : "addSkill"]("dcyunzheng_block");
 					}
+				},
+			},
+			global: {
+				mod: {
+					aiValue(player, card, num) {
+						if (num <= 0 || get.itemtype(card) !== "card" || !card.hasGaintag("dcyunzheng_tag")) return;
+						if (player.hasSkill("dcyunzheng")) return num * 1.2;
+						return num / 10;
+					},
+					aiUseful(player, card, num) {
+						if (num <= 0 || get.itemtype(card) !== "card" || !card.hasGaintag("dcyunzheng_tag")) return;
+						if (player.hasSkill("dcyunzheng")) return num * 1.2;
+						return num / 10;
+					},
+					aiOrder(player, card, num) {
+						if (num <= 0 || get.itemtype(card) !== "card" || !card.hasGaintag("dcyunzheng_tag")) return;
+						if (player.hasSkill("dcyunzheng")) return num * 0.8;
+						return num * 10;
+					},
+				},
+				trigger: {
+					player: "dieAfter"
+				},
+				filter(event, player) {
+					return !game.hasPlayer(cur => !cur.hasSkill("dcyunzheng", null, null, false), true);
+				},
+				silent: true,
+				forceDie: true,
+				content() {
+					game.removeGlobalSkill("dcyunzheng_gloabl");
+					game.countPlayer(cur => {
+						cur.removeSkill("dcyunzheng_block");
+					});
 				},
 			},
 			block: {

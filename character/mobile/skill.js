@@ -1805,30 +1805,37 @@ const skills = {
 					.reverse()
 					.concat("none")
 					.filter(i => target.hasCard({ suit: i }, "h"));
-				var dialog = ui.create.dialog("清正：弃置" + get.translation(target) + "一种花色的所有牌");
-				dialog.addNewRow(
-					{ item: get.translation('heart'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'heart' }), ratio: 3 },
-					{ item: get.translation('diamond'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'diamond' }), ratio: 3 },
-				);
-				dialog.addNewRow(
-					{ item: get.translation('spade'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'spade' }), ratio: 3 },
-					{ item: get.translation('club'), retio: 1 },
-					{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
-				);
-				if (list.includes("none")) {
-					dialog.classList.add("fullheight");
+				event.videoId = lib.status.videoId++;
+				function createDialog(target, id) {
+					var dialog = ui.create.dialog("清正：弃置" + get.translation(target) + "一种花色的所有牌");
 					dialog.addNewRow(
-						{ item: get.translation('none'), retio: 1 },
-						{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
+						{ item: get.translation('heart'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'heart' }), ratio: 3 },
+						{ item: get.translation('diamond'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'diamond' }), ratio: 3 },
 					);
-				}
+					dialog.addNewRow(
+						{ item: get.translation('spade'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'spade' }), ratio: 3 },
+						{ item: get.translation('club'), retio: 1 },
+						{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
+					);
+					if (target.hasCard({ suit: "none" }, 'h')) {
+						dialog.classList.add( 'fullheight' );
+						dialog.addNewRow(
+							{ item: get.translation('none'), retio: 1 },
+							{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
+						);
+					}
+					dialog.css({ height: "60%" });
+					dialog.videoId = id;
+				};
+				if (event.isMine()) createDialog(target, event.videoId);
+				else if (player.isOnline2()) player.send(createDialog, target, event.videoId);
 				if (list.length) {
 					player
 						.chooseControl(list)
-						.set("dialog", dialog)
+						.set("dialog", get.idDialog(event.videoId))
 						.set("ai", () => {
 							return _status.event.control;
 						})
@@ -1844,6 +1851,7 @@ const skills = {
 				}
 			} else event.finish();
 			"step 3";
+			game.broadcastAll("closeDialog", event.videoId);
 			var cards2 = target.getCards("h", { suit: result.control });
 			event.cards2 = cards2;
 			target.discard(cards2, "notBySelf").set("discarder", player);
@@ -10383,11 +10391,11 @@ const skills = {
 		},
 		aiCheck: function (target) {
 			if (target.hasSkill("tiansuan2_2")) return 0;
-			var player = _status.event.player;
+			let player = _status.event.player, original = get.damageEffect(target, player, player);
 			target.addSkill("tiansuan2_ai");
-			var num = get.damageEffect(target, player, player, "fire");
+			let fire = get.damageEffect(target, player, player, "fire");
 			target.removeSkill("tiansuan2_ai");
-			return num;
+			return (fire - original) * get.attitude(player, target);
 		},
 		group: ["tiansuan2_fire", "tiansuan2_ai"],
 	},
@@ -13514,15 +13522,20 @@ const skills = {
 			game.updateRoundNumber();
 			player.chooseTarget(true, "将整理出的经典置于一名角色的武将牌上").set("ai", function (target) {
 				if (target.hasSkill("xinfu_pdgyingshi")) return 0;
-				var player = _status.event.player;
-				var cards = _status.event.getParent().cards;
-				var att = get.attitude(player, target);
-				return -att;
-				//if(cards.length==1) return -att;
-				// if(player==target) att/=2;
-				// if(target.hasSkill('pingkou')) att*=1.4;
-				// att*=(1+target.countCards('j')/2);
-				// return att;
+				let player = _status.event.player,
+					cards = _status.event.getParent().cards,
+					att = get.attitude(player, target),
+					js = target.getCards("j", i => {
+						let name = i.viewAs || i.name, info = lib.card[name];
+						if (!info || !info.judge) return false;
+						return true;
+					}),
+					eff = -1.5 * get.effect(target, { name: "draw" }, player, player);
+				if (js.length) eff += js.reduce((acc, i) => {
+					let name = i.viewAs || i.name;
+					return acc - 0.7 * get.effect(target, get.autoViewAs({ name }, [i]), target, player);
+				}, 0);
+				return eff;
 			});
 			"step 3";
 			if (result.bool) {

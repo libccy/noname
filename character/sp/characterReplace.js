@@ -57,7 +57,7 @@ const characterReplaces = {
 	ol_luyusheng: ["ol_luyusheng", "luyusheng"],
 	fanjiangzhangda: ["fanjiangzhangda", "jsrg_fanjiangzhangda"],
 	simalang: ["re_simalang", "simalang"],
-	zhugedan: ["re_zhugedan", "zhugedan"],
+	zhugedan: ["re_zhugedan", "zhugedan", "jsrg_zhugedan"],
 	jsrg_zhangren: ["jsrg_zhangren", "dc_zhangren"],
 	ol_wenqin: ["ol_wenqin", "pe_wenqin", "mb_wenqin"],
 	lukai: ["ol_lukai", "lukai"],
