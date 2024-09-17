@@ -198,6 +198,7 @@ export class Dialog extends HTMLDivElement {
 				itemContainer.classList.add("popup");
 				let button = ui.create.button(item, get.itemtype(item), itemContainer, itemOption.ItemNoclick);
 				button.css(itemOption.itemCss ?? {});
+				if(item._custom) item._custom(button);
 				items.push(button);
 			} else {
 				for (let i of item) {
