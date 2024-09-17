@@ -252,7 +252,7 @@
 }
 
 .player[data-position="0"] .tipContainer {
-    width: var(--w, 120px);
+    width: max(var(--w, 120px), 120px);
 }
 
 .player .tipContainer>.tip {
