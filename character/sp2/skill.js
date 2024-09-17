@@ -4196,8 +4196,6 @@ const skills = {
 					var target = trigger.targets[0];
 					event.target = target;
 					trigger.targets.remove(target);
-					//trigger.triggeredTargets1.remove(target);
-					trigger.untrigger();
 					game.delayx();
 					"step 1";
 					var list;
