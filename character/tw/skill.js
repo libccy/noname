@@ -1107,6 +1107,7 @@ const skills = {
 			},
 			backup(links, player) {
 				return {
+					audio: "twhuanji",
 					names: links.map(i => [{ name: i[2], nature: i[3] }]),
 					filterCard: () => false,
 					selectCard: -1,

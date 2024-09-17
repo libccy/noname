@@ -6725,8 +6725,8 @@ const skills = {
 				mark: true,
 				marktext: "金",
 				intro: {
-					name: "金(膴仕)",
-					name2: "金(膴仕)",
+					name: "亿金",
+					name2: "亿金",
 					markcount: function (storage, player) {
 						return lib.skill.yijin.getKane(player).length;
 					},
@@ -6813,6 +6813,7 @@ const skills = {
 						if (card.name == "sha") return num + 1;
 					},
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(膴仕)",
@@ -6828,6 +6829,7 @@ const skills = {
 					player.skip("phaseUse");
 					player.skip("phaseDiscard");
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(金迷)",
@@ -6851,6 +6853,7 @@ const skills = {
 						return num - 3;
 					},
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(贾凶)",
@@ -6877,6 +6880,7 @@ const skills = {
 						},
 					},
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(通神)",
@@ -6895,6 +6899,7 @@ const skills = {
 					neg: true,
 					nokeep: true,
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(拥蔽)",
@@ -6909,6 +6914,7 @@ const skills = {
 				content: function () {
 					player.recover(3);
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(厚任)",

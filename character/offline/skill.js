@@ -3374,6 +3374,7 @@ const skills = {
 			},
 			backup(links, player) {
 				return {
+					audio: "jdlongdan",
 					viewAs: {
 						name: links[0][2],
 						nature: links[0][3],
