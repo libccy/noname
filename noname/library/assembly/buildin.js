@@ -166,6 +166,35 @@ export const checkOverflow = {
 		}
 	},
 };
+/**
+ * @type {(NonameAssemblyType["checkTipBottom"])}
+ */
+export const checkTipBottom = {
+	undateTipBottom(player) {
+
+		if (!player.node.tipContainer) return;
+		if ((lib.config.layout == "mobile" || lib.config.layout == "long") && player.dataset.position == '0') {
+			player.style.removeProperty('--bottom');
+		} else {
+			if (!player.node.equips.querySelectorAll(":not(.emptyequip)").length) {
+				player.style.removeProperty('--bottom');
+			} else {
+				let eqipContainerTop = player.node.equips.offsetTop;
+				let equipTop = 0;
+				for (let equip of Array.from(player.node.equips.children)) {
+					if (!equip.classList.contains("emptyequip")) {
+						equipTop = equip.offsetTop;
+						break;
+					}
+				}
+				let top = equipTop + eqipContainerTop;
+				const bottom = player.getBoundingClientRect().height - top;
+				player.style.setProperty('--bottom', bottom + 'px');
+			}
+
+		}
+	}
+};
 
 /**
  * @type {(NonameAssemblyType["checkDamage1"])}

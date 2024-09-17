@@ -1027,8 +1027,8 @@ const skills = {
 						player.countCards("h", function (card) {
 							return get.name(card, player) == "sha" && player.hasUseTarget(card);
 						}) -
-							player.getCardUsable("sha") >
-							1
+						player.getCardUsable("sha") >
+						1
 					)
 						return "equip1";
 					if (
@@ -1066,8 +1066,8 @@ const skills = {
 						player.countCards("h", function (card) {
 							return get.name(card, player) == "sha" && player.hasValueTarget(card);
 						}) -
-							player.getCardUsable("sha") >
-							1
+						player.getCardUsable("sha") >
+						1
 					)
 						return 1;
 					if (
@@ -1327,13 +1327,13 @@ const skills = {
 			result: {
 				target: (player, target) => {
 					let hs = player.countCards("h", card => {
-							if (!get.tag(card, "damage") || get.effect(target, card, player, player) <= 0) return 0;
-							if (get.name(card, player) === "sha") {
-								if (target.getEquip("bagua")) return 0.5;
-								if (target.getEquip("rewrite_bagua")) return 0.25;
-							}
-							return 1;
-						}),
+						if (!get.tag(card, "damage") || get.effect(target, card, player, player) <= 0) return 0;
+						if (get.name(card, player) === "sha") {
+							if (target.getEquip("bagua")) return 0.5;
+							if (target.getEquip("rewrite_bagua")) return 0.25;
+						}
+						return 1;
+					}),
 						ts =
 							target.hp +
 							target.hujia +
@@ -2071,9 +2071,9 @@ const skills = {
 				player.getHistory("useCard", function (evt) {
 					return evt.getParent("phaseUse") == event;
 				}).length <
-					game.countPlayer(function (current) {
-						return current != player && !current.inRange(player);
-					}) &&
+				game.countPlayer(function (current) {
+					return current != player && !current.inRange(player);
+				}) &&
 				game.hasPlayer(function (target) {
 					return target != player && !target.inRange(player) && target.countDiscardableCards(player, "he");
 				})
@@ -2250,14 +2250,28 @@ const skills = {
 				return 20 * val;
 			},
 		},
-		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
+		trigger: { player: ["useCardAfter", "useCardToTargeted", "useCard1"] },
 		prompt2(event, player) {
 			const cards = event.cards.filterInD("oe");
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
-		filter(event, player) {
-			let type = get.type2(event.card);
-			if (player.getHistory("useCard", evtx => get.type2(evtx.card) == type).indexOf(event.name == "useCardToTargeted" ? event.getParent() : event) !== 0) return false;
+		filter(event, player, name) {
+			let evt = event.name == "useCardToTargeted" ? event : event.getParent();
+			let type = get.type2(evt.card, false);
+			if (
+				player.hasHistory(
+					"useCard",
+					evtx => {
+						return evtx != evt && get.type2(evtx.card, false) == type;
+					},
+					evt
+				)
+			)
+				return false;
+			if (name === "useCard1") {
+				lib.skill.nzry_shicai.init(player);
+				return false;
+			}
 			if (!event.cards.someInD("oe")) return false;
 			if (event.name == "useCardToTargeted") {
 				return type == "equip" && player == event.target;
@@ -2298,6 +2312,19 @@ const skills = {
 			await game.cardsGotoPile(cards, "insert");
 			game.log(player, "将", cards, "置于了牌堆顶");
 			await player.draw();
+		},
+		init(player) {
+			const types = player
+				.getHistory("useCard")
+				.slice()
+				.map(evt => get.translation(get.type2(evt.card, false))[0] || "")
+				.unique();
+			if (types.length) {
+				player.addTip("nzry_shicai", "恃才 " + types.slice().join(" "), true);
+			}
+		},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 		subSkill: {
 			2: {
@@ -3196,7 +3223,7 @@ const skills = {
 			if (control == "cancel2") return;
 			event.result = { bool: true }; // 好像在content里面不能中断getIndex喵
 		},
-		async content(event, trigger, player) {},
+		async content(event, trigger, player) { },
 	},
 	xinliegong: {
 		mod: {
@@ -5070,12 +5097,12 @@ const skills = {
 						get.tag(card, "damage") &&
 						get.itemtype(player) === "player" &&
 						target.hp >
-							(player.hasSkillTag("damageBonus", true, {
-								target: target,
-								card: card,
-							})
-								? 2
-								: 1)
+						(player.hasSkillTag("damageBonus", true, {
+							target: target,
+							card: card,
+						})
+							? 2
+							: 1)
 					)
 						return [1, 1];
 				},
@@ -5159,12 +5186,12 @@ const skills = {
 						get.tag(card, "damage") &&
 						get.itemtype(player) === "player" &&
 						target.hp >
-							(player.hasSkillTag("damageBonus", true, {
-								target: target,
-								card: card,
-							})
-								? 2
-								: 1)
+						(player.hasSkillTag("damageBonus", true, {
+							target: target,
+							card: card,
+						})
+							? 2
+							: 1)
 					)
 						return [1, 1];
 				},
@@ -5394,7 +5421,7 @@ const skills = {
 		filter(event, player, name) {
 			return _status.currentPhase == player && event.player != player;
 		},
-		async content() {},
+		async content() { },
 	},
 	wansha2: {
 		mod: {
@@ -5421,7 +5448,7 @@ const skills = {
 			var info = lib.card[event.card.name];
 			return info && info.selectTarget && info.selectTarget == -1 && !info.toself;
 		},
-		async content() {},
+		async content() { },
 		mod: {
 			targetEnabled(card) {
 				if ((get.type(card) == "trick" || get.type(card) == "delay") && get.color(card) == "black") return false;
@@ -6154,7 +6181,7 @@ const skills = {
 				player.countCards("h") > player.hp
 			);
 		},
-		async content() {},
+		async content() { },
 		mod: {
 			maxHandcard(player, num) {
 				if (player.hasZhuSkill("xueyi")) {
@@ -7750,7 +7777,7 @@ const skills = {
 			return player.hp == 1;
 		},
 		forced: true,
-		async content() {},
+		async content() { },
 	},
 	guhuo_phase: {},
 };

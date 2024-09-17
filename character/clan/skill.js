@@ -2743,12 +2743,16 @@ const skills = {
 	//族荀谌
 	clansankuang: {
 		audio: 2,
-		trigger: { player: "useCardAfter" },
+		trigger: { player: ["useCardAfter", "useCard1"] },
 		direct: true,
 		forced: true,
-		filter(event, player) {
+		filter(event, player, name) {
 			const type = get.type2(event.card);
 			if (player.getRoundHistory("useCard", evt => get.type2(evt.card) == type).indexOf(event) !== 0) return false;
+			if (name === "useCard1") {
+				lib.skill.clansankuang.init(player);
+				return false;
+			}
 			return game.hasPlayer(current => current != player);
 		},
 		getNum(player) {
@@ -2823,6 +2827,18 @@ const skills = {
 				},
 			},
 			threaten: 1.6,
+		},
+		init(player) {
+			const types = player
+				.getRoundHistory("useCard")
+				.reduce((list, evt) => {
+					return list.add(get.type2(evt.card));
+				}, [])
+				.map(type => get.translation(type)[0] || "");
+			if (types.length) player.addTip("clansankuang", "三恇 " + types.slice().join(" "), "roundStart");
+		},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	clanbeishi: {
@@ -3312,12 +3328,16 @@ const skills = {
 	},
 	clandianzhan: {
 		audio: 2,
-		trigger: { player: "useCardAfter" },
+		trigger: { player: ["useCard1", "useCardAfter"] },
 		forced: true,
-		filter(event, player) {
+		filter(event, player, name) {
 			if (!lib.suit.includes(get.suit(event.card))) return false;
 			const suit = get.suit(event.card);
 			if (player.getRoundHistory("useCard", evt => get.suit(evt.card) == suit).indexOf(event) != 0) return false;
+			if (name === "useCard1") {
+				lib.skill.clandianzhan.init(player);
+				return false;
+			}
 			return (event.targets && event.targets.length == 1 && !event.targets[0].isLinked()) || player.hasCard(card => get.suit(card) == get.suit(event.card) && player.canRecast(card), "h");
 		},
 		content() {
@@ -3341,6 +3361,20 @@ const skills = {
 					player.removeTip(skill);
 				},
 			},
+		},
+		init(player) {
+			let suits = player
+				.getRoundHistory("useCard", evt => {
+					return lib.suits.includes(get.suit(evt.card));
+				})
+				.reduce((list, evt) => {
+					return list.add(get.suit(evt.card));
+				}, [])
+				.sort((a, b) => lib.suits.indexOf(b) - lib.suits.indexOf(a));
+			if (suits.length) player.addTip("clandianzhan", "点盏 " + suits.reduce((str, suit) => str + get.translation(suit), ""), "roundStart");
+		},
+		onremove(player, skill) {
+			player.removeTip(skill);
 		},
 	},
 	clanhuanyin: {
