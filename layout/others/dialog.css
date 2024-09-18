@@ -248,7 +248,7 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
     z-index: 3;
-
+    right: 0;
 }
 
 .player[data-position="0"] .tipContainer {
