@@ -3134,12 +3134,10 @@ const skills = {
 				const player = get.player(),
 					target = get.event().getParent().result.targets[0];
 				const link = button.link;
-				const att = get.attitude(player, target) / 5;
-				const hs = target.countCards("h");
-				if (link === "draw") {
-					return (2 - (hs + 2 > game.countPlayer()) * hs) * att;
-				}
-				return (1.1 - (hs > game.countPlayer()) * hs) * att;
+				const att = Math.sgn(get.attitude(player, target));
+				const drawWugu = target.countCards("h") + 2 > game.countPlayer();
+				if (link === "draw") return (drawWugu ? -1 : 2) * att;
+				return 1;
 			},
 			backup(links) {
 				return {
@@ -3215,12 +3213,10 @@ const skills = {
 			},
 			result: {
 				target(player, target) {
-					const del = player.countCards("h") - target.countCards("h"),
-						toFind = [2, 4].find(num => Math.abs(del) === num);
-					if (toFind) {
-						return (-del * (get.attitude(player, target) * Math.min(3, target.countCards("h"))) * toFind) / 10;
-					}
-					return -1;
+					const att = get.attitude(player, target);
+					const wugu = target.countCards("h") + 2 > game.countPlayer();
+					if (wugu) return Math.min(0, att) * Math.min(3, target.countCards("h"));
+					return Math.max(0, att) * Math.min(3, target.countCards("h"));
 				},
 			},
 		},
@@ -15596,14 +15592,10 @@ const skills = {
 	yuqi: {
 		audio: 2,
 		trigger: { global: "damageEnd" },
-		init: function (player) {
-			if (!player.storage.yuqi) player.storage.yuqi = [0, 3, 1, 1];
-		},
 		getInfo: function (player) {
 			if (!player.storage.yuqi) player.storage.yuqi = [0, 3, 1, 1];
 			return player.storage.yuqi;
 		},
-		onremove: true,
 		usable: 2,
 		filter: function (event, player) {
 			var list = lib.skill.yuqi.getInfo(player);
@@ -15670,6 +15662,7 @@ const skills = {
 		},
 		onremove(player, name) {
 			player.removeTip(name);
+			delete player.storage[name];
 		},
 		ai: {
 			threaten: 8.8,

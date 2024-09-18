@@ -1972,7 +1972,7 @@ const skills = {
 					var card = get.cardPile2(function (card) {
 						return get.type2(card) == "trick";
 					});
-					if (card) player.gain(card, "gain2");
+					if (card) player.gain(card, "draw");
 				},
 			},
 		},

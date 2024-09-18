@@ -2363,9 +2363,9 @@ const skills = {
 		async callback(event, trigger, player) {
 			const result = event.debateResult;
 			if (result.bool && result.opinion) {
-				var opinion = result.opinion,
-					targets = result[opinion].map(i => i[0]);
-				if (opinion == "red") {
+				if (!["red", "black"].includes(result.opinion)) return;
+				const targets = result[result.opinion].map(i => i[0]);
+				if (result.opinion == "red") {
 					for (const target of targets) {
 						target.addTempSkill("tyqingshi_distance", "roundStart");
 						target.addMark("tyqingshi_distance", 1, false);
