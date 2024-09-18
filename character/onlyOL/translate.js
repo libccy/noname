@@ -117,7 +117,7 @@ const translates = {
 	ol_zhangchunhua: "OL界张春华",
 	ol_zhangchunhua_prefix: "OL界",
 	oljianmie: "翦灭",
-	oljianmie_info: "出牌阶段限一次，你可以选择一名其他角色，你与其依次选择一个颜色，然后依次弃置各自选择颜色的手牌，若你/其以此法弃置了更多手牌，则你/其视为对其/你使用一张【决斗】。",
+	oljianmie_info: "出牌阶段限一次，你可以选择一名其他角色，你与其同时选择一个颜色，然后弃置各自选择颜色的手牌，若你/其以此法弃置了更多手牌，则你/其视为对其/你使用一张【决斗】。",
 	ol_caochong: "OL界曹冲",
 	ol_caochong_prefix: "OL界",
 	olchengxiang: "称象",

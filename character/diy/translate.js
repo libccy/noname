@@ -448,8 +448,6 @@ const translates = {
 	ns_duji: "画饼杜畿",
 	ns_duji_prefix: "画饼",
 	ns_duji_ab: "杜畿",
-	junk_zhangjiao: "OL神张角",
-	junk_zhangjiao_prefix: "OL神",
 	junksijun: "肆军",
 	junksijun_info: "准备阶段，若“黄”数大于牌堆的牌数，你可以移去所有“黄”，然后从牌堆中随机获得任意张点数之和为36的牌（若牌堆没有点数和为36的组合则获得牌堆顶点数和刚好超过36的牌组）。",
 	junk_guanyu: "旧谋关羽",
