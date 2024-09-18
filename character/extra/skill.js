@@ -710,19 +710,10 @@ const skills = {
 		audio: "renjie2",
 		trigger: {
 			player: ["chooseToUseAfter", "chooseToRespondAfter"],
-			global: "useCardAfter",
 		},
 		filter(event, player) {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
-			if (event.name == "useCard") {
-				//......
-				if (event.player == player || get.type(event.card) != "trick") return false;
-				const history = game.getGlobalHistory("everything", evt => evt.player == player && ["useCard", "respond"].includes(evt.name));
-				return !history.some(evt => Array.isArray(evt.respondTo) && evt.respondTo[1] == event.card && evt.card.name == "wuxie");
-			}
-			const evt = event.getParent(2);
-			if (!evt || evt.name != "useCard" || evt.player == player) return false;
-			return event.respondTo && !event.result.bool;
+			return event.respondTo && event.respondTo[0] !==player && !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
@@ -733,18 +724,11 @@ const skills = {
 			content: "mark",
 		},
 		marktext: "忍",
-		global: "xinrenjie_global",
-		subSkill: {
-			global: {
-				hiddenCard: () => true,
-				ai: {
-					respondSha: true,
-					respondShan: true,
-				},
-			},
-		},
+		hiddenCard: () => true,
 		ai: {
 			combo: "xinjilve",
+			respondSha: true,
+			respondShan: true,
 		},
 	},
 	xinbaiyin: {
