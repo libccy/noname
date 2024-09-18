@@ -4,7 +4,28 @@
  * @type {WeakMap<AnnounceSubscriber, EventTarget>}
  */
 const vm = new WeakMap();
+/**
+ * 发布-订阅者模式
+ * 使用方法
+ * @example
+ * //使用前先实例化一个announce实例，本体的lib.announce为已经实例化好的一个Announce实例，我们可以直接用
+ * const eventTarget = new EventTarget();
+ * const records = new WeakMap();
+ * const announce = new Announce(eventTarget, records);
+ * 
+ * //订阅一个事件，直接使用lib.annouce也行
+ * announce.subscribe('newEvent', data => {
+	console.log('Received:', data.message);
+});
 
+//发布事件，发布事件时，会执行所有订阅了这个事件的回调
+announce.publish('newEvent', { message: 'Hello World!' });
+
+//取消订阅，method是之前注册时的回调函数
+announce.unsubscribe('newEvent', method);
+
+
+ */
 export class Announce {
 	/**
 	 * @type {EventTarget}
@@ -99,6 +120,13 @@ export class Announce {
 
 /**
  * @template T
+ */
+/**
+ * 
+ * 订阅者类，该类的构造函数需要一个处理函数和一个事件目标对象作为参数
+ * @example
+ * let subscriber = new AnnounceSubscriber(()=>{console.log('我被点击了')},div)
+ * subscriber.subscribe('click') //即当点击这个div时，会执行传入的回调。
  */
 export class AnnounceSubscriber {
 	/**
