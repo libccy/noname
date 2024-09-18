@@ -4,7 +4,35 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 
-
+CanvasRenderingContext2D.prototype.lineToWithArrow = function (x, y, startX, startY) {
+	var angle = Math.atan2(y - startY, x - startX);
+	var arrowSize = 40;
+	var arrowAngle = Math.PI / 5;
+	this.lineTo(x, y); // 调用原始的 lineTo 方法绘制线条
+	this.stroke();
+	this.beginPath();
+	this.setLineDash([15, 0]);
+	this.lineWidth = 1;
+	// 绘制箭头
+	const cos = Math.cos;
+	const sin = Math.sin;
+	x += arrowSize * cos(arrowAngle) * cos(angle);
+	y += arrowSize * cos(arrowAngle) * sin(angle);
+	this.moveTo(x, y);
+	this.lineTo(
+		x - arrowSize * cos(angle - arrowAngle),
+		y - arrowSize * sin(angle - arrowAngle)
+	);
+	this.lineTo(
+		x - arrowSize * cos(angle + arrowAngle),
+		y - arrowSize * sin(angle + arrowAngle)
+	);
+	this.lineTo(x, y);
+	this.fill();
+	this.beginPath();
+	this.lineWidth = 25;
+	this.setLineDash([15, 15]);
+};
 // 废弃覆盖原型的HTMLDivElement.prototype.animate
 // 改为HTMLDivElement.prototype.addTempClass
 /**
