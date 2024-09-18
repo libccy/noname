@@ -675,66 +675,73 @@ const skills = {
 						const target = event.target,
 							types = lib.skill.olweimian_backup.types;
 						for (const t of types) await player.disableEquip(t);
-						const num = Math.min(target.hasDisabledSlot() + target.isDamaged() + 1, types.length);
-						const result = await target
-							.chooseButton(
-								[
-									"慰勉：请选择至多" + get.cnNumber(num) + "项执行",
+						const num = Math.min(target.hasDisabledSlot() + target.isDamaged() + 1, types.length),
+							selected = [];
+						while(selected.length < num) {
+							const result = await target
+								.chooseButton(
 									[
+										"慰勉：是否执行其中一项？",
 										[
-											["equip", "恢复一个装备栏"],
-											["recover", "回复1点体力"],
-											["discard", "弃置所有手牌，然后摸四张牌"],
+											[
+												["equip", "恢复一个装备栏"],
+												["recover", "回复1点体力"],
+												["discard", "弃置所有手牌，然后摸四张牌"],
+											],
+											"textbutton",
 										],
-										"textbutton",
 									],
-								],
-								[1, num]
-							)
-							.set("filterButton", button => {
-								const player = get.event().player;
-								switch (button.link) {
-									case "equip":
-										return player.hasDisabledSlot();
-									case "recover":
-										return player.isDamaged();
-									case "discard":
-										return true;
+								)
+								.set("forceAuto", true)
+								.set("filterButton", button => {
+									const player = get.event().player;
+									if(get.event("selected").includes(button.link)) return false;
+									switch (button.link) {
+										case "equip":
+											return player.hasDisabledSlot();
+										case "recover":
+											return player.isDamaged();
+										case "discard":
+											return true;
+									}
+								})
+								.set("ai", button => {
+									const player = get.event().player;
+									switch (button.link) {
+										case "equip":
+											return 1;
+										case "recover":
+											return get.recoverEffect(player, player, player);
+										case "discard":
+											return (
+												get.effect(player, { name: "draw" }, player, player) * 4 -
+												player
+													.getCards("h", card => {
+														return lib.filter.cardDiscardable(card, player);
+													})
+													.reduce((sum, card) => {
+														return sum + get.value(card, player);
+													}, 0)
+											);
+									}
+								})
+								.set("selected", selected)
+								.forResult();
+							if (result.bool) {
+								selected.addArray(result.links);
+								if (result.links.includes("equip")) {
+									await target.chooseToEnable();
 								}
-							})
-							.set("ai", button => {
-								const player = get.event().player;
-								switch (button.link) {
-									case "equip":
-										return 1;
-									case "recover":
-										return get.recoverEffect(player, player, player);
-									case "discard":
-										return (
-											get.effect(player, { name: "draw" }, player, player) * 4 -
-											player
-												.getCards("h", card => {
-													return lib.filter.cardDiscardable(card, player);
-												})
-												.reduce((sum, card) => {
-													return sum + get.value(card, player);
-												}, 0)
-										);
+								if (result.links.includes("recover")) {
+									await target.recover();
 								}
-							})
-							.forResult();
-						if (result.bool) {
-							if (result.links.includes("equip")) {
-								await target.chooseToEnable();
+								if (result.links.includes("discard")) {
+									const cards = target.getDiscardableCards(target, "h");
+									if (cards.length) await target.discard(cards);
+									await target.draw(4);
+								}
 							}
-							if (result.links.includes("recover")) {
-								await target.recover();
-							}
-							if (result.links.includes("discard")) {
-								const cards = target.getDiscardableCards(target, "h");
-								if (cards.length) await target.discard(cards);
-								await target.draw(4);
-							}
+							else break;
 						}
 					},
 					ai: {
@@ -5137,6 +5144,10 @@ const skills = {
 			if (!player.storage.olgangshu_buff) player.storage.olgangshu_buff = [0, 0, 0];
 			return player.storage.olgangshu_buff;
 		},
+		init(player) {
+			let info = lib.skill.olgangshu.getInfo(player);
+			player.addTip("olgangshu_buff", "刚述 " + info.slice().join(" "));
+		},
 		direct: true,
 		group: "olgangshu_reset",
 		content: function () {
@@ -5185,7 +5196,7 @@ const skills = {
 				var info = lib.skill.olgangshu.getInfo(player);
 				info[result.index] = Math.min(5, info[result.index] + 1);
 				game.log(player, "的", result.control.slice(0, result.control.indexOf("(")), "#y+1");
-				player.addTip("olgangshu_buff", "刚述 " + info.slice().join(" "));
+				lib.skill.olgangshu.init(player);
 			}
 		},
 		ai: {
@@ -5197,6 +5208,7 @@ const skills = {
 				charlotte: true,
 				onremove(player, skill) {
 					delete player.storage[skill];
+					lib.skill.olgangshu.init(player);
 				},
 				forced: true,
 				filter: function (event, player) {
@@ -5208,7 +5220,7 @@ const skills = {
 					var info = lib.skill.olgangshu.getInfo(player);
 					trigger.num += info[1];
 					info[1] = 0;
-					player.addTip("olgangshu_buff", "刚述 " + info.slice().join(""));
+					lib.skill.olgangshu.init(player);
 				},
 				mod: {
 					attackRange: function (player, range) {
@@ -5221,7 +5233,6 @@ const skills = {
 						if (info) return num + info[2];
 					},
 				},
-				mark: true,
 				intro: {
 					markcount: function (storage, player) {
 						var info = lib.skill.olgangshu.getInfo(player);
@@ -11773,8 +11784,8 @@ const skills = {
 		audio: 2,
 		init(player, name) {
 			let list = [1, 2, 3, 4];
-			player.storage[name] = list;
-			player.addTip("shanduan", "善断 " + list.slice().join(" "));
+			if(!player.storage[name]) player.storage[name] = list;
+			player.addTip("shanduan", "善断 " +  player.storage[name].slice().join(" "));
 		},
 		onremove(player, name) {
 			player.removeTip(name);
@@ -11799,7 +11810,7 @@ const skills = {
 					break;
 				}
 			}
-			player.addTip("shanduan", "善断 " + player.storage.shanduan.slice().join(" "));
+			lib.skill.shanduan.init(player, "shanduan");
 			game.delayx();
 		},
 		group: ["shanduan_draw", "shanduan_use", "shanduan_discard"],

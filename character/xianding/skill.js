@@ -95,7 +95,7 @@ const skills = {
 			if (player.countCards("h") < 2 || !player.isPhaseUsing()) return true;
 			if (player.countCards("h", card => player.hasValueTarget(card) && !player.countCards("h", cardx =>{
 				return get.number(cardx, player) < get.number(card, player);
-			})) && !player.getStorage("dclianjie_used").includes(get.number(card, player))) return false;
+			}) && !player.getStorage("dclianjie_used").includes(get.number(card, player)))) return false;
 			return true;
 		},
 		async content(event, trigger, player) {
@@ -15864,172 +15864,181 @@ const skills = {
 	yuyun: {
 		audio: 2,
 		trigger: { player: "phaseUseBegin" },
-		forced: true,
+		locked: true,
 		filter: function (event, player) {
 			return player.hp > 0 || player.maxHp > 1;
 		},
-		content: function () {
-			"step 0";
-			if (player.maxHp <= 1) event._result = { control: "失去体力", index: 0 };
-			else if (player.hp < 1) event._result = { control: "减体力上限", index: 1 };
-			else
-				player
+		async cost(event, trigger, player) {
+			if (player.hp <= 1 || player.maxHp <= 1) event.result = { bool: true, cost_data: 1 };
+			else {
+				const result = await player
 					.chooseControl("失去体力", "减体力上限")
 					.set("prompt", "玉陨：失去1点体力或减1点体力上限")
 					.set("ai", function () {
 						var player = _status.event.player;
 						if (player.hp < 2 || player.getDamagedHp() > 2) return 1;
 						return 0;
-					});
-			"step 1";
-			if (result.index == 1) player.loseMaxHp();
-			else player.loseHp();
-			"step 2";
-			var list = ["选项一：摸两张牌", "选项二：对一名其他角色造成1点伤害，且本回合对其使用【杀】无距离和次数限制", "选项三：本回合手牌上限视为无限", "选项四：获得一名其他角色区域内的一张牌", "选项五：令一名其他角色将手牌数摸至体力上限（至多摸至五张）"];
-			var next = player.chooseButton([
-				"玉陨：请选择一" + (player.getDamagedHp() > 0 ? "至" + get.cnNumber(player.getDamagedHp() + 1) : "") + "项",
-				[
-					list.map((item, i) => {
-						return [i, item];
-					}),
-					"textbutton",
-				],
-			]);
-			next.set("dialog", event.videoId);
-			next.set("forced", true);
-			next.set("ai", function (button) {
-				var player = _status.event.player;
-				switch (button.link) {
-					case 0:
-						return 2;
-					case 1:
-						return (
-							Math.max(
-								0.5,
-								player.countCards("hs", function (card) {
-									return get.name(card) == "sha" && player.hasValueTarget(card);
-								}) - player.getCardUsable({ name: "sha" })
-							) +
-							Math.max.apply(
-								Math,
-								game
-									.filterPlayer(function (current) {
-										return current != player;
-									})
-									.map(function (target) {
+					})
+					.forResult();
+				event.result = {
+					bool: true,
+					cost_data: result.index,
+				};
+			}
+		},
+		async content(event, trigger, player) {
+			if (event.cost_data == 1) {
+				if (player.maxHp > 1) await player.loseMaxHp();
+			}
+			else {
+				if (player.hp > 1) await player.loseHp();
+			}
+			const list = ["选项一：摸两张牌", "选项二：对一名其他角色造成1点伤害，且本回合对其使用【杀】无距离和次数限制", "选项三：本回合手牌上限视为无限", "选项四：获得一名其他角色区域内的一张牌", "选项五：令一名其他角色将手牌数摸至体力上限（至多摸至五张）"],
+				num = Math.min(5, player.getDamagedHp() + 1),
+				selected = [];
+			while(selected.length < num) {
+				const result = await player
+					.chooseButton([
+						"玉陨：是否选择一项执行？",
+						[
+							list.map((item, i) => {
+								return [i, item];
+							}),
+							"textbutton",
+						],
+					])
+					.set("filterButton", button => {
+						return !get.event("selected").includes(button.link);
+					})
+					.set("selected", selected)
+					.set("ai", function (button) {
+						let player = _status.event.player;
+						switch (button.link) {
+							case 0:
+								return 2;
+							case 1:
+								return (
+									Math.max(
+										0.5,
+										player.countCards("hs", function (card) {
+											return get.name(card) == "sha" && player.hasValueTarget(card);
+										}) - player.getCardUsable({ name: "sha" })
+									) +
+									Math.max.apply(
+										Math,
+										game
+											.filterPlayer(function (current) {
+												return current != player;
+											})
+											.map(function (target) {
+												return get.damageEffect(target, player, player);
+											})
+									)
+								);
+							case 2:
+								return player.needsToDiscard() / 4;
+							case 3:
+								var num = 0;
+								return (
+									0.8 *
+									Math.max.apply(
+										Math,
+										game
+											.filterPlayer(function (current) {
+												return current != player && current.hasCard(card => lib.filter.canBeGained(card, current, player), "hej");
+											})
+											.map(function (target) {
+												return get.effect(target, { name: "shunshou_copy" }, player, player);
+											})
+									)
+								);
+							case 4:
+								var num = 0;
+								game.countPlayer(function (current) {
+									if (current != player && get.attitude(player, current) > 0) {
+										var num2 = Math.min(5, current.maxHp) - current.countCards("h");
+										if (num2 > num) num = num2;
+									}
+								});
+								return num * 0.8;
+						}
+					})
+					.forResult();
+				if (result.bool) {
+					const choice = result.links[0];
+					selected.add(choice);
+					game.log(player, "选择了", "#g【玉陨】", "的", "#y选项" + get.cnNumber(1 + choice, true));
+					switch (choice) {
+						case 0: await player.draw(2); break;
+						case 1: {
+							if (game.hasPlayer(current => current != player)) {
+								const result2 = await player
+									.chooseTarget(lib.filter.notMe, true, "对一名其他角色造成1点伤害")
+									.set("ai", function (target) {
+										let player = _status.event.player;
 										return get.damageEffect(target, player, player);
 									})
-							)
-						);
-					case 2:
-						return player.needsToDiscard() / 4;
-					case 3:
-						var num = 0;
-						return (
-							0.8 *
-							Math.max.apply(
-								Math,
-								game
-									.filterPlayer(function (current) {
+									.forResult();
+								if(result2.bool) {
+									const target = result2.targets[0];
+									player.line(target, "green");
+									await target.damage();
+									player.markAuto("yuyun_sha", [target]);
+									player.addTempSkill("yuyun_sha");
+								}
+							}
+							break;
+						}
+						case 2: player.addTempSkill("yuyun_114514"); break;
+						case 3: {
+							if (game.hasPlayer(function (current) {
+								return current != player && current.hasCard(card => lib.filter.canBeGained(card, current, player), "hej");
+							})) {
+								const result2 = await player
+									.chooseTarget(true, "获得一名其他角色区域内的一张牌", function (card, player, current) {
 										return current != player && current.hasCard(card => lib.filter.canBeGained(card, current, player), "hej");
 									})
-									.map(function (target) {
+									.set("ai", function (target) {
+										let player = _status.event.player;
 										return get.effect(target, { name: "shunshou_copy" }, player, player);
 									})
-							)
-						);
-					case 4:
-						var num = 0;
-						game.countPlayer(function (current) {
-							if (current != player && get.attitude(player, current) > 0) {
-								var num2 = Math.min(5, current.maxHp) - current.countCards("h");
-								if (num2 > num) num = num2;
+									.forResult();
+								if (result2.bool) {
+									const target = result2.targets[0];
+									player.line(target, "green");
+									await player.gainPlayerCard(target, "hej", true);
+								}
 							}
-						});
-						return num * 0.8;
-				}
-			});
-			if (player.getDamagedHp() > 0) next.set("selectButton", [1, 1 + player.getDamagedHp()]);
-			"step 3";
-			result.links.sort();
-			for (var i of result.links) game.log(player, "选择了", "#g【玉陨】", "的", "#y选项" + get.cnNumber(1 + i, true));
-			event.links = result.links;
-			if (result.links.includes(0)) player.draw(2);
-			if (result.links.includes(2)) player.addTempSkill("yuyun_114514");
-			"step 4";
-			if (
-				event.links.includes(1) &&
-				game.hasPlayer(function (current) {
-					return current != player;
-				})
-			)
-				player.chooseTarget(lib.filter.notMe, true, "对一名其他角色造成1点伤害").set("ai", function (target) {
-					var player = _status.event.player;
-					return get.damageEffect(target, player, player);
-				});
-			else if (event.links.includes(3)) event.goto(6);
-			else if (event.links.includes(4)) event.goto(8);
-			else event.finish();
-			"step 5";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.line(target, "green");
-				target.damage();
-				player.markAuto("yuyun_sha", [target]);
-				player.addTempSkill("yuyun_sha");
-			}
-			if (event.links.includes(3)) event.goto(6);
-			else if (event.links.includes(4)) event.goto(8);
-			else event.finish();
-			"step 6";
-			if (
-				event.links.includes(3) &&
-				game.hasPlayer(function (current) {
-					return current != player && current.hasCard(card => lib.filter.canBeGained(card, current, player), "hej");
-				})
-			) {
-				player
-					.chooseTarget(true, "获得一名其他角色区域内的一张牌", function (card, player, current) {
-						return current != player && current.hasCard(card => lib.filter.canBeGained(card, current, player), "hej");
-					})
-					.set("ai", function (target) {
-						var player = _status.event.player;
-						return get.effect(target, { name: "shunshou_copy" }, player, player);
-					});
-			} else if (event.links.includes(4)) event.goto(8);
-			else event.finish();
-			"step 7";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.line(target, "green");
-				player.gainPlayerCard(target, "hej", true);
-			}
-			if (!event.links.includes(4)) event.finish();
-			"step 8";
-			if (
-				event.links.includes(4) &&
-				game.hasPlayer(function (current) {
-					return current != player && current.countCards("h") < Math.min(5, current.maxHp);
-				})
-			) {
-				player
-					.chooseTarget(true, "令一名其他角色将手牌数摸至体力上限", function (card, player, current) {
-						return current != player && current.countCards("h") < Math.min(5, current.maxHp);
-					})
-					.set("ai", function (target) {
-						var att = get.attitude(_status.event.player, target);
-						if (target.hasSkillTag("nogain")) att /= 6;
-						if (att > 2) {
-							return Math.min(5, target.maxHp) - target.countCards("h");
+							break;
 						}
-						return att / 3;
-					});
-			} else event.finish();
-			"step 9";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.line(target, "green");
-				target.drawTo(Math.min(5, target.maxHp));
+						case 4: {
+							if (game.hasPlayer(function (current) {
+									return current != player && current.countCards("h") < Math.min(5, current.maxHp);
+							})) {
+								const result2 = await player
+									.chooseTarget(true, "令一名其他角色将手牌数摸至体力上限", function (card, player, current) {
+										return current != player && current.countCards("h") < Math.min(5, current.maxHp);
+									})
+									.set("ai", function (target) {
+										let att = get.attitude(_status.event.player, target);
+										if (target.hasSkillTag("nogain")) att /= 6;
+										if (att > 2) {
+											return Math.min(5, target.maxHp) - target.countCards("h");
+										}
+										return att / 3;
+									})
+									.forResult();
+								if (result2.bool) {
+									const target = result2.targets[0];
+									player.line(target, "green");
+									await target.drawTo(Math.min(5, target.maxHp));
+								}
+							}
+							break;
+						}
+					}
+				}
+				else break;
 			}
 		},
 		subSkill: {
@@ -18135,7 +18144,7 @@ const skills = {
 						if (
 							game.countPlayer(function (current) {
 								if (!filter(current)) return false;
-								return current.countCards("e", function (card) {
+								return get.attitude(player, current) <= 0 && current.countCards("e", function (card) {
 									return get.color(card) == color && get.value(card) > 0;
 								});
 							}) > 1
