@@ -307,10 +307,10 @@ HTMLDivElement.prototype.setPosition = function () {
 	return this;
 };
 /**
- * @this HTMLDivElement
- * @type { typeof HTMLDivElement['prototype']['css'] }
+ * @this HTMLElement
+ * @type { typeof HTMLElement['prototype']['css'] }
  */
-HTMLDivElement.prototype.css = function (style) {
+HTMLElement.prototype.css = function (style) {
 	for (var i in style) {
 		if (i == "innerHTML" && typeof style["innerHTML"] == "string") {
 			this.innerHTML = style["innerHTML"];
