@@ -987,10 +987,8 @@ export const Content = {
 									let element = get.copy(list[1]);
 									if (typeof element == "string") {
 										if (!lib.card["debate_" + element]) {
-											game.broadcastAll(element => {
-												lib.card["debate_" + element] = {};
-												lib.translate["debate_" + element] = get.translation(element);
-											}, element);
+											lib.card["debate_" + element] = {};
+											lib.translate["debate_" + element] = get.translation(element);
 										}
 										element = new lib.element.VCard(game.createCard("debate_" + element, " ", " "));
 									}
@@ -1033,7 +1031,7 @@ export const Content = {
 			.slice()
 			.filter(i => i != "others")
 			.sort((a, b) => event[b].length - event[a].length);
-		opinion = event[opinions[0]].length > event[opinions[1]].length ? opinions[0] : null;
+		opinion = event[opinion[0]].length > event[opinion[1]].length ? opinion[0] : null;
 		if (opinion) game.log(player, "本次发起的议事结果为", opinion == "red" ? '<span class="firetext">红色</span>' : "#g" + get.translation(opinion));
 		else game.log(player, "本次发起的议事无结果");
 		event.result = {
