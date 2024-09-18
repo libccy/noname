@@ -444,7 +444,7 @@ const skills = {
 		locked: false,
 		logAudio: () => 1,
 		async content(event, trigger, player) {
-			const cards = get.cards(3);
+			const cards = get.cards(get.mode() == "doudizhu" ? 1 : 2);
 			const next = player.addToExpansion(cards, "draw");
 			next.gaintag.add(event.name);
 			await next;
@@ -537,6 +537,7 @@ const skills = {
 					}
 				},
 				async content(event, trigger, player) {
+					await player.showCards(event.cost_data, get.translation(player) + "发动了【戢鳞】");
 					event.cost_data[0].storage.jilin = true;
 					trigger.getParent().excluded.add(player);
 				},
@@ -631,6 +632,7 @@ const skills = {
 		},
 		logAudio: () => 2,
 		async content(event, trigger, player) {
+			await player.showCards(event.cost_data, get.translation(player) + "发动了【英猷】");
 			event.cost_data[0].storage.jilin = true;
 			const num = player.getExpansions("jilin").filter(card => card.storage.jilin).length;
 			await player.draw(num);
