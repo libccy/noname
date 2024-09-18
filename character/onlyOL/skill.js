@@ -9,7 +9,7 @@ const skills = {
 			player: "useCard",
 		},
 		filter: function (event, player) {
-			if(!player.isTurnedOver()) return false;
+			if (!player.isTurnedOver()) return false;
 			return event.player.hasHistory("lose", function (evt) {
 				if (evt.getParent() != event) return false;
 				for (var i in evt.gaintag_map) {
@@ -25,7 +25,7 @@ const skills = {
 		locked: false,
 		mod: {
 			targetInRange(card, player, target) {
-				if(!player.isTurnedOver()) return;
+				if (!player.isTurnedOver()) return;
 				if (!card.cards) return;
 				for (var i of card.cards) {
 					if (i.hasGaintag("reluoying")) return true;
@@ -61,8 +61,7 @@ const skills = {
 							const result = await player.chooseBool("是否发动【酒诗】，将武将牌翻面？").forResult();
 							event.result = result;
 						}
-					}
-					else player.unmarkAuto("oljiushi_gain", player.getStorage("oljiushi_gain"));
+					} else player.unmarkAuto("oljiushi_gain", player.getStorage("oljiushi_gain"));
 				},
 				async content(event, trigger, player) {
 					await player.turnOver();
@@ -188,12 +187,7 @@ const skills = {
 			return player.getStorage("olsbjinming").length;
 		},
 		async cost(event, trigger, player) {
-			let choiceList = [
-				"1.回复过1点体力",
-				"2.造成过2点伤害",
-				"3.使用过3种类型的牌",
-				"4.弃置过4张牌",
-			];
+			let choiceList = ["1.回复过1点体力", "2.造成过2点伤害", "3.使用过3种类型的牌", "4.弃置过4张牌"];
 			let list = ["回复体力", "造成伤害", "使用牌", "弃置牌"].filter((key, index) => {
 				return player.getStorage("olsbjinming").includes(index + 1);
 			});
@@ -207,12 +201,19 @@ const skills = {
 				.chooseControl(list)
 				.set("choiceList", choiceList)
 				.set("prompt", get.prompt2("olsbjinming"))
-				.set("chosen", function () {
-					if (list.includes("使用牌") && ["trick", "equip"].every(type => {
-						return player.countCards("h", card => get.type2(card) == type && player.getUseValue(card) > 0);
-					})) return "使用牌";
-					return list.randomGet();
-				}())
+				.set(
+					"chosen",
+					(function () {
+						if (
+							list.includes("使用牌") &&
+							["trick", "equip"].every(type => {
+								return player.countCards("h", card => get.type2(card) == type && player.getUseValue(card) > 0);
+							})
+						)
+							return "使用牌";
+						return list.randomGet();
+					})()
+				)
 				.set("ai", () => get.event("chosen"))
 				.forResult();
 			event.result = {
@@ -320,9 +321,9 @@ const skills = {
 				.set("num", num)
 				.set("ai", target => {
 					const trigger = get.event().getTrigger();
-					const eff1 = get.effect(target,trigger.card, trigger.player, get.player());
+					const eff1 = get.effect(target, trigger.card, trigger.player, get.player());
 					const eff2 = get.effect(target, { name: "draw" }, get.player(), get.player());
-					if ((eff1 + eff2 * get.event("num")) <= 0) return 0;
+					if (eff1 + eff2 * get.event("num") <= 0) return 0;
 					return eff1 + eff2;
 				})
 				.forResult();
@@ -643,47 +644,71 @@ const skills = {
 		filterTarget: lib.filter.notMe,
 		usable: 1,
 		async content(event, trigger, player) {
-			const target = event.target;
-			let map = {};
-			for (const current of [player, target]) {
-				let colors = ["red", "black"];
-				if (current.getDiscardableCards(current, "h").some(card => get.color(card) == "none")) {
-					colors.push("none2");
-				}
-				const str = get.translation(current == player ? target : player);
-				const result = await current
-					.chooseControl(colors)
-					.set("prompt", "翦灭：请选择一个颜色")
-					.set("prompt2", "弃置选择颜色的手牌，然后若你/" + str + "弃置的牌更多，则你/" + str + "视为对" + str + "/你使用【决斗】")
-					.set("ai", () => {
-						const player = get.event().player;
-						let controls = get.event().controls.slice();
-						return controls.sort((a, b) => {
-							return (
-								player
-									.getDiscardableCards(player, "h")
-									.filter(card => {
-										return get.color(card) == (a == "none2" ? "none" : a);
-									})
-									.reduce((sum, card) => sum + get.value(card, player), 0) -
-								player
-									.getDiscardableCards(player, "h")
-									.filter(card => {
-										return get.color(card) == (b == "none2" ? "none" : b);
-									})
-									.reduce((sum, card) => sum + get.value(card, player), 0)
-							);
-						})[0];
+			const target = event.target,
+				targets = [player, target];
+			let map = {},
+				locals = targets.slice();
+			let humans = targets.filter(current => current === game.me || current.isOnline());
+			locals.removeArray(humans);
+			const eventId = get.id();
+			const send = (current, eventId) => {
+				lib.skill.oljianmie.chooseControl(current, targets, eventId);
+				game.resume();
+			};
+			event._global_waiting = true;
+			let time = 10000;
+			if (lib.configOL && lib.configOL.choose_timeout) time = parseInt(lib.configOL.choose_timeout) * 1000;
+			targets.forEach(current => current.showTimer(time));
+			if (humans.length > 0) {
+				const solve = function (resolve, reject) {
+					return function (result, player) {
+						if (result && result.control) {
+							map[player.playerid] = result.control == "none2" ? "none" : result.control;
+							resolve();
+						} else reject();
+					};
+				};
+				await Promise.any(
+					humans.map(current => {
+						return new Promise(async (resolve, reject) => {
+							if (current.isOnline()) {
+								current.send(send, current, eventId);
+								current.wait(solve(resolve, reject));
+							} else {
+								const next = lib.skill.oljianmie.chooseControl(current, targets, eventId);
+								const solver = solve(resolve, reject);
+								if (_status.connectMode) game.me.wait(solver);
+								const result = await next.forResult();
+								if (_status.connectMode) game.me.unwait(result, current);
+								else solver(result, current);
+							}
+						});
 					})
-					.forResult();
-				if (result.control) map[current.playerid] = result.control == "none2" ? "none" : result.control;
+				).catch(() => {});
+				game.broadcastAll("cancel", eventId);
 			}
+			if (locals.length > 0) {
+				for (const current of locals) {
+					const result = await lib.skill.oljianmie.chooseControl(current, targets).forResult();
+					if (result && result.control) map[current.playerid] = result.control == "none2" ? "none" : result.control;
+				}
+			}
+			delete event._global_waiting;
+			for (const i of targets) i.hideTimer();
 			const cards_player = player.getDiscardableCards(player, "h").filter(card => get.color(card) == map[player.playerid]);
 			const cards_target = target.getDiscardableCards(target, "h").filter(card => get.color(card) == map[target.playerid]);
-			if (cards_player.length) await player.discard(cards_player);
-			else player.chat("无牌可弃");
-			if (cards_target.length) await target.discard(cards_target);
-			else target.chat("无牌可弃");
+			if (cards_player.length && cards_target.length) {
+				await game
+					.loseAsync({
+						lose_list: [
+							[player, cards_player],
+							[target, cards_target],
+						],
+						discarder: player,
+					})
+					.setContent("discardMultiple");
+			} else if (cards_player.length) await player.discard(cards_player);
+			else if (cards_target.length) await target.discard(cards_target);
 			if (cards_player.length != cards_target.length) {
 				const user = cards_player.length > cards_target.length ? player : target;
 				const aim = user == player ? target : player;
@@ -698,6 +723,39 @@ const skills = {
 					return get.effect(target, { name: "juedou" }, player, player) * get.sgn(get.attitude(player, target));
 				},
 			},
+		},
+		chooseControl(player, targets, eventId) {
+			let colors = ["red", "black"];
+			if (player.getDiscardableCards(player, "h").some(card => get.color(card) == "none")) {
+				colors.push("none2");
+			}
+			const str = get.translation(targets[0] == player ? targets[1] : targets[0]);
+			return player
+				.chooseControl(colors)
+				.set("prompt", "翦灭：请选择一个颜色")
+				.set("prompt2", "弃置选择颜色的手牌，然后若你/" + str + "弃置的牌更多，则你/" + str + "视为对" + str + "/你使用【决斗】")
+				.set("ai", () => {
+					const player = get.event().player;
+					let controls = get.event().controls.slice();
+					return controls.sort((a, b) => {
+						return (
+							player
+								.getDiscardableCards(player, "h")
+								.filter(card => {
+									return get.color(card) == (a == "none2" ? "none" : a);
+								})
+								.reduce((sum, card) => sum + get.value(card, player), 0) -
+							player
+								.getDiscardableCards(player, "h")
+								.filter(card => {
+									return get.color(card) == (b == "none2" ? "none" : b);
+								})
+								.reduce((sum, card) => sum + get.value(card, player), 0)
+						);
+					})[0];
+				})
+				.set("id", eventId)
+				.set("_global_waiting", true);
 		},
 	},
 	//OL谋孔融
@@ -831,7 +889,7 @@ const skills = {
 							}
 						});
 					})
-				).catch(() => { });
+				).catch(() => {});
 				game.broadcastAll("cancel", eventId);
 			}
 			if (locals.length > 0) {
@@ -874,7 +932,7 @@ const skills = {
 				.set("_global_waiting", true);
 		},
 		ai: {
-			combo: "olsbliwen"
+			combo: "olsbliwen",
 		},
 	},
 	//OL界吴国太
@@ -1176,7 +1234,7 @@ const skills = {
 						player.countCards("h", card => {
 							return !current.hasUseTarget(card);
 						}) >=
-						2 + (player.getHp() > 1)
+							2 + (player.getHp() > 1)
 					);
 				})
 			)
@@ -1258,9 +1316,9 @@ const skills = {
 				}
 			} else {
 				const numbers = cards
-					.map(card => get.number(card, player))
-					.toUniqued()
-					.sort((a, b) => a - b),
+						.map(card => get.number(card, player))
+						.toUniqued()
+						.sort((a, b) => a - b),
 					min = numbers[0],
 					max = numbers.at(-1);
 				const [card] = links;
@@ -2944,7 +3002,7 @@ const skills = {
 				.set("choiceList", choiceList)
 				.set("prompt", get.prompt("oljiangchi"));
 			if (result.control != "cancel2") {
-				player.logSkill("oljiangchi", null, null, null, [(result.control == "摸牌，-1" ? 1 : 2)]);
+				player.logSkill("oljiangchi", null, null, null, [result.control == "摸牌，-1" ? 1 : 2]);
 				if (result.control == "摸牌，-1") {
 					player.draw();
 					player.addTempSkill("oljiangchi_less");
