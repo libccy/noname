@@ -16822,6 +16822,7 @@ const skills = {
 		},
 	},
 	jinzhi2: {
+		charlotte: true,
 		onremove: true,
 		intro: {
 			content: "本轮已发动过#次",

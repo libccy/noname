@@ -3311,7 +3311,6 @@ export default () => {
 				},
 			},
 			boss_remen: {
-				equipSkill: true,
 				trigger: { target: ["useCardToBefore"] },
 				forced: true,
 				priority: 6,
