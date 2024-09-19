@@ -425,8 +425,16 @@ const skills = {
 				const cardx = cards.filter(card => card.hasGaintag("dcyunzheng_tag") || get.suit(card) == get.suit(trigger.card));
 				if (cardx.length) {
 					cards.removeArray(cardx);
-					await player.gain(cardx, target, "give");
-					await event.trigger("dchuoxin_update");
+					const result2 = await player
+						.chooseBool("是否获得" + get.translation(cardx) + "？")
+						.set("choice", get.value(cardx, player) > 7)
+						.forResult();
+					if (result2.bool) {
+						const next = player.gain(cardx, target, "give");
+						if(cardx[0].hasGaintag("dcyunzheng_tag")) next.gaintag.add("dcyunzheng_tag");
+						await next;
+						await event.trigger("dchuoxin_update");
+					}
 				}
 				if (cards.some(card => !card.hasGaintag("dcyunzheng_tag"))) {
 					target.addGaintag(

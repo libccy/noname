@@ -819,7 +819,8 @@ const skills = {
 					return 6 - get.value(card);
 				})
 				.set("filterButton", button => {
-					const card = button.link;
+					const card = button.link,
+						player = get.player();
 					return !get.tag(card, "damage") && player.canRecast(card);
 				})
 				.forResult();

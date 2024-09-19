@@ -1107,6 +1107,7 @@ const skills = {
 			},
 			backup(links, player) {
 				return {
+					audio: "twhuanji",
 					names: links.map(i => [{ name: i[2], nature: i[3] }]),
 					filterCard: () => false,
 					selectCard: -1,
@@ -7786,7 +7787,7 @@ const skills = {
 				if (get.type(i, null, player) != "basic" && num < 5) num++;
 			}
 			await player.chooseToGuanxing(num);
-			const result = await player.chooseBool("羽化：是否摸" + get.cnNumber(num) + "张牌？").set("frequentSkill", "twyuhua");
+			const { result } = await player.chooseBool("羽化：是否摸" + get.cnNumber(num) + "张牌？").set("frequentSkill", "twyuhua");
 			if (result.bool) await player.draw(num);
 		},
 		mod: {

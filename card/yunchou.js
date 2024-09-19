@@ -904,7 +904,7 @@ game.import("card", function () {
 						})
 					)
 						return;
-					if (event.nature) return true;
+					if (event.hasNature()) return true;
 				},
 				forced: true,
 				content: function () {
