@@ -5411,7 +5411,6 @@ const skills = {
 				},
 			},
 		},
-		subSkill: { backup: { } },
 	},
 	oltuishi: {
 		audio: 2,
