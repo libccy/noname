@@ -6442,7 +6442,7 @@ const skills = {
 		locked: false,
 		group: "sbguidao_defend",
 		filter: function (event, player) {
-			if (player.countMark("sbguidao") >= 8) return false;
+			if (player.hasSkill("sbguidao_banned") || player.countMark("sbguidao") >= 8) return false;
 			if (event.name == "damage") return event.hasNature();
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
@@ -6473,9 +6473,12 @@ const skills = {
 					trigger.cancel();
 					player.removeMark("sbguidao", 2);
 					if (player != _status.currentPhase) {
-						player.tempBanSkill("sbguidao", { player: "phaseBegin" });
+						player.addTempSkill("sbguidao_banned", { player: "phaseBegin" });
 					}
 				},
+			},
+			banned: {
+				charlotte: true
 			},
 		},
 	},
