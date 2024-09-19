@@ -703,6 +703,9 @@ const skills = {
 					inRange(from, to) {
 						if (!from.getStorage("starruijun_effect").includes(to)) return false;
 					},
+					targetInRange(card, player, target) {
+						if (player.getStorage("starruijun_effect").includes(target)) return true;
+					},
 				},
 			},
 		},
