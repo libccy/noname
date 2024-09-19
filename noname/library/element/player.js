@@ -469,7 +469,12 @@ export class Player extends HTMLDivElement {
 		this.markSkill("stratagem_fury");
 	}
 	/**
-	 * * @example
+	 * 
+	 * 链式创建一次性的API。
+	 * 
+	 * 使用者只需关注技能的效果，而不是技能本身
+	 * 
+	 *  @example
 	 * when('xxx') when([xxx1,xxx2])//均会被解析为：player:xxx或player:[xxx1,xxx2]
 	 * 
 	 * when({player:xxx})或when({gloal:[xxx]})//对象类型将直接应用
