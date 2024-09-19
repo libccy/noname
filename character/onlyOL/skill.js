@@ -509,104 +509,11 @@ const skills = {
 	},
 	//OL界曹冲
 	olchengxiang: {
-		audio: 2,
-		filter(event, player) {
-			return event.num > 0;
-		},
+		inherit: "chengxiang",
 		getIndex(event, player) {
 			return event.num;
 		},
-		trigger: { player: "damageEnd" },
-		frequent: true,
-		intro: {
-			content: "下次发动【称象】多亮出$张牌",
-		},
-		content: function () {
-			"step 0";
-			let mark = player.countMark("olchengxiang");
-			player.removeMark("olchengxiang", mark, false);
-			event.cards = get.cards(4 + mark);
-			game.cardsGotoOrdering(event.cards);
-			event.videoId = lib.status.videoId++;
-			game.broadcastAll(
-				function (player, id, cards, num) {
-					var str;
-					if (player == game.me && !_status.auto) {
-						str = "称象：选择任意张点数不大于" + num + "的牌";
-					} else {
-						str = "称象";
-					}
-					var dialog = ui.create.dialog(str, cards);
-					dialog.videoId = id;
-				},
-				player,
-				event.videoId,
-				event.cards,
-				event.name == "oldchengxiang" ? 12 : 13
-			);
-			event.time = get.utc();
-			game.addVideo("showCards", player, ["称象", get.cardsInfo(event.cards)]);
-			game.addVideo("delay", null, 2);
-			"step 1";
-			var next = player.chooseButton([0, Infinity]);
-			next.set("dialog", event.videoId);
-			next.set("filterButton", function (button) {
-				var num = 0;
-				for (var i = 0; i < ui.selected.buttons.length; i++) {
-					num += get.number(ui.selected.buttons[i].link);
-				}
-				return num + get.number(button.link) <= _status.event.maxNum;
-			});
-			next.set("maxNum", event.name == "oldchengxiang" ? 12 : 13);
-			next.set("ai", function (button) {
-				let player = _status.event.player,
-					name = get.name(button.link),
-					val = get.value(button.link, player);
-				if (name === "tao") return val + 2 * Math.min(3, 1 + player.getDamagedHp());
-				if (name === "jiu" && player.hp < 3) return val + 2 * (2.8 - player.hp);
-				if (name === "wuxie" && player.countCards("j") && !player.hasWuxie()) return val + 5;
-				if (player.hp > 1 && player.hasSkill("renxin") && player.hasFriend() && get.type(button.link) === "equip") return val + 4;
-				return val;
-			});
-			"step 2";
-			if (result.bool && result.links) {
-				var cards2 = [];
-				for (var i = 0; i < result.links.length; i++) {
-					cards2.push(result.links[i]);
-					cards.remove(result.links[i]);
-				}
-				event.cards2 = cards2;
-			} else {
-				event.finish();
-			}
-			var time = 1000 - (get.utc() - event.time);
-			if (time > 0) {
-				game.delay(0, time);
-			}
-			"step 3";
-			game.broadcastAll("closeDialog", event.videoId);
-			var cards2 = event.cards2;
-			player.gain(cards2, "log", "gain2");
-			let num = cards2.reduce((num, i) => {
-				return num + get.number(i, player);
-			}, 0);
-			if (num == 13) player.addMark("olchengxiang", 1, false);
-		},
-		ai: {
-			maixie: true,
-			maixie_hp: true,
-			effect: {
-				target: function (card, player, target) {
-					if (get.tag(card, "damage")) {
-						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
-						if (!target.hasFriend()) return;
-						if (target.hp >= 4) return [1, 2];
-						if (target.hp == 3) return [1, 1.5];
-						if (target.hp == 2) return [1, 0.5];
-					}
-				},
-			},
-		},
+		intro: { content: "下次发动【称象】多亮出$张牌" },
 	},
 	olrenxin: {
 		audio: 2,
