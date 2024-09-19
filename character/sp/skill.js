@@ -5357,6 +5357,7 @@ const skills = {
 			},
 			backup(links, player) {
 				return {
+					audio: "olxiaofan",
 					filterCard: function () {
 						return false;
 					},
@@ -5410,6 +5411,7 @@ const skills = {
 				},
 			},
 		},
+		subSkill: { backup: { } },
 	},
 	oltuishi: {
 		audio: 2,
