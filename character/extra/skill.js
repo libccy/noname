@@ -1331,7 +1331,7 @@ const skills = {
 			storage: { zhuangpo: true },
 		},
 		viewAsFilter() {
-			return get.event("zhuangpo_cards").length > 0;
+			return get.event("zhuangpo_cards")?.length;
 		},
 		prompt: "将一张牌面信息包含“【杀】”的牌当【决斗】使用",
 		filterCard(card, player) {
