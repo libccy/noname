@@ -469,24 +469,16 @@ export class Player extends HTMLDivElement {
 		this.markSkill("stratagem_fury");
 	}
 	/**
-	 * version 1.7
-	 *
-	 * 链式创建一次性技能的api。
-	 *
-	 * 使用者只需要关注技能的效果，而不是技能的本身。
-	 *
-	 * v1.7 可传递作用域
-	 * @example
-	 * ```js
-	 * (function () {
-	 * 	let _var = 1;
-	 * 	let me = player;
-	 * 	player.when('drawAfter')
-	 * 		.apply(code => eval(code))
-	 * 		.then(() => console.log(_var))
-	 * 		.then('me.gainMaxHp(5)');
-	 * })();
-	 * ```
+	 * * @example
+	 * when('xxx') when([xxx1,xxx2])//均会被解析为：player:xxx或player:[xxx1,xxx2]
+	 * 
+	 * when({player:xxx})或when({gloal:[xxx]})//对象类型将直接应用
+	 * 
+	 * when(xxx1,xxx2)//解析为player:[xxx1,xxx2]
+	 * 
+	 * when({player: 'xxAfter'}, {global: 'yyBegin'})//合并解析
+	 * @param  {[signal[]]|signal[]|SkillTrigger[]} triggerNames 
+	 * @returns {_When}
 	 */
 	when(...triggerNames) {
 		const player = this;
