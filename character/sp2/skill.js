@@ -2134,7 +2134,7 @@ const skills = {
 					true
 				)
 				.set("filterButton", button => {
-					var target = _status.event.target;
+					const { player, target } = get.event();
 					if (player.hasSkill("dchumei_" + button.link)) return false;
 					if (button.link == 1 && !target.countCards("he")) return false;
 					if (button.link == 2 && target.isHealthy()) return false;

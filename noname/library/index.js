@@ -10975,6 +10975,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						if (!event.source) return false;
@@ -11032,6 +11033,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						if (event.getParent().name != "draw") return false;
@@ -11089,6 +11091,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						if (event.type != "discard") return false;
@@ -11156,6 +11159,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						var suit = get.suit(event.card);
@@ -11256,6 +11260,7 @@ export class Library {
 					charlotte: true,
 					forced: true,
 					popup: false,
+					nopop: true,
 					onremove: true,
 					filter: function (event, player) {
 						return player.isPhaseUsing() && player.storage.zhengsu_leijin !== false;
@@ -11318,6 +11323,7 @@ export class Library {
 					charlotte: true,
 					forced: true,
 					popup: false,
+					nopop: true,
 					onremove: true,
 					filter: function (event, player) {
 						return player.isPhaseUsing() && player.storage.zhengsu_bianzhen !== false;
@@ -11410,6 +11416,7 @@ export class Library {
 					charlotte: true,
 					forced: true,
 					popup: false,
+					nopop: true,
 					onremove: true,
 					filter: function (event, player) {
 						if (player.storage.zhengsu_mingzhi === false || event.type != "discard") return false;

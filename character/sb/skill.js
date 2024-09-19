@@ -5370,18 +5370,20 @@ const skills = {
 	},
 	sbjizhu: {
 		audio: 3,
+		logAudio: () => 2,
 		trigger: { player: "phaseZhunbeiBegin" },
-		direct: true,
-		content: function () {
-			"step 0";
-			player.chooseTarget(lib.filter.notMe, get.prompt("sbjizhu"), "和一名其他角色进行“协力”").set("ai", function (target) {
-				return get.threaten(target) * Math.sqrt(1 + target.countCards("h")) * (target.isTurnedOver() || target.hasJudge("lebu") ? 0.1 : 1);
-			});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("sbjizhu", target);
-				player.chooseCooperationFor(target, "sbjizhu").set("ai", function (button) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(lib.filter.notMe, get.prompt("sbjizhu"), "和一名其他角色进行“协力”").set("ai", function (target) {
+					return get.threaten(target) * Math.sqrt(1 + target.countCards("h")) * (target.isTurnedOver() || target.hasJudge("lebu") ? 0.1 : 1);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			await player
+				.chooseCooperationFor(target, "sbjizhu")
+				.set("ai", function (button) {
 					var base = 0;
 					switch (button.link) {
 						case "cooperation_damage":
@@ -5398,15 +5400,14 @@ const skills = {
 							break;
 					}
 					return base + Math.random();
-				});
-				player.addAdditionalSkill("cooperation", "sbjizhu_effect");
-			} else event.finish();
-			"step 2";
-			game.delayx();
+				})
+				.forResult();
+			player.addAdditionalSkill("cooperation", "sbjizhu_effect");
+			await game.delayx();
 		},
 		subSkill: {
 			effect: {
-				audio: "sbjizhu",
+				audio: "sbjizhu3.mp3",
 				charlotte: true,
 				trigger: { global: "phaseJieshuBegin" },
 				forced: true,

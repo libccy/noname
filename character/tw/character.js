@@ -17,7 +17,7 @@ const characters = {
 	huan_simayi: ["male", "wei", 4, ["twzongquan", "twguimou"], ["name:司马|懿"]],
 	huan_weiyan: ["male", "shu", 4, ["twqiji", "twpiankuang"]],
 	tw_zhugejun: ["male", "qun", 3, ["twshouzhu", "twdaigui", "twcairu"], ["name:诸葛|均"]],
-	simafu: ["male", "wei", 3, ["xunde", "chenjie"], ["name:司马|孚"]],
+	simafu: ["male", "wei", 3, ["xunde", "chenjie"], ["name:司马|孚", "border:jin"]],
 	tw_yanliang: ["male", "qun", 4, ["twduwang", "twylyanshi"]],
 	tw_wenchou: ["male", "qun", 4, ["twjuexing", "twxiayong"]],
 	tw_yuantan: ["male", "qun", 4, ["twqiaosi", "twbaizu"]],
