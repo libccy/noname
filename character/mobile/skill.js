@@ -703,7 +703,7 @@ const skills = {
 					const cards = player.getExpansions("mbsuwang");
 					trigger.changeToZero();
 					await player.gain(cards, "gain2");
-					if (cards.length >= 3) {
+					if (cards.length >= 0) {
 						const result = await player
 							.chooseTarget("是否令一名其他角色摸两张牌?", lib.filter.notMe)
 							.set("ai", function (target) {
