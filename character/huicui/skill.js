@@ -4318,7 +4318,13 @@ const skills = {
 						return 7 - get.value(card);
 					},
 					ai2: function (target) {
-						return get.effect(target, { name: "sha" }, _status.event.player, _status.event.player) * _status.event.map[target.playerid];
+						let player = get.event("player"),
+							num = get.event("map")[target.playerid],
+							eff = get.effect(target, { name: "sha" }, player, player);
+						if (num > 1 && eff !== 0) {
+							eff -= 10 / target.getHp() * Math.pow(2, num);
+						}
+						return eff * num;
 					},
 				})
 				.set("map", map);
