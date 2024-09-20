@@ -7131,6 +7131,15 @@ const skills = {
 			skillTagFilter(player, tag, target) {
 				if (player != target) return false;
 			},
+			effect: {
+				target(card, player, target) {
+					if (get.tag(card, "damage") || get.tag(card, "losehp")) {
+						let num = target.getExpansions("buqu").length || target.getHp();
+						if (!num) return;
+						return Math.pow(2, Math.min(6, num));
+					}
+				}
+			},
 		},
 		intro: {
 			content: "expansion",
@@ -7207,7 +7216,9 @@ const skills = {
 				.chooseBool(get.prompt("fenji", target), "失去1点体力，令该角色摸两张牌")
 				.set("ai", function () {
 					const evt = _status.event.getParent();
-					return get.attitude(evt.player, evt.target) > 4;
+					if (get.attitude(evt.player, evt.target) <= 0) return false;
+					return 2 * get.effect(evt.target, { name: "draw" }, evt.player, get.event("player")) +
+						get.effect(evt.player, { name: "losehp" }, evt.player, get.event("player")) > 0;
 				})
 				.forResult();
 		},
@@ -7228,7 +7239,9 @@ const skills = {
 		},
 		preHidden: true,
 		check(event, player) {
-			return get.attitude(player, event.player) > 2;
+			if (get.attitude(get.event("player"), event.player) <= 0) return false;
+			return 2 * get.effect(event.player, { name: "draw" }, player, get.event("player")) +
+				get.effect(player, { name: "losehp" }, player, get.event("player")) > 0;
 		},
 		async content(event, trigger, player) {
 			player.line(trigger.player, "green");
