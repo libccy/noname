@@ -1381,7 +1381,8 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		filter(event, player) {
-			return (!player.hasSkill("olxvfa_0") && player.countCards("h")) || (!player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length);
+			const list = player.getStorage("olxvfa_used");
+			return (!list.includes("0") && player.countCards("h")) || (!list.includes("1") && player.getExpansions("olxvfa").length);
 		},
 		chooseButton: {
 			dialog(_, player) {
@@ -1390,16 +1391,18 @@ const skills = {
 					["0", "将至少一半手牌称为“蓄发”置于武将牌上，然后可以将一张牌当作“蓄发”牌中的一张普通锦囊牌使用"],
 					["1", "移去至少一半“蓄发”牌，然后可以将一张牌当作其中一张普通锦囊牌使用"],
 				].filter(listx => {
-					if (listx[0] == "0") return !player.hasSkill("olxvfa_0") && player.countCards("h");
-					return !player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length;
+					if (player.getStorage("olxvfa_used").includes(listx[0])) return false;
+					if (listx[0] == "0") return player.countCards("h");
+					return player.getExpansions("olxvfa").length;
 				});
 				dialog.add([list, "textbutton"]);
 				if (list.length == 1) dialog.direct = true;
 				return dialog;
 			},
 			filter(button, player) {
-				if (button.link == "0") return !player.hasSkill("olxvfa_0") && player.countCards("h");
-				return !player.hasSkill("olxvfa_1") && player.getExpansions("olxvfa").length;
+				if (player.getStorage("olxvfa_used").includes(button.link)) return false;
+				if (button.link == "0") return player.countCards("h");
+				return player.getExpansions("olxvfa").length;
 			},
 			check: () => 1 + Math.random(),
 			backup: links => get.copy(lib.skill["olxvfa_" + ["put", "remove"][parseInt(links[0])]]),
@@ -1418,8 +1421,7 @@ const skills = {
 		},
 		subSkill: {
 			backup: {},
-			0: { charlotte: true },
-			1: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 			put: {
 				audio: "olxvfa",
 				filterCard: true,
@@ -1435,7 +1437,8 @@ const skills = {
 				discard: false,
 				delay: 0,
 				async content(event, trigger, player) {
-					player.addTempSkill("olxvfa_0", "phaseUseAfter");
+					player.addTempSkill("olxvfa_used", "phaseUseAfter");
+					player.markAuto("olxvfa_used", ["0"]);
 					await player.addToExpansion(event.cards, player, "give").set("gaintag", ["olxvfa"]);
 					const cards = player.getExpansions("olxvfa");
 					if (cards.some(card => get.type(card) == "trick" && player.hasCard(cardx => player.hasUseTarget(get.autoViewAs({ name: card.name }, [cardx]), true), "hes"))) {
@@ -1478,7 +1481,8 @@ const skills = {
 				selectCard: -1,
 				delay: 0,
 				async content(event, trigger, player) {
-					player.addTempSkill("olxvfa_1", "phaseUseAfter");
+					player.addTempSkill("olxvfa_used", "phaseUseAfter");
+					player.markAuto("olxvfa_used", ["1"]);
 					const cards = player.getExpansions("olxvfa"),
 						num = Math.ceil(cards.length / 2);
 					const result = await player
@@ -3597,13 +3601,15 @@ const skills = {
 		filter: function (event, player) {
 			var name = player.storage.ollianju;
 			if (!name) return false;
-			if (event.getg) return event.getg(player).some(card => card.name == name) && !player.hasSkill("olsilv_gain");
-			return event.getl(player).cards2.some(card => card.name == name) && !player.hasSkill("olsilv_lose");
+			const list = player.getStorage("olsilv_used");
+			if (event.getg) return event.getg(player).some(card => card.name == name) && !list.includes("gain");
+			return event.getl(player).cards2.some(card => card.name == name) && !list.includes("lose");
 		},
 		forced: true,
 		content: function () {
 			"step 0";
-			player.addTempSkill("olsilv_" + (trigger.getg ? "gain" : "lose"));
+			player.addTempSkill("olsilv_used");
+			player.markAuto("olsilv_used", (trigger.getg ? "gain" : "lose"));
 			if (!trigger.visible) {
 				var cards,
 					name = player.storage.ollianju;
@@ -3616,8 +3622,7 @@ const skills = {
 		},
 		ai: { combo: "ollianju" },
 		subSkill: {
-			gain: { charlotte: true },
-			lose: { charlotte: true },
+			used: { charlotte: true, charlotte: true },
 		},
 	},
 	relianju: {
@@ -4446,7 +4451,7 @@ const skills = {
 		filter: function (event, player) {
 			if (!player.countCards("h")) return false;
 			var num = player.countCards("h") % 2;
-			return !player.hasSkill("yanru_" + num);
+			return !player.getStorage("yanru_used").includes(num);
 		},
 		filterCard: function (card, player) {
 			if (player.countCards("h") && player.countCards("h") % 2 == 0) return lib.filter.cardDiscardable(card, player);
@@ -4463,7 +4468,7 @@ const skills = {
 		},
 		check: function (card) {
 			var player = _status.event.player;
-			if (player.hasSkill("hezhong") && !(player.hasSkill("hezhong_0") && player.hasSkill("hezhong_1"))) {
+			if (player.hasSkill("hezhong") && player.getStorage("hezhong_used").length < 2) {
 				if (player.countCards("h") - ui.selected.cards.length > 1) return 1 / (get.value(card) || 0.5);
 				return 0;
 			}
@@ -4478,7 +4483,8 @@ const skills = {
 			"step 0";
 			var bool = player.countCards("h") % 2;
 			if (cards) player.discard(cards);
-			player.addTempSkill("yanru_" + bool, "phaseUseAfter");
+			player.addTempSkill("yanru_used", "phaseUseAfter");
+			player.markAuto("yanru_used", [bool]);
 			player.draw(3);
 			if (!bool) event.finish();
 			"step 1";
@@ -4490,8 +4496,7 @@ const skills = {
 			});
 		},
 		subSkill: {
-			0: { charlotte: true },
-			1: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 		},
 		ai: {
 			order: 3,
@@ -4506,7 +4511,7 @@ const skills = {
 		},
 		filter: function (event, player) {
 			if (player.countCards("h") != 1 || typeof get.number(player.getCards("h")[0], player) != "number") return false;
-			if (player.hasSkill("hezhong_0") && player.hasSkill("hezhong_1")) return false;
+			if (player.getStorage("hezhong_used").length > 1) return false;
 			let gain = 0,
 				lose = 0;
 			if (event.getg) gain = event.getg(player).length;
@@ -4514,12 +4519,13 @@ const skills = {
 			return gain != lose;
 		},
 		prompt2: function (event, player) {
-			var str = "展示最后一张手牌并摸一张牌";
-			if (!player.hasSkill("hezhong_0") || !player.hasSkill("hezhong_0")) {
+			let str = "展示最后一张手牌并摸一张牌";
+			let list = player.getStorage("hezhong_used");
+			if (list.length < 2) {
 				str += "，然后令本回合使用点数";
-				if (!player.hasSkill("hezhong_0")) str += "大于";
-				if (!player.hasSkill("hezhong_0") && !player.hasSkill("hezhong_0")) str += "或";
-				if (!player.hasSkill("hezhong_1")) str += "小于";
+				if (!list.includes("max")) str += "大于";
+				if (!list.length) str += "或";
+				if (!list.includes("min")) str += "小于";
 				str += get.number(player.getCards("h")[0], player);
 				str += "的普通锦囊牌额外结算一次";
 			}
@@ -4533,8 +4539,8 @@ const skills = {
 			"step 1";
 			player.draw();
 			"step 2";
-			if (player.hasSkill("hezhong_0")) event._result = { index: 1 };
-			else if (player.hasSkill("hezhong_1")) event._result = { index: 0 };
+			if (player.getStorage("hezhong_used").includes("max")) event._result = { index: 1 };
+			else if (player.getStorage("hezhong_used").includes("min")) event._result = { index: 0 };
 			else {
 				player
 					.chooseControl()
@@ -4556,9 +4562,15 @@ const skills = {
 			"step 3";
 			var skill = "hezhong_" + result.index;
 			player.addTempSkill(skill);
+			player.addTempSkill("hezhong_used");
+			player.markAuto("hezhong_used", ["max", "min"][result.index]);
 			player.markAuto(skill, [num]);
 		},
 		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			0: {
 				charlotte: true,
 				onremove: true,
@@ -7651,18 +7663,20 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseZhunbeiBegin" },
 		filter: function (event, player) {
-			if (event.player.isMinHandcard() && !player.hasSkill("olhongji_min")) return true;
-			if (event.player.isMaxHandcard() && !player.hasSkill("olhongji_max")) return true;
+			const list = player.getStorage("olhongji_used");
+			if (event.player.isMinHandcard() && !list.includes("min")) return true;
+			if (event.player.isMaxHandcard() && !list.includes("max")) return true;
 			return false;
 		},
 		direct: true,
 		content: function () {
 			"step 0";
-			var target = trigger.player;
+			let target = trigger.player;
 			event.target = target;
-			var bool1 = target.isMinHandcard() && !player.hasSkill("olhongji_min"),
+			const list = player.getStorage("olhongji_used");
+			let bool1 = target.isMinHandcard() && !list.includes("min"),
 				str1 = "其手牌数为全场最少。你可以令其于本回合摸牌阶段结束后执行一个额外的摸牌阶段，然后本轮你不能再发动该分支。";
-			var bool2 = target.isMaxHandcard() && !player.hasSkill("olhongji_max"),
+			let bool2 = target.isMaxHandcard() && !list.includes("max"),
 				str2 = "其手牌数为全场最多。你可以令其于本回合出牌阶段结束后执行一个额外的出牌阶段，然后本轮你不能再发动该分支。";
 			if (bool1 && !bool2) {
 				event.branch = 0;
@@ -7694,18 +7708,17 @@ const skills = {
 			if ((event.branch == 1 && result.bool) || result.control == "出牌阶段") choice = 1;
 			if (choice == 0) {
 				player.logSkill("olhongji", target);
-				player.addTempSkill("olhongji_min", "roundStart");
 				target.addTempSkill("olhongji_draw");
 			} else if (choice == 1) {
 				player.logSkill("olhongji", target);
-				player.addTempSkill("olhongji_max", "roundStart");
 				target.addTempSkill("olhongji_use");
 			}
+			player.addTempSkill("olhongji_used", "roundStart");
+			player.markAuto("olhongji_used", ["min", "max"][choice]);
 		},
 		ai: { expose: 0.25 },
 		subSkill: {
-			min: { charlotte: true },
-			max: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 			draw: {
 				trigger: { player: "phaseDrawAfter" },
 				charlotte: true,
@@ -8085,6 +8098,10 @@ const skills = {
 			},
 		},
 		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			after: {
 				audio: "olhuiyun",
 				trigger: { global: "useCardAfter" },
@@ -8099,7 +8116,7 @@ const skills = {
 					var choices = [];
 					var choiceList = ["使用展示牌，然后重铸所有手牌", "使用一张手牌，然后重铸展示牌", "摸一张牌"];
 					for (var i = 1; i <= 3; i++) {
-						if (!player.hasSkill("olhuiyun_" + i)) choices.push("选项" + get.cnNumber(i, true));
+						if (!player.getStorage("olhuiyun_used").includes(i)) choices.push("选项" + get.cnNumber(i, true));
 						else choiceList[i - 1] = '<span style="opacity:0.5">' + choiceList[i - 1] + "</span>";
 					}
 					if (!choices.length) event.finish();
@@ -8128,7 +8145,8 @@ const skills = {
 						var index = ["选项一", "选项二", "选项三"].indexOf(result.control) + 1;
 						event.index = index;
 						game.log(player, "选择了", "#y" + result.control);
-						player.addTempSkill("olhuiyun_" + index, "roundStart");
+						player.addTempSkill("olhuiyun_used", "roundStart");
+						player.markAuto("olhuiyun_used", [index]);
 						event.targets = trigger.targets.slice(0);
 					} else event.finish();
 					"step 2";
@@ -8205,9 +8223,6 @@ const skills = {
 					}, trigger.cards);
 				},
 			},
-			1: { charlotte: true },
-			2: { charlotte: true },
-			3: { charlotte: true },
 		},
 	},
 	//王瓘
@@ -11513,9 +11528,9 @@ const skills = {
 		audio: 2,
 		enable: "chooseToUse",
 		hiddenCard: function (player, name) {
+			if (player.getStorage("liangyuan_used").includes(name)) return false;
 			if (name == "tao") {
 				return (
-					!player.hasSkill("liangyuan_tao", null, null, false) &&
 					game.hasPlayer(function (current) {
 						var storage = current.getExpansions("huamu");
 						return (
@@ -11528,7 +11543,6 @@ const skills = {
 				);
 			} else if (name == "jiu") {
 				return (
-					!player.hasSkill("liangyuan_jiu", null, null, false) &&
 					game.hasPlayer(function (current) {
 						var storage = current.getExpansions("huamu");
 						return (
@@ -11545,7 +11559,7 @@ const skills = {
 		filter: function (event, player) {
 			if (event.type == "wuxie") return false;
 			if (
-				!player.hasSkill("liangyuan_tao", null, null, false) &&
+				!player.getStorage("liangyuan_used").includes("tao") &&
 				event.filterCard(get.autoViewAs({ name: "tao" }, "unsure"), player, event) &&
 				game.hasPlayer(function (current) {
 					var storage = current.getExpansions("huamu");
@@ -11559,7 +11573,7 @@ const skills = {
 			)
 				return true;
 			if (
-				!player.hasSkill("liangyuan_jiu", null, null, false) &&
+				!player.getStorage("liangyuan_used").includes("jiu") &&
 				event.filterCard(get.autoViewAs({ name: "jiu" }, "unsure"), player, event) &&
 				game.hasPlayer(function (current) {
 					var storage = current.getExpansions("huamu");
@@ -11582,7 +11596,7 @@ const skills = {
 				var evt = _status.event.getParent();
 				var name = button.link[2],
 					color = name == "tao" ? "red" : "black";
-				if (player.hasSkill("liangyuan_" + name, null, null, false)) return false;
+				if (player.getStorage("liangyuan_used").includes(name)) return false;
 				var cards = [];
 				game.countPlayer(function (current) {
 					cards.addArray(
@@ -11630,7 +11644,8 @@ const skills = {
 					selectCard: -1,
 					filterCard: () => false,
 					precontent: function () {
-						player.addTempSkill("liangyuan_" + event.result.card.name, "roundStart");
+						player.addTempSkill("liangyuan_used", "roundStart");
+						player.markAuto("liangyuan_used", event.result.card.name);
 						player.logSkill("liangyuan");
 						var list = [],
 							color = lib.skill.liangyuan_backup.color;
@@ -11662,8 +11677,7 @@ const skills = {
 			},
 		},
 		subSkill: {
-			tao: { charlotte: true },
-			jiu: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 		},
 		ai: {
 			order: function (item, player) {
@@ -12403,10 +12417,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 3,
 		filter: function (event, player) {
-			var list = ["equip1", "equip2", "others"];
-			for (var i = 0; i < list.length; i++) {
-				if (player.hasSkill("olshengong_" + list[i], null, null, false)) list.splice(i--, 1);
-			}
+			var list = ["equip1", "equip2", "others"].filter(i => !player.getStorage("olshengong_used").includes(i));
 			if (!list.length) return false;
 			return player.hasCard(function (card) {
 				var type = get.type(card);
@@ -12421,7 +12432,7 @@ const skills = {
 			if (type != "equip") return false;
 			var subtype = get.subtype(card);
 			if (subtype != "equip1" && subtype != "equip2") subtype = "others";
-			return !player.hasSkill("olshengong_" + subtype, null, null, false);
+			return !player.getStorage("olshengong_used").includes(subtype);
 		},
 		position: "he",
 		check: function (card) {
@@ -12435,7 +12446,8 @@ const skills = {
 			"step 0";
 			var subtype = get.subtype(cards[0]);
 			if (subtype != "equip1" && subtype != "equip2") subtype = "others";
-			player.addTempSkill("olshengong_" + subtype, "phaseUseAfter");
+			player.addTempSkill("olshengong_used", "phaseUseAfter");
+			player.markAuto("olshengong_used", subtype);
 			var send = function () {
 				game.me.chooseControl("助力锻造！", "妨碍锻造！", "什么都不做");
 				game.resume();
@@ -12685,9 +12697,7 @@ const skills = {
 			result: { player: 1 },
 		},
 		subSkill: {
-			equip1: { charlotte: true },
-			equip2: { charlotte: true },
-			others: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 			destroy: {
 				trigger: { global: ["loseEnd", "cardsDiscardEnd"] },
 				forced: true,
@@ -13233,20 +13243,10 @@ const skills = {
 	qiaoli: {
 		onChooseToUse: function (event) {
 			if (event.type == "phase" && !game.online && !(event.qiaoli_equip1 && event.qiaoli_noequip1)) {
-				var player = event.player;
-				var evt = event.getParent("phaseUse");
-				if (
-					player.getHistory("useCard", function (evtx) {
-						return evtx.getParent("phaseUse") == evt && evtx.skill == "qiaoli" && get.subtype(evtx.cards[0]) == "equip1";
-					}).length
-				)
-					event.set("qiaoli_equip1", true);
-				if (
-					player.getHistory("useCard", function (evtx) {
-						return evtx.getParent("phaseUse") == evt && evtx.skill == "qiaoli" && get.subtype(evtx.cards[0]) != "equip1";
-					}).length
-				)
-					event.set("qiaoli_noequip1", true);
+				let player = event.player;
+				const list = player.getStorage("qiaoli_used");
+				if (list.includes("equip1")) event.set("qiaoli_equip1", true);
+				if (list.length && list.some(i => i != "equip1")) event.set("qiaoli_noequip1", true);
 			}
 		},
 		audio: 2,
@@ -13276,6 +13276,9 @@ const skills = {
 		},
 		position: "hes",
 		precontent: function () {
+			player.addTempSkill("qiaoli_used");
+			const subtype = get.subtype(event.result.cards[0]) || "equip";
+			player.markAuto("qiaoli_used", [subtype]);
 			player.addTempSkill("qiaoli_norespond");
 			player.addTempSkill("qiaoli_effect");
 		},
@@ -13286,6 +13289,10 @@ const skills = {
 			},
 		},
 		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			norespond: {
 				charlotte: true,
 				trigger: { player: "useCard1" },

@@ -4326,11 +4326,11 @@ const skills = {
 			source: "damageSource",
 		},
 		filter(event, player) {
-			const bool1 = event.player == player && !player.hasHistory("custom", evt => evt.dcxiace == "player") && game.hasPlayer(target => target != player && !target.hasSkill("fengyin"));
+			const bool1 = event.player == player && !player.getStorage("dcxiace_used").includes("player") && game.hasPlayer(target => target != player && !target.hasSkill("fengyin"));
 			const bool2 =
 				event.source &&
 				event.source == player &&
-				!player.hasHistory("custom", evt => evt.dcxiace == "source") &&
+				!player.getStorage("dcxiace_used").includes("source") &&
 				player.isDamaged() &&
 				player.countCards("he", card => {
 					if (_status.connectMode && get.position(card) == "h") return true;
@@ -4340,7 +4340,7 @@ const skills = {
 		},
 		direct: true,
 		async content(event, trigger, player) {
-			if (trigger.player == player && !player.hasHistory("custom", evt => evt.dcxiace == "player") && game.hasPlayer(target => target != player && !target.hasSkill("fengyin"))) {
+			if (trigger.player == player && !player.getStorage("dcxiace_used").includes("player") && game.hasPlayer(target => target != player && !target.hasSkill("fengyin"))) {
 				const {
 					result: { bool, targets },
 				} = await player
@@ -4363,14 +4363,15 @@ const skills = {
 				if (bool) {
 					const target = targets[0];
 					player.logSkill("dcxiace", target);
-					player.getHistory("custom").push({ dcxiace: "player" });
+					player.addTempSkill("dcxiace_used");
+					player.markAuto("dcxiace_used", "player");
 					target.addTempSkill("fengyin");
 				}
 			}
 			if (
 				trigger.source &&
 				trigger.source == player &&
-				!player.hasHistory("custom", evt => evt.dcxiace == "source") &&
+				!player.getStorage("dcxiace_used").includes("source") &&
 				player.isDamaged() &&
 				player.countCards("he", card => {
 					if (_status.connectMode && get.position(card) == "h") return true;
@@ -4389,10 +4390,17 @@ const skills = {
 					})
 					.set("logSkill", "dcxiace");
 				if (bool) {
-					player.getHistory("custom").push({ dcxiace: "source" });
+					player.addTempSkill("dcxiace_used");
+					player.markAuto("dcxiace_used", "source");
 					await player.recover();
 				}
 			}
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 		},
 	},
 	dcyuxin: {
@@ -4999,7 +5007,7 @@ const skills = {
 		filter: function (event, player) {
 			if (typeof player.maxHp != "number" || player.maxHp <= 0) return false;
 			if (event.name == "loseAsync" && event.type != "gain") return false;
-			if (player.hasSkill("dcsbmengmou_true") && player.hasSkill("dcsbmengmou_false")) return false;
+			if (player.getStorage("dcsbmengmou_used").includes(player.storage.dcsbmengmou ? "yin" : "yang")) return false;
 			var cards1 = event.getl(player).cards2,
 				cards2 = event.getg(player);
 			return (
@@ -5095,7 +5103,8 @@ const skills = {
 			if (result.bool) {
 				if (!target) target = result.targets[0];
 				yield player.logSkill("dcsbmengmou", target);
-				player.addTempSkill("dcsbmengmou_" + (storage || false));
+				player.addTempSkill("dcsbmengmou_used");
+				player.markAuto("dcsbmengmou_used", [storage ? "yin" : "yang"]);
 				player.changeZhuanhuanji("dcsbmengmou");
 				while (num > 0) {
 					num--;
@@ -5145,8 +5154,7 @@ const skills = {
 					trigger.source.recover(trigger.num);
 				},
 			},
-			true: { charlotte: true },
-			false: { charlotte: false },
+			used: { charlotte: true, onremove: true },
 			change: {
 				audio: "dcsbmengmou",
 				audioname: ["dc_sb_lusu_shadow"],
@@ -12884,7 +12892,7 @@ const skills = {
 				return dialog;
 			},
 			filter: function (button, player) {
-				return !player.hasSkill("dcfengyan_" + button.link, null, null, false);
+				return !player.getStorage("dcfengyan_used").includes(button.link);
 			},
 			check: function (button) {
 				var player = _status.event.player;
@@ -12918,6 +12926,10 @@ const skills = {
 			result: { player: 1 },
 		},
 		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			backup: { audio: "dcfengyan" },
 			gain: {
 				audio: "dcfengyan",
@@ -12928,7 +12940,8 @@ const skills = {
 				selectCard: -1,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcfengyan_gain", "phaseUseAfter");
+					player.addTempSkill("dcfengyan_used", "phaseUseAfter");
+					player.markAuto("dcfengyan_used", "gain");
 					target.chooseCard("h", true, "交给" + get.translation(player) + "一张牌");
 					"step 1";
 					if (result.bool) target.give(result.cards, player);
@@ -12952,7 +12965,8 @@ const skills = {
 				filterCard: () => false,
 				selectCard: -1,
 				content: function () {
-					player.addTempSkill("dcfengyan_sha", "phaseUseAfter");
+					player.addTempSkill("dcfengyan_used", "phaseUseAfter");
+					player.markAuto("dcfengyan_used", "sha");
 					player.useCard(
 						{
 							name: "sha",
@@ -16448,15 +16462,10 @@ const skills = {
 	//杨婉
 	youyan: {
 		audio: 2,
-		// trigger:{
-		// 	player:'loseAfter',
-		// 	global:'loseAsyncAfter',
-		// },
 		trigger: {
 			player: ["loseAfter", "equipAfter"],
 			global: ["loseAsyncAfter", "cardsDiscardAfter"],
 		},
-		//usable:1,
 		prompt2: function (event, player) {
 			var cards2 = [];
 			if (event.name == "cardsDiscard") {
@@ -16515,11 +16524,11 @@ const skills = {
 			return false;
 		},
 		content: function () {
-			var evt = trigger.getParent("phaseUse");
-			if (evt && evt.player == player) evt.youyaned = true;
+			let evt = trigger.getParent("phaseUse");
+			if (evt && evt.player == player) player.tempBanSkill("youyan", "phaseUseAfter", false);
 			else {
-				var evt = trigger.getParent("phaseDiscard");
-				if (evt) evt.youyaned = true;
+				let evtx = trigger.getParent("phaseDiscard");
+				if (evtx && evtx.player == player) player.tempBanSkill("youyan", "phaseDiscardAfter", false);
 			}
 			var list = [],
 				cards = [];

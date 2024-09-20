@@ -3571,7 +3571,7 @@ const skills = {
 		usable: 4,
 		filter: function (event, player) {
 			var hs = player.getCards("h"),
-				suits = player.getStorage("dcbingji_mark");
+				suits = player.getStorage("dcbingji_used");
 			if (!hs.length) return false;
 			var suit = get.suit(hs[0], player);
 			if (suit == "none" || suits.includes(suit)) return false;
@@ -3639,9 +3639,10 @@ const skills = {
 						player.logSkill("dcbingji");
 						delete event.result.skill;
 						var hs = player.getCards("h");
+						event.getParent().addCount = false;
 						player.showCards(hs, get.translation(player) + "发动了【秉纪】");
-						player.markAuto("dcbingji_mark", [get.suit(hs[0], player)]);
-						player.addTempSkill("dcbingji_mark");
+						player.markAuto("dcbingji_used", [get.suit(hs[0], player)]);
+						player.addTempSkill("dcbingji_used");
 					},
 				};
 			},
@@ -3650,20 +3651,9 @@ const skills = {
 			},
 		},
 		subSkill: {
-			mark: {
+			used: {
 				charlotte: true,
 				onremove: true,
-				trigger: { player: "useCard1" },
-				forced: true,
-				popup: false,
-				firstDo: true,
-				filter: function (event, player) {
-					return event.addCount !== false && event.card.name == "sha" && event.card.storage && event.card.storage.dcbingji;
-				},
-				content: function () {
-					trigger.addCount = false;
-					player.getStat("card").sha--;
-				},
 			},
 		},
 	},
