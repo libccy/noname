@@ -7496,7 +7496,7 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
-			return !player.hasSkill("dcjianguo_0") || !player.hasSkill("dcjianguo_1");
+			return ["discard", "draw"].some(i => !player.getStorage("dcjianguo_used").includes(i));
 		},
 		chooseButton: {
 			dialog: function (event, player) {
@@ -7511,9 +7511,7 @@ const skills = {
 				return dialog;
 			},
 			filter: function (button, player) {
-				if (button.link == "discard" && player.hasSkill("dcjianguo_0")) return false;
-				if (button.link == "draw" && player.hasSkill("dcjianguo_1")) return false;
-				return true;
+				return !player.getStorage("dcjianguo_used").includes(button.link);
 			},
 			check: function (button) {
 				var player = _status.event.player;
@@ -7562,8 +7560,10 @@ const skills = {
 			},
 		},
 		subSkill: {
-			0: { charlotte: true },
-			1: { charlotte: true },
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			backup: { audio: "dcjianguo" },
 			discard: {
 				audio: "dcjianguo",
@@ -7572,7 +7572,8 @@ const skills = {
 				selectCard: -1,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcjianguo_0", "phaseUseAfter");
+					player.addTempSkill("dcjianguo_used", "phaseUseAfter");
+					player.markAuto("dcjianguo_used", ["discard"]);
 					target.draw();
 					game.delayex();
 					"step 1";
@@ -7600,7 +7601,8 @@ const skills = {
 				selectCard: -1,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcjianguo_1", "phaseUseAfter");
+					player.addTempSkill("dcjianguo_used", "phaseUseAfter");
+					player.markAuto("dcjianguo_used", ["draw"]);
 					target.chooseToDiscard("he", true, "谏国：请弃置一张牌");
 					"step 1";
 					var num = Math.ceil(target.countCards("h") / 2);

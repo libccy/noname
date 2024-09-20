@@ -2279,11 +2279,7 @@ const skills = {
 						const status = player.countMark("mbxuetu_status");
 						player.changeZhuanhuanji("mbxuetu");
 						if (status < 2) {
-							if (!player.storage.mbxuetu_used) {
-								player.when(["phaseUseAfter", "mbweiming_achieveAfter"]).then(() => {
-									delete player.storage.mbxuetu_used;
-								});
-							}
+							player.addTempSkill("mbxuetu_used", "phaseUseAfter");
 							player.markAuto("mbxuetu_used", [choice]);
 							if (!choice) {
 								await target.recover();
@@ -2362,6 +2358,12 @@ const skills = {
 			},
 			result: {
 				player: 1,
+			},
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
 			},
 		},
 	},

@@ -2661,14 +2661,16 @@ const skills = {
 		audio: "xhzhiyan",
 		enable: "phaseUse",
 		filter: function (event, player) {
-			return (!player.hasSkill("xinxhzhiyan_true") && player.countCards("h") > player.hp) || (!player.hasSkill("xinxhzhiyan_false") && player.countCards("h") < player.maxHp);
+			const list = player.getStorage("xinxhzhiyan_used");
+			return (!list.includes("give") && player.countCards("h") > player.hp) || (!list.includes("draw") && player.countCards("h") < player.maxHp);
 		},
 		filterCard: true,
 		selectCard: function () {
 			var player = _status.event.player;
-			if (player.hasSkill("xinxhzhiyan_true")) return 0;
+			const list = player.getStorage("xinxhzhiyan_used");
+			if (list.includes("give")) return 0;
 			var num = Math.max(0, player.countCards("h") - player.hp);
-			if (ui.selected.cards.length || player.hasSkill("xinxhzhiyan_false") || player.countCards("h") >= player.maxHp) return [num, num];
+			if (ui.selected.cards.length || !list.includes("draw") || player.countCards("h") >= player.maxHp) return [num, num];
 			return [0, num];
 		},
 		filterTarget: lib.filter.notMe,
@@ -2702,10 +2704,13 @@ const skills = {
 		lose: false,
 		content: function () {
 			var bool = cards && cards.length > 0;
-			player.addTempSkill("xinxhzhiyan_" + bool, "phaseUseEnd");
+			player.addTempSkill("xinxhzhiyan_used", "phaseUseEnd");
 			if (!bool) {
+				player.markAuto("xinxhzhiyan_used", "draw");
+				player.addTempSkill("xinxhzhiyan_false", "phaseUseEnd");
 				player.draw(player.maxHp - player.countCards("h"));
 			} else {
+				player.markAuto("xinxhzhiyan_used", "give");
 				player.give(cards, target);
 			}
 		},
@@ -2723,13 +2728,17 @@ const skills = {
 			},
 		},
 	},
-	xinxhzhiyan_true: {},
+	xinxhzhiyan_used: {
+		charlotte: true,
+		onremove: true,
+	},
 	xinxhzhiyan_false: {
 		mod: {
 			playerEnabled: function (card, player, target) {
 				if (player != target && (!get.info(card) || !get.info(card).singleCard || !ui.selected.targets.length)) return false;
 			},
 		},
+		charlotte: true,
 		mark: true,
 		intro: {
 			content: "不能对其他角色使用牌",

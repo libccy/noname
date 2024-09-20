@@ -1559,6 +1559,7 @@ const skills = {
 			player: "damageBegin4",
 		},
 		filter: function (event, player, name) {
+			return !player.getStorage("stdjinjian_used").includes(name.slice(11));
 			return !player.hasSkill(`stdjinjian_effect${name.slice(11)}`);
 		},
 		prompt2(event, player, name) {
@@ -1569,37 +1570,44 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			trigger.cancel();
+			player.addTempSkill("stdjinjian_used");
+			player.markAuto("stdjinjian_used", event.triggername.slice(11));
 			player.addTempSkill(`stdjinjian_effect${event.triggername.slice(11)}`);
+			player.addMark(`stdjinjian_effect${event.triggername.slice(11)}`, 1, false);
 		},
 		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			effect2: {
 				trigger: { source: "damageBegin1" },
 				forced: true,
 				charlotte: true,
+				onremove: true,
 				async content(event, trigger, player) {
-					trigger.num++;
-					player.tempBanSkill(event.name, null, false);
-					player.unmarkSkill(event.name);
+					const num = player.countMark(event.name);
+					trigger.num += num;
+					player.removeMark(event.name, num, false);
 				},
-				mark: true,
 				marktext: "进",
 				intro: {
-					content: "下次造成的伤害+1",
+					content: "下次造成的伤害+$",
 				},
 			},
 			effect4: {
 				trigger: { player: "damageBegin3" },
 				forced: true,
 				charlotte: true,
+				onremove: true,
 				async content(event, trigger, player) {
-					trigger.num++;
-					player.tempBanSkill(event.name, null, false);
-					player.unmarkSkill(event.name);
+					const num = player.countMark(event.name);
+					trigger.num += num;
+					player.removeMark(event.name, num, false);
 				},
-				mark: true,
 				marktext: "谏",
 				intro: {
-					content: "下次受到的伤害+1",
+					content: "下次受到的伤害+$",
 				},
 			},
 		},

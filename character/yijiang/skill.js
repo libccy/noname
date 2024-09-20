@@ -8824,7 +8824,7 @@ const skills = {
 		enable: "phaseUse",
 		audio: "sanyao",
 		filter: function (event, player) {
-			return player.countCards("he") > 0 && (!player.hasSkill("olsanyao0") || !player.hasSkill("olsanyao1"));
+			return player.countCards("he") > 0 && player.getStorage("olsanyao_used").length < 2;
 		},
 		chooseButton: {
 			dialog: function (event, player) {
@@ -8839,7 +8839,7 @@ const skills = {
 				return choiceList;
 			},
 			filter: function (button, player) {
-				return !player.hasSkill("olsanyao" + button.link);
+				return !player.getStorage("olsanyao_used").includes(button.link);
 			},
 			check: function (button) {
 				var player = _status.event.player;
@@ -8891,7 +8891,8 @@ const skills = {
 					},
 					position: "he",
 					content: function () {
-						player.addTempSkill("olsanyao" + lib.skill[event.name].index);
+						player.addTempSkill("olsanyao_used", "phaseUseAfter");
+						player.markAuto("olsanyao_used", lib.skill[event.name].index);
 						target.damage("nocard");
 					},
 					ai: lib.skill.sanyao.ai,
@@ -8907,9 +8908,13 @@ const skills = {
 				player: 1,
 			},
 		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
+		},
 	},
-	olsanyao0: {},
-	olsanyao1: {},
 	rezhiman: {
 		audio: "zhiman",
 		audioname: ["re_masu"],

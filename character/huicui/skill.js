@@ -8321,7 +8321,7 @@ const skills = {
 				return dialog;
 			},
 			filter: function (button, player) {
-				return !player.hasSkill("dcquanjian_" + button.link, null, null, false);
+				return !player.getStorage("dcquanjian_used").includes(button.link);
 			},
 			check: () => 1 + Math.random(),
 			backup: function (links) {
@@ -8338,6 +8338,10 @@ const skills = {
 		},
 		subSkill: {
 			backup: { audio: "dcquanjian" },
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			damage: {
 				audio: "dcquanjian",
 				selectTarget: 2,
@@ -8353,7 +8357,8 @@ const skills = {
 				multitarget: true,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcquanjian_damage", "phaseUseAfter");
+					player.addTempSkill("dcquanjian_used", "phaseUseAfter");
+					player.markAuto("dcquanjian_used", "damage");
 					targets[0]
 						.chooseControl()
 						.set("choiceList", ["对" + get.translation(targets[1]) + "造成1点伤害", "本回合下次受到的伤害+1"])
@@ -8389,7 +8394,8 @@ const skills = {
 				selectCard: -1,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcquanjian_draw", "phaseUseAfter");
+					player.addTempSkill("dcquanjian_used", "phaseUseAfter");
+					player.markAuto("dcquanjian_used", "draw");
 					var num1 = target.countCards("h"),
 						num2 = target.getHandcardLimit();
 					var num = 0;
