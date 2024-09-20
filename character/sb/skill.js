@@ -6478,7 +6478,10 @@ const skills = {
 				},
 			},
 			banned: {
-				charlotte: true
+				charlotte: true,
+				mark: true,
+				marktext: '<span style="text-decoration: line-through;">道</span>',
+				intro: { content: "孩子们，我不能获得道兵了" },
 			},
 		},
 	},
