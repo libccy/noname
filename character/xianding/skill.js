@@ -97,7 +97,7 @@ const skills = {
 				await game.delay();
 				if (!game.hasPlayer(current => ![first, player].includes(current))) return;
 				const result = await first
-					.chooseTarget("令" + get.translation(player) + "对一名其他角色发动〖缀文〗", true, function (card, player, target) {
+					.chooseTarget("令" + get.translation(player) + "对一名其他角色发动〖撰文〗", true, function (card, player, target) {
 						return !get.event("targets").includes(target);
 					})
 					.set("targets", [first, player])
@@ -111,7 +111,7 @@ const skills = {
 				if (result.bool) {
 					const targets = result.targets;
 					first.line(targets, "green");
-					await player.useSkill("dcsbzhuiwen", null, targets);
+					await player.useSkill("dcsbzhuanwen", null, targets);
 				}
 			}
 		},
@@ -144,7 +144,7 @@ const skills = {
 			},
 		},
 	},
-	dcsbzhuiwen: {
+	dcsbzhuanwen: {
 		audio: 2,
 		trigger: {
 			player: "phaseJieshuBegin",
@@ -154,7 +154,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt2("dcsbzhuiwen"), function (card, player, target) {
+				.chooseTarget(get.prompt2("dcsbzhuanwen"), function (card, player, target) {
 					return target != player && target.countCards("h");
 				})
 				.set("ai", target => {
@@ -172,7 +172,7 @@ const skills = {
 				return;
 			}
 			let cards = game.cardsGotoOrdering(get.cards(target.countCards("h"))).cards;
-			await player.showCards(cards, get.translation(player) + "发动了〖缀文〗");
+			await player.showCards(cards, get.translation(player) + "发动了〖撰文〗");
 			let damages = cards.filter(card => get.tag(card, "damage") && player.canUse(card, target, false)),
 				nodamages = cards.filter(card => !get.tag(card, "damage"));
 			const list = [
@@ -182,7 +182,7 @@ const skills = {
 			const result = await player
 				.chooseControl("使用伤害牌", "获得非伤害牌")
 				.set("choiceList", list)
-				.set("prompt", "缀文：请选择一项")
+				.set("prompt", "撰文：请选择一项")
 				.set(
 					"effect",
 					(function () {

@@ -1,5 +1,5 @@
 const characters = {
-	dc_sb_chenlin: ["male", "qun", 3, ["dcsbyaozuo", "dcsbzhuiwen"]],
+	dc_sb_chenlin: ["male", "qun", 3, ["dcsbyaozuo", "dcsbzhuanwen"]],
 	wu_huangfusong: ["male", "qun", 4, ["dcchaozhen", "dclianjie", "dcjiangxian"], ["name:皇甫|嵩"]],
 	wenyuan: ["female", "shu", 3, ["dckengqiang", "dckuichi", "dcshangjue"]],
 	dc_jiangqing: ["male", "wu", 4, ["dcshangyi", "dcniaoxiang"], ["die:jiangqin.mp3"]],
