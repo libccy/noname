@@ -24,8 +24,6 @@ const skills = {
 			});
 			if (!places.length) return;
 			//射击部位-by 鸽子
-			//牢萌负责精修断后
-			//一个团队要有XX的X，YY的Y，ZZ的Z...
 			await Promise.all(event.next);
 			event.videoId = lib.status.videoId++;
 			if (player.isUnderControl()) game.swapPlayerAuto(player);
