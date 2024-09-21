@@ -4112,7 +4112,17 @@ const skills = {
 				.set("ai", () => {
 					var player = get.player(),
 						target = get.event("target"),
-						att = get.attitude(player, target) > 0 ? 1 : -1;
+						att = get.attitude(player, target) > 0 ? 1 : -1,
+						colors = get.event("controls"),
+						known = target.getCards("e");
+					if (att > 0) return "cancel2";
+					known.addArray(target.getKnownCards(player));
+					if (colors.includes("red") && !known.some(i => get.color(i) != "red")) return "red";
+					known = 2 * known.filter(i => get.color(i) == colors[0]).length - known.length;
+					if (Math.abs(known) > 1) {
+						if (known > 1) return colors[0];
+						return colors[1];
+					}
 					var list = get
 						.event("controls")
 						.map(i => [
