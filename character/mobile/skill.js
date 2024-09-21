@@ -690,7 +690,7 @@ const skills = {
 					player: "phaseDrawBegin1",
 				},
 				filter(event, player) {
-					return player.getExpansions("mbsuwang").length;
+					return !event.numFixed && player.getExpansions("mbsuwang").length;
 				},
 				async cost(event, trigger, player) {
 					const cards = player.getExpansions("mbsuwang");

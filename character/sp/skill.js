@@ -4875,8 +4875,8 @@ const skills = {
 					"step 3";
 					if (result.bool) {
 						var target = result.targets[0];
-						player.line(target);
-						game.log(trigger.card, "对", target, "的伤害-1");
+						//player.line(target);
+						//game.log(trigger.card, "对", target, "的伤害-1");
 						player.addTempSkill("olfushi_buff2");
 						player.initStorage("olfushi_buff2", []);
 						player.getStorage("olfushi_buff2").push([target, trigger.card]);
@@ -4901,8 +4901,8 @@ const skills = {
 					"step 5";
 					if (result.bool) {
 						var target = result.targets[0];
-						player.line(target);
-						game.log(trigger.card, "对", target, "的伤害+1");
+						//player.line(target);
+						//game.log(trigger.card, "对", target, "的伤害+1");
 						player.addTempSkill("olfushi_buff3");
 						player.initStorage("olfushi_buff3", []);
 						player.getStorage("olfushi_buff3").push([target, trigger.card]);
@@ -14010,7 +14010,7 @@ const skills = {
 				},
 			},
 		},
-		derivation: ["tiaoxin", "new_repaoxiao", "xinshensu"],
+		derivation: ["tiaoxin", "olpaoxiao", "xinshensu"],
 	},
 	//范强张达
 	yuanchou: {
