@@ -1464,6 +1464,10 @@ export class Player extends HTMLDivElement {
 		} else {
 			rangex.push(...new Set(ranges));
 		}
+		if (get.itemtype(name) == "card") {
+			const owner = get.owner(name, "judge");
+			if (owner && !lib.filter.canBeGained(name, this, owner)) return false;
+		}
 		for (let range of rangex) {
 			let num = this.countEquipableSlot(range);
 			let num2 = get.numOf(rangex, range);

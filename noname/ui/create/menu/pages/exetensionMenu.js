@@ -1046,9 +1046,9 @@ export const extensionMenu = function (connectMenu) {
 					}
 				}
 				if(!list.length){
-					if(!lib.character["noname_sunce"]) lib.character["noname_sunce"]=["male","wu",4,["jiang"],[]];
-					if(!lib.translate["noname_sunce"]) lib.translate["noname_sunce"]="孙策";
-					list.push(["noname_sunce",lib.translate["noname_sunce"]]);
+					if(!lib.character["noname_sunce"]) lib.character["noname_sunce"] = ["male", "wu", 4, ["jiang"], ["unseen"]];
+					if(!lib.translate["noname_sunce"]) lib.translate["noname_sunce"] = "孙策";
+					list.push(["noname_sunce", lib.translate["noname_sunce"]]);
 				}
 				list.sort(function (a, b) {
 					a = a[0];
@@ -2190,9 +2190,9 @@ export const extensionMenu = function (connectMenu) {
 					}
 				}
 				if(!list.length){
-					if(!lib.character["noname_sunce"]) lib.character["noname_sunce"]=["male","wu",4,["jiang"],[]];
-					if(!lib.translate["noname_sunce"]) lib.translate["noname_sunce"]="孙策";
-					list.push(["noname_sunce",lib.translate["noname_sunce"]]);
+					if(!lib.character["noname_sunce"]) lib.character["noname_sunce"] = ["male", "wu", 4, ["jiang"], ["unseen"]];
+					if(!lib.translate["noname_sunce"]) lib.translate["noname_sunce"] = "孙策";
+					list.push(["noname_sunce", lib.translate["noname_sunce"]]);
 				}
 				list.sort(function (a, b) {
 					a = a[0];

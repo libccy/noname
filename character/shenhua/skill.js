@@ -2173,6 +2173,12 @@ const skills = {
 		zhuanhuanji: true,
 		marktext: "☯",
 		intro: {
+			markcount(storage, player) {
+				if (player.storage.nzry_chenglve1) {
+					return get.translation(player.storage.nzry_chenglve1);
+				}
+				return null;
+			},
 			content(storage, player, skill) {
 				let str = player.storage.nzry_chenglve ? "出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制" : "出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制";
 				if (player.storage.nzry_chenglve1) {
@@ -2229,7 +2235,10 @@ const skills = {
 				if (suit == "unsure" || player.getStorage("nzry_chenglve1").includes(suit)) return true;
 			},
 		},
-		onremove: true,
+		onremove(player, skill) {
+			delete player.storage[skill];
+			player.markSkill("nzry_chenglve");
+		},
 	},
 	nzry_shicai: {
 		audio: "nzry_shicai_2",
@@ -2256,7 +2265,7 @@ const skills = {
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
 		filter(event, player, name) {
-			let evt = event.name == "useCardToTargeted" ? event : event.getParent();
+			let evt = event.name == "useCard" ? event : event.getParent();
 			let type = get.type2(evt.card, false);
 			if (
 				player.hasHistory(
