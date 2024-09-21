@@ -1992,6 +1992,25 @@ export class Player extends HTMLDivElement {
 		};
 		return next;
 	}
+	chooseToMove_new() {
+		var next = game.createEvent("chooseToMove_new");
+		next.player = this;
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] == "boolean") {
+				next.forced = arguments[i];
+			} else if (typeof arguments[i] == "string") {
+				next.prompt = arguments[i];
+			}
+		}
+		next.setContent("chooseToMove_new");
+		next.filterOk = function () {
+			return true;
+		};
+		next.filterMove = function () {
+			return true;
+		};
+		return next;
+	}
 	chooseToGuanxing(num) {
 		var next = game.createEvent("chooseToGuanxing");
 		next.num = num || 1;

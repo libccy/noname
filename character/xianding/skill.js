@@ -15853,7 +15853,7 @@ const skills = {
 			var cards = get.cards(event.list[1]);
 			event.cards = cards;
 			game.cardsGotoOrdering(cards);
-			var next = player.chooseToMove(true, "隅泣");
+			var next = player.chooseToMove_new(true, "隅泣");
 			next.set("list", [
 				["牌堆顶的牌", cards],
 				[
@@ -15883,7 +15883,6 @@ const skills = {
 			next.set("filterOk", function (moved) {
 				return moved[1].length > 0;
 			});
-			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				var moved = result.moved;

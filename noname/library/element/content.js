@@ -9626,7 +9626,7 @@ export const Content = {
 		if (event.isMine()) {
 			//自动选择
 			event.switchToAuto = function () {
-				if (!filterOk(event.moved)) {
+				if (!event.filterOk(event.moved)) {
 					if (!event.forced) event._result = { bool: false };
 					else event._result = "ai";
 				} else {

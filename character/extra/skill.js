@@ -2683,7 +2683,7 @@ const skills = {
 				}
 			}
 			list = [list[0], list.slice(1)];
-			var next = player.chooseToMove("拓域：请分配你的手牌", true);
+			var next = player.chooseToMove_new("拓域：请分配你的手牌", true);
 			next.set("list", list);
 			next.set("filterMove", function (from, to, moved) {
 				var storage = _status.event.player.getStorage("dctuoyu"),
@@ -2743,7 +2743,6 @@ const skills = {
 				moved[0].addArray(hs2);
 				return moved;
 			});
-			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				game.broadcastAll(
@@ -3164,7 +3163,7 @@ const skills = {
 			}, []).length;
 			"step 1";
 			var cards = target.getCards("h");
-			var next = player.chooseToMove("攻心");
+			var next = player.chooseToMove_new("攻心");
 			next.set("list", [
 				[get.translation(target) + "的手牌", cards],
 				[["弃置"], ["置于牌堆顶"]],
@@ -3179,7 +3178,6 @@ const skills = {
 				if (!card) return false;
 				return [list[0][1].slice().remove(card), [card], []];
 			});
-			next.setContent("chooseToMove_new");
 			"step 2";
 			if (result.bool) {
 				if (result.moved[1].length) target.discard(result.moved[1]);
@@ -8774,7 +8772,7 @@ const skills = {
 		content() {
 			"step 0";
 			var cards = target.getCards("h");
-			var next = player.chooseToMove("攻心");
+			var next = player.chooseToMove_new("攻心");
 			next.set("list", [
 				[get.translation(target) + "的手牌", cards],
 				[["弃置"], ["置于牌堆顶"]],
@@ -8786,6 +8784,10 @@ const skills = {
 						.concat(moved[2])
 						.filter(card => get.suit(card) == "heart").length == 1
 				);
+			});
+			next.set("filterMove", (from, to, moved) => {
+				if (moved[0].includes(from.link) && moved[1].length + moved[2].length >= 1 && [1, 2].includes(to)) return false;
+				return get.suit(from) == "heart";
 			});
 			next.set("processAI", list => {
 				let card = list[0][1]
@@ -8799,7 +8801,6 @@ const skills = {
 				if (!card) return false;
 				return [list[0][1].slice().remove(card), [card], []];
 			});
-			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				if (result.moved[1].length) target.discard(result.moved[1]);

@@ -12218,7 +12218,7 @@ const skills = {
 			game.addVideo("showCards", player, ["称象", get.cardsInfo(event.cards)]);
 			game.addVideo("delay", null, 2);
 			"step 1";
-			var next = player.chooseButton([0, 4]);
+			var next = player.chooseButton([0, Infinity]);
 			next.set("dialog", event.videoId);
 			next.set("filterButton", function (button) {
 				var num = 0;
