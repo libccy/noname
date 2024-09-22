@@ -1521,7 +1521,8 @@ const skills = {
 					return target !== player && target.hasEnabledSlot(1);
 				})
 				.set("ai", target => {
-					return 1 - get.attitude(get.player(), target);
+					const player = get.event("player");
+					return (1 - get.attitude(player, target)) * Math.sqrt(get.distance(player, target));
 				})
 				.forResult();
 		},
@@ -1593,6 +1594,11 @@ const skills = {
 		},
 		ai: {
 			neg: true,
+			effect: {
+				target(card, player, target) {
+					if (player && player.isIn() && get.tag(card, "damage") && player.hasDisabledSlot(1)) return [1, 0, 1, 1.5];
+				}
+			}
 		},
 	},
 	//曹髦  史?! 我求你别改了
