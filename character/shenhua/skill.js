@@ -2190,12 +2190,6 @@ const skills = {
 		zhuanhuanji: true,
 		marktext: "☯",
 		intro: {
-			markcount(storage, player) {
-				if (player.storage.nzry_chenglve1) {
-					return get.translation(player.storage.nzry_chenglve1);
-				}
-				return null;
-			},
 			content(storage, player, skill) {
 				let str = player.storage.nzry_chenglve ? "出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制" : "出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制";
 				if (player.storage.nzry_chenglve1) {
@@ -2208,13 +2202,6 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		audio: 2,
-		filter(event, player) {
-			// 加个检查喵
-			if (player.storage.nzry_chenglve != true) {
-				return player.countDiscardableCards(player, "h");
-			}
-			return true;
-		},
 		async content(event, trigger, player) {
 			let result;
 			if (player.storage.nzry_chenglve == true) {
@@ -2227,7 +2214,6 @@ const skills = {
 			player.changeZhuanhuanji("nzry_chenglve");
 			if (result.bool) {
 				player.storage.nzry_chenglve1 = result.cards.map(card => get.suit(card, player)).unique();
-				player.markSkill("nzry_chenglve");
 				player.addTempSkill("nzry_chenglve1");
 			}
 		},
@@ -2242,6 +2228,8 @@ const skills = {
 		},
 	},
 	nzry_chenglve1: {
+		charlotte: true,
+		onremove: true,
 		mod: {
 			cardUsable(card, player) {
 				const suit = get.suit(card);
@@ -2251,10 +2239,6 @@ const skills = {
 				const suit = get.suit(card);
 				if (suit == "unsure" || player.getStorage("nzry_chenglve1").includes(suit)) return true;
 			},
-		},
-		onremove(player, skill) {
-			delete player.storage[skill];
-			player.markSkill("nzry_chenglve");
 		},
 	},
 	nzry_shicai: {
