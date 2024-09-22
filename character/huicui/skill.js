@@ -7753,8 +7753,8 @@ const skills = {
 							player.storage.dccuijin_map.targets[idx].remove(target);
 							player.draw(2);
 							if (source && source.isIn()) {
-								player.line(trigger.player, "green");
-								trigger.player.damage();
+								player.line(source, "green");
+								source.damage();
 							}
 						}
 					}

@@ -4868,6 +4868,7 @@ const skills = {
 								},
 								true
 							)
+							.set("animate", false)
 							.set("ai", function (target) {
 								var player = _status.event.player;
 								return get.attitude(player, target);
@@ -4894,6 +4895,7 @@ const skills = {
 								},
 								true
 							)
+							.set("animate", false)
 							.set("ai", function (target) {
 								var player = _status.event.player;
 								return get.damageEffect(target, player, player);
