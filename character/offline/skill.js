@@ -6907,7 +6907,6 @@ const skills = {
 				charlotte: true,
 				trigger: { player: "useCard2" },
 				forced: true,
-				popup: false,
 				onremove: true,
 				nopop: true,
 				filter(event, player) {
@@ -6915,6 +6914,7 @@ const skills = {
 				},
 				content() {
 					"step 0";
+					player.removeSkill("vtbyaoli_effect");
 					trigger.directHit.addArray(game.filterPlayer());
 					var num = player.countMark("vtbyaoli_effect");
 					if (
@@ -6944,7 +6944,6 @@ const skills = {
 					"step 2";
 					player.logSkill("vtbyaoli_effect", event.targets);
 					trigger.targets.addArray(event.targets);
-					player.removeSkill("vtbyaoli_effect");
 				},
 				marktext: "媱",
 				intro: {
