@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//神黄忠
 	//丁真神将，赤矢神将，爆头神将，吃人神将
-	"1！5！": {
+	dclieqiong: {
 		audio: 2,
 		trigger: { source: "damageSource" },
 		filter(event, player) {
@@ -15,17 +15,15 @@ const skills = {
 		prompt2: (event, player) => "击伤其一个部位",
 		async cost(event, trigger, player) {
 			const target = trigger.player;
-			const places = lib.skill["1！5！"].derivation.slice().filter(i => {
-				let storage = target.getStorage("1！5！_injury");
-				if (!storage.length && i == "1！5！_place1") {
+			const places = lib.skill["dclieqiong"].derivation.slice().filter(i => {
+				let storage = target.getStorage("dclieqiong_injury");
+				if (!storage.length && i == "dclieqiong_place1") {
 					return false;
 				}
 				return true;
 			});
 			if (!places.length) return;
 			//射击部位-by 鸽子
-			//牢萌负责精修断后
-			//一个团队要有XX的X，YY的Y，ZZ的Z...
 			await Promise.all(event.next);
 			event.videoId = lib.status.videoId++;
 			if (player.isUnderControl()) game.swapPlayerAuto(player);
@@ -73,14 +71,14 @@ const skills = {
 				const dialog = ui.create.dialog("forcebutton", "hidden");
 				event.dialog = dialog;
 				//白底大图不加textPrompt了
-				dialog.textPrompt = dialog.add('<div class="text center">毅武：是否击伤' + get.translation(target) + "的一个部位？</div>");
+				dialog.textPrompt = dialog.add('<div class="text center">裂穹：是否击伤' + get.translation(target) + "的一个部位？</div>");
 				dialog.style.display = "flex";
 				dialog.style.justifyContent = "center";
 				dialog.style.alignItems = "center";
 				dialog.style.position = "relative";
 				dialog.style.width = "100%";
 				dialog.style.height = "100%";
-				dialog.id = "1！5！";
+				dialog.id = "dclieqiong";
 				dialog.classList.add("fixed");
 				dialog.classList.add("scroll1");
 				dialog.classList.add("scroll2");
@@ -89,7 +87,7 @@ const skills = {
 				dialog.classList.add("fullwidth");
 				dialog.classList.add("fullheight");
 				const target_img = document.createElement("div");
-				const position = lib.skill["1！5！"].derivation;
+				const position = lib.skill["dclieqiong"].derivation;
 				target_img.style.width = "50%";
 				target_img.style.height = "100%";
 				target_img.style.position = "relative";
@@ -159,7 +157,7 @@ const skills = {
 						if (bool) {
 							a.target.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_click_chosen.png)";
 							if (event.control) event.control.close();
-							if (!lib.config.autoskilllist.includes("1！5！")) {
+							if (!lib.config.autoskilllist.includes("dclieqiong")) {
 								event.dialog.close();
 								game.resume();
 								_status.imchoosing = false;
@@ -206,9 +204,9 @@ const skills = {
 			const place = event.cost_data;
 			player.popup(place, "fire");
 			game.log(player, "击伤了", target, "的", "#y" + get.translation(place));
-			target.addTempSkill("1！5！_injury");
-			target.markAuto("1！5！_injury", [place]);
-			switch (parseInt(place.slice("1！5！_place".length))) {
+			target.addTempSkill("dclieqiong_injury");
+			target.markAuto("dclieqiong_injury", [place]);
+			switch (parseInt(place.slice("dclieqiong_place".length))) {
 				case 1:
 					if (target.getHp() > 0) {
 						await target.loseHp(target.getHp());
@@ -231,7 +229,7 @@ const skills = {
 					if (cards.length) await target.discard(cards).set("discarder", player);
 					break;
 				case 3:
-					target.addTempSkill("1！5！_maxhand", { player: "phaseEnd" });
+					target.addTempSkill("dclieqiong_maxhand", { player: "phaseEnd" });
 					break;
 				case 4:
 					const cardx = target.getDiscardableCards(target, "h");
@@ -239,20 +237,20 @@ const skills = {
 					if (cardx.length) await target.discard(cardx.randomGets(num));
 					break;
 				case 5:
-					target.addTempSkill("1！5！_damage", { player: "phaseEnd" });
+					target.addTempSkill("dclieqiong_damage", { player: "phaseEnd" });
 					break;
 				case 6:
-					target.addTempSkill("1！5！_use", { player: "phaseEnd" });
+					target.addTempSkill("dclieqiong_use", { player: "phaseEnd" });
 					break;
 				case 7:
-					target.addTempSkill("1！5！_respond", { player: "phaseEnd" });
+					target.addTempSkill("dclieqiong_respond", { player: "phaseEnd" });
 					break;
 			}
 		},
 		marktext: "赤",
 		intro: { content: "mark" },
 		frequent: true,
-		derivation: ["1！5！_place1", "1！5！_place4", "1！5！_place5", "1！5！_place6", "1！5！_place7"],
+		derivation: ["dclieqiong_place1", "dclieqiong_place4", "dclieqiong_place5", "dclieqiong_place6", "dclieqiong_place7"],
 		subSkill: {
 			injury: {
 				charlotte: true,
@@ -268,10 +266,10 @@ const skills = {
 				},
 				mod: {
 					maxHandcard(player, num) {
-						if (_status["1！5！_maxhand"]) return;
-						_status["1！5！_maxhand"] = true;
+						if (_status["dclieqiong_maxhand"]) return;
+						_status["dclieqiong_maxhand"] = true;
 						const numx = player.getHandcardLimit();
-						delete _status["1！5！_maxhand"];
+						delete _status["dclieqiong_maxhand"];
 						return num - Math.ceil(numx);
 					},
 				},
@@ -307,7 +305,7 @@ const skills = {
 				async content(event, trigger, player) {
 					trigger.all_excluded = true;
 					trigger.targets.length = 0;
-					player.removeSkill("1！5！_use");
+					player.removeSkill("dclieqiong_use");
 				},
 			},
 			respond: {
@@ -332,13 +330,14 @@ const skills = {
 			},
 		},
 	},
-	chiren: {
+	dczhanjue: {
 		audio: 2,
 		trigger: {
 			player: "phaseUseBegin",
 		},
 		async cost(event, trigger, player) {
-			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段下一次造成伤害后，回复等量体力。"];
+			const hps = [player.getHp(), player.getDamagedHp()];
+			let list = [(hps[0] > 0 ? "摸" + get.cnNumber(hps[0]) + "张牌，" : "") + "此阶段使用的下一张【杀】无距离限制且不能被响应。", (hps[1] > 0 ? "摸" + get.cnNumber(hps[1]) + "张牌" : "") + "此阶段下一次造成伤害后，回复等量体力。"];
 			let result = await player
 				.chooseControlList(list)
 				.set("ai", function () {
@@ -390,10 +389,10 @@ const skills = {
 		async content(event, trigger, player) {
 			if (event.cost_data == "选项一") {
 				player.draw(player.getHp());
-				player.addTempSkill("chiren_directHit", { player: "phaseUseEnd" });
+				player.addTempSkill("dczhanjue_directHit", { player: "phaseUseEnd" });
 			} else {
 				player.draw(player.getDamagedHp());
-				player.addTempSkill("chiren_recover", { player: "phaseUseEnd" });
+				player.addTempSkill("dczhanjue_recover", { player: "phaseUseEnd" });
 			}
 		},
 		subSkill: {
@@ -713,7 +712,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
-			return event.respondTo && event.respondTo[0] !==player && !event.result.bool;
+			return event.respondTo && event.respondTo[0] !== player && !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
@@ -2683,7 +2682,7 @@ const skills = {
 				}
 			}
 			list = [list[0], list.slice(1)];
-			var next = player.chooseToMove("拓域：请分配你的手牌", true);
+			var next = player.chooseToMove_new("拓域：请分配你的手牌", true);
 			next.set("list", list);
 			next.set("filterMove", function (from, to, moved) {
 				var storage = _status.event.player.getStorage("dctuoyu"),
@@ -2743,7 +2742,6 @@ const skills = {
 				moved[0].addArray(hs2);
 				return moved;
 			});
-			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				game.broadcastAll(
@@ -3164,7 +3162,7 @@ const skills = {
 			}, []).length;
 			"step 1";
 			var cards = target.getCards("h");
-			var next = player.chooseToMove("攻心");
+			var next = player.chooseToMove_new("攻心");
 			next.set("list", [
 				[get.translation(target) + "的手牌", cards],
 				[["弃置"], ["置于牌堆顶"]],
@@ -3179,7 +3177,6 @@ const skills = {
 				if (!card) return false;
 				return [list[0][1].slice().remove(card), [card], []];
 			});
-			next.setContent("chooseToMove_new");
 			"step 2";
 			if (result.bool) {
 				if (result.moved[1].length) target.discard(result.moved[1]);
@@ -5383,10 +5380,17 @@ const skills = {
 							game.countPlayer(i => {
 								if (i.hasSkill("lingce", null, null, false)) {
 									nohave = false;
-									if (i.isIn() && lib.skill.lingce.filter({
-										card: card,
-										cards: card.cards ? card.cards : [card]
-									}, i)) num += get.sgnAttitude(player, i);
+									if (
+										i.isIn() &&
+										lib.skill.lingce.filter(
+											{
+												card: card,
+												cards: card.cards ? card.cards : [card],
+											},
+											i
+										)
+									)
+										num += get.sgnAttitude(player, i);
 								}
 							}, true);
 							if (nohave) game.removeGlobalSkill("lingce_global");
@@ -8774,7 +8778,7 @@ const skills = {
 		content() {
 			"step 0";
 			var cards = target.getCards("h");
-			var next = player.chooseToMove("攻心");
+			var next = player.chooseToMove_new("攻心");
 			next.set("list", [
 				[get.translation(target) + "的手牌", cards],
 				[["弃置"], ["置于牌堆顶"]],
@@ -8786,6 +8790,10 @@ const skills = {
 						.concat(moved[2])
 						.filter(card => get.suit(card) == "heart").length == 1
 				);
+			});
+			next.set("filterMove", (from, to, moved) => {
+				if (moved[0].includes(from.link) && moved[1].length + moved[2].length >= 1 && [1, 2].includes(to)) return false;
+				return get.suit(from) == "heart";
 			});
 			next.set("processAI", list => {
 				let card = list[0][1]
@@ -8799,7 +8807,6 @@ const skills = {
 				if (!card) return false;
 				return [list[0][1].slice().remove(card), [card], []];
 			});
-			next.setContent("chooseToMove_new");
 			"step 1";
 			if (result.bool) {
 				if (result.moved[1].length) target.discard(result.moved[1]);

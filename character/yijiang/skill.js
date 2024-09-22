@@ -8824,7 +8824,7 @@ const skills = {
 		enable: "phaseUse",
 		audio: "sanyao",
 		filter: function (event, player) {
-			return player.countCards("he") > 0 && (!player.hasSkill("olsanyao0") || !player.hasSkill("olsanyao1"));
+			return player.countCards("he") > 0 && player.getStorage("olsanyao_used").length < 2;
 		},
 		chooseButton: {
 			dialog: function (event, player) {
@@ -8839,7 +8839,7 @@ const skills = {
 				return choiceList;
 			},
 			filter: function (button, player) {
-				return !player.hasSkill("olsanyao" + button.link);
+				return !player.getStorage("olsanyao_used").includes(button.link);
 			},
 			check: function (button) {
 				var player = _status.event.player;
@@ -8891,7 +8891,8 @@ const skills = {
 					},
 					position: "he",
 					content: function () {
-						player.addTempSkill("olsanyao" + lib.skill[event.name].index);
+						player.addTempSkill("olsanyao_used", "phaseUseAfter");
+						player.markAuto("olsanyao_used", lib.skill[event.name].index);
 						target.damage("nocard");
 					},
 					ai: lib.skill.sanyao.ai,
@@ -8907,9 +8908,13 @@ const skills = {
 				player: 1,
 			},
 		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
+		},
 	},
-	olsanyao0: {},
-	olsanyao1: {},
 	rezhiman: {
 		audio: "zhiman",
 		audioname: ["re_masu"],
@@ -12177,13 +12182,20 @@ const skills = {
 		inherit: "chengxiang",
 	},
 	chengxiang: {
-		trigger: { player: "damageEnd" },
-		//direct:true,
-		frequent: true,
 		audio: 2,
+		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			return event.num > 0;
+		},
+		frequent: true,
 		content: function () {
 			"step 0";
-			event.cards = get.cards(4);
+			let mark = 0;
+			if (event.name == "olchengxiang") {
+				mark += player.countMark("olchengxiang");
+				player.removeMark("olchengxiang", mark, false);
+			}
+			event.cards = get.cards(4 + mark);
 			game.cardsGotoOrdering(event.cards);
 			event.videoId = lib.status.videoId++;
 			game.broadcastAll(
@@ -12206,7 +12218,7 @@ const skills = {
 			game.addVideo("showCards", player, ["称象", get.cardsInfo(event.cards)]);
 			game.addVideo("delay", null, 2);
 			"step 1";
-			var next = player.chooseButton([0, 4]);
+			var next = player.chooseButton([0, Infinity]);
 			next.set("dialog", event.videoId);
 			next.set("filterButton", function (button) {
 				var num = 0;
@@ -12228,7 +12240,6 @@ const skills = {
 			});
 			"step 2";
 			if (result.bool && result.links) {
-				//player.logSkill('chengxiang');
 				var cards2 = [];
 				for (var i = 0; i < result.links.length; i++) {
 					cards2.push(result.links[i]);
@@ -12245,7 +12256,13 @@ const skills = {
 			"step 3";
 			game.broadcastAll("closeDialog", event.videoId);
 			var cards2 = event.cards2;
-			player.gain(cards2, "log", "gain2");
+			player.gain(cards2, "gain2");
+			if (event.name == "olchengxiang") {
+				let num = cards2.reduce((num, i) => {
+					return num + get.number(i, player);
+				}, 0);
+				if (num == 13) player.addMark("olchengxiang", 1, false);
+			}
 		},
 		ai: {
 			maixie: true,

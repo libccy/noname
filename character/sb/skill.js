@@ -5370,18 +5370,20 @@ const skills = {
 	},
 	sbjizhu: {
 		audio: 3,
+		logAudio: () => 2,
 		trigger: { player: "phaseZhunbeiBegin" },
-		direct: true,
-		content: function () {
-			"step 0";
-			player.chooseTarget(lib.filter.notMe, get.prompt("sbjizhu"), "和一名其他角色进行“协力”").set("ai", function (target) {
-				return get.threaten(target) * Math.sqrt(1 + target.countCards("h")) * (target.isTurnedOver() || target.hasJudge("lebu") ? 0.1 : 1);
-			});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				player.logSkill("sbjizhu", target);
-				player.chooseCooperationFor(target, "sbjizhu").set("ai", function (button) {
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(lib.filter.notMe, get.prompt("sbjizhu"), "和一名其他角色进行“协力”").set("ai", function (target) {
+					return get.threaten(target) * Math.sqrt(1 + target.countCards("h")) * (target.isTurnedOver() || target.hasJudge("lebu") ? 0.1 : 1);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			await player
+				.chooseCooperationFor(target, "sbjizhu")
+				.set("ai", function (button) {
 					var base = 0;
 					switch (button.link) {
 						case "cooperation_damage":
@@ -5398,15 +5400,14 @@ const skills = {
 							break;
 					}
 					return base + Math.random();
-				});
-				player.addAdditionalSkill("cooperation", "sbjizhu_effect");
-			} else event.finish();
-			"step 2";
-			game.delayx();
+				})
+				.forResult();
+			player.addAdditionalSkill("cooperation", "sbjizhu_effect");
+			await game.delayx();
 		},
 		subSkill: {
 			effect: {
-				audio: "sbjizhu",
+				audio: "sbjizhu3.mp3",
 				charlotte: true,
 				trigger: { global: "phaseJieshuBegin" },
 				forced: true,
@@ -6441,7 +6442,7 @@ const skills = {
 		locked: false,
 		group: "sbguidao_defend",
 		filter: function (event, player) {
-			if (player.countMark("sbguidao") >= 8) return false;
+			if (player.hasSkill("sbguidao_banned") || player.countMark("sbguidao") >= 8) return false;
 			if (event.name == "damage") return event.hasNature();
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
@@ -6472,9 +6473,15 @@ const skills = {
 					trigger.cancel();
 					player.removeMark("sbguidao", 2);
 					if (player != _status.currentPhase) {
-						player.tempBanSkill("sbguidao", { player: "phaseBegin" });
+						player.addTempSkill("sbguidao_banned", { player: "phaseBegin" });
 					}
 				},
+			},
+			banned: {
+				charlotte: true,
+				mark: true,
+				marktext: '<span style="text-decoration: line-through;">道</span>',
+				intro: { content: "孩子们，我不能获得道兵了" },
 			},
 		},
 	},
@@ -7565,18 +7572,19 @@ const skills = {
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: function () {
-			var player = _status.event.player;
-			if (player.hasSkill("sbkeji_discard")) return [0, 0];
-			if (player.hasSkill("sbkeji_losehp")) return [1, 1];
+			let player = _status.event.player,
+				list = player.getStorage("sbkeji_used");
+			if (list.includes("discard")) return [0, 0];
+			if (list.includes("losehp")) return [1, 1];
 			return [0, 1];
 		},
 		locked: false,
 		usable: 2,
 		prompt: function (event) {
-			var player = _status.event.player,
+			let player = _status.event.player,
 				str = "出牌阶段" + (player.storage.sbkeji ? "" : "各") + "限一次。你可以";
-			var discard = player.hasSkill("sbkeji_discard"),
-				losehp = player.hasSkill("sbkeji_losehp");
+			let discard = player.getStorage("sbkeji_used").includes("discard"),
+				losehp = player.getStorage("sbkeji_used").includes("losehp");
 			if (!discard) str += "弃置一张手牌并获得1点护甲";
 			if (!losehp) str += (!discard ? "，或" : "") + "点击“确定”失去1点体力并获得2点护甲";
 			return str;
@@ -7591,16 +7599,17 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
+			player.addTempSkill("sbkeji_used", "phaseUseAfter");
 			if (cards.length) {
 				player.changeHujia(1, null, true);
-				player.addTempSkill("sbkeji_discard", "phaseUseAfter");
+				player.markAuto("sbkeji_used", "discard");
 				event.finish();
 			} else {
 				player.loseHp();
 			}
 			"step 1";
 			player.changeHujia(2, null, true);
-			player.addTempSkill("sbkeji_losehp", "phaseUseAfter");
+			player.markAuto("sbkeji_used", "losehp");
 		},
 		mod: {
 			maxHandcard: function (player, num) {
@@ -7632,8 +7641,7 @@ const skills = {
 			},
 		},
 		subSkill: {
-			discard: { charlotte: true },
-			losehp: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 		},
 	},
 	sbdujiang: {

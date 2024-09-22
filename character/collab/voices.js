@@ -43,6 +43,8 @@ export default {
 	"#dcshixian2": "武侯立岷蜀，壮志吞咸京。",
 	"#libai:die": "谁识卧龙客，长吟愁鬓斑……",
 	"#libai2:die": "再来一杯吧！",
+	"#dcjinjing1": "嗯？有妖气！",
+	"#dcjinjing2": "融石为甲，披焰成袍，火眼金睛，踏碎凌霄！",
 	"#dccibei1": "生亦何欢，死亦何苦。",
 	"#dccibei2": "我欲成佛，天下无魔；我欲成魔，佛奈我何？",
 	"#dcruyi1": "俺老孙来也！",

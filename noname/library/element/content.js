@@ -7975,10 +7975,12 @@ export const Content = {
 		}
 		"step 3";
 		event.vcards1?.forEach(card => {
-			player.removeVirtualEquip(card);
+			if(card.cards?.every(cardx => get.position(cardx) != "e")) player.removeVirtualEquip(card);
+			else event.getParent().vcards[0].remove(card);
 		});
 		event.vcards2?.forEach(card => {
-			target.removeVirtualEquip(card);
+			if(card.cards?.every(cardx => get.position(cardx) != "e")) target.removeVirtualEquip(card);
+			else event.getParent().vcards[1].remove(card);
 		});
 		if (!event.delayed) game.delay();
 	},
@@ -9066,6 +9068,7 @@ export const Content = {
 						player.node.marks.lastChild.remove();
 					}
 				}, player);
+				player.removeTip();
 			}
 			for (var i in player.tempSkills) {
 				player.removeSkill(i);
@@ -9626,7 +9629,7 @@ export const Content = {
 		if (event.isMine()) {
 			//自动选择
 			event.switchToAuto = function () {
-				if (!filterOk(event.moved)) {
+				if (!event.filterOk(event.moved)) {
 					if (!event.forced) event._result = { bool: false };
 					else event._result = "ai";
 				} else {

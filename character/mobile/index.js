@@ -30,7 +30,7 @@ game.import("character", function () {
 				["mb_caomao_shadow", ["die:mb_caomao"]],
 				["mb_caomao_dead", ["die:mb_caomao"]],
 			],
-			shichangshi: [["shichangshi_dead", []]],
+			shichangshi: [["shichangshi_dead", ["die:shichangshi"]]],
 		},
 		card: { ...cards },
 		skill: { ...skills },

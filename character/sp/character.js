@@ -112,7 +112,7 @@ const characters = {
 	caohong: ["male", "wei", 4, ["yuanhu"]],
 	xiahouba: ["male", "shu", 4, ["baobian"], ["name:夏侯|霸"]],
 	yuanshu: ["male", "qun", 4, ["yongsi", "weidi"]],
-	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"], ["name:null|null"]],
+	sp_diaochan: ["female", "qun", 3, ["lihun", "rebiyue"], ["name:null|null", "die:diaochan"]],
 	sp_zhaoyun: ["male", "qun", 3, ["ollongdan", "chongzhen"], ["die:zhaoyun"]],
 	liuxie: ["male", "qun", 3, ["tianming", "mizhao", "twzhuiting"], ["zhu"]],
 	zhugejin: ["male", "wu", 3, ["huanshi", "olhongyuan", "olmingzhe"], ["name:诸葛|瑾"]],

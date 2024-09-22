@@ -690,7 +690,7 @@ const skills = {
 					player: "phaseDrawBegin1",
 				},
 				filter(event, player) {
-					return player.getExpansions("mbsuwang").length;
+					return !event.numFixed && player.getExpansions("mbsuwang").length;
 				},
 				async cost(event, trigger, player) {
 					const cards = player.getExpansions("mbsuwang");
@@ -703,7 +703,7 @@ const skills = {
 					const cards = player.getExpansions("mbsuwang");
 					trigger.changeToZero();
 					await player.gain(cards, "gain2");
-					if (cards.length >= 3) {
+					if (cards.length >= 0) {
 						const result = await player
 							.chooseTarget("是否令一名其他角色摸两张牌?", lib.filter.notMe)
 							.set("ai", function (target) {
@@ -1972,7 +1972,7 @@ const skills = {
 					var card = get.cardPile2(function (card) {
 						return get.type2(card) == "trick";
 					});
-					if (card) player.gain(card, "gain2");
+					if (card) player.gain(card, "draw");
 				},
 			},
 		},
@@ -2279,11 +2279,7 @@ const skills = {
 						const status = player.countMark("mbxuetu_status");
 						player.changeZhuanhuanji("mbxuetu");
 						if (status < 2) {
-							if (!player.storage.mbxuetu_used) {
-								player.when(["phaseUseAfter", "mbweiming_achieveAfter"]).then(() => {
-									delete player.storage.mbxuetu_used;
-								});
-							}
+							player.addTempSkill("mbxuetu_used", "phaseUseAfter");
 							player.markAuto("mbxuetu_used", [choice]);
 							if (!choice) {
 								await target.recover();
@@ -2362,6 +2358,12 @@ const skills = {
 			},
 			result: {
 				player: 1,
+			},
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
 			},
 		},
 	},
@@ -4359,7 +4361,9 @@ const skills = {
 		filter: function (event, player) {
 			return event.name != "phase" || game.phaseNumber == 0;
 		},
-		derivation: ["mbdanggu_faq", "mbdanggu_faq2"],
+		derivation: ["mbdanggu_faq", "mbdanggu_faq2", "scstaoluan", "scschiyan", "scszimou", "scspicai",
+			"scsyaozhuo", "scsxiaolu", "scskuiji", "scschihe", "scsniqu", "scsmiaoyu"
+		],
 		forced: true,
 		unique: true,
 		onremove: function (player) {
@@ -6725,8 +6729,8 @@ const skills = {
 				mark: true,
 				marktext: "金",
 				intro: {
-					name: "金(膴仕)",
-					name2: "金(膴仕)",
+					name: "亿金",
+					name2: "亿金",
 					markcount: function (storage, player) {
 						return lib.skill.yijin.getKane(player).length;
 					},
@@ -6813,6 +6817,7 @@ const skills = {
 						if (card.name == "sha") return num + 1;
 					},
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(膴仕)",
@@ -6828,6 +6833,7 @@ const skills = {
 					player.skip("phaseUse");
 					player.skip("phaseDiscard");
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(金迷)",
@@ -6851,6 +6857,7 @@ const skills = {
 						return num - 3;
 					},
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(贾凶)",
@@ -6877,6 +6884,7 @@ const skills = {
 						},
 					},
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(通神)",
@@ -6895,6 +6903,7 @@ const skills = {
 					neg: true,
 					nokeep: true,
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(拥蔽)",
@@ -6909,6 +6918,7 @@ const skills = {
 				content: function () {
 					player.recover(3);
 				},
+				nopop: true,
 				marktext: "金",
 				intro: {
 					name: "金(厚任)",

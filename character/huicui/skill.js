@@ -425,8 +425,16 @@ const skills = {
 				const cardx = cards.filter(card => card.hasGaintag("dcyunzheng_tag") || get.suit(card) == get.suit(trigger.card));
 				if (cardx.length) {
 					cards.removeArray(cardx);
-					await player.gain(cardx, target, "give");
-					await event.trigger("dchuoxin_update");
+					const result2 = await player
+						.chooseBool("是否获得" + get.translation(cardx) + "？")
+						.set("choice", get.value(cardx, player) > 7)
+						.forResult();
+					if (result2.bool) {
+						const next = player.gain(cardx, target, "give");
+						if(cardx[0].hasGaintag("dcyunzheng_tag")) next.gaintag.add("dcyunzheng_tag");
+						await next;
+						await event.trigger("dchuoxin_update");
+					}
 				}
 				if (cards.some(card => !card.hasGaintag("dcyunzheng_tag"))) {
 					target.addGaintag(
@@ -4310,7 +4318,13 @@ const skills = {
 						return 7 - get.value(card);
 					},
 					ai2: function (target) {
-						return get.effect(target, { name: "sha" }, _status.event.player, _status.event.player) * _status.event.map[target.playerid];
+						let player = get.event("player"),
+							num = get.event("map")[target.playerid],
+							eff = get.effect(target, { name: "sha" }, player, player);
+						if (num > 1 && eff !== 0) {
+							eff -= 10 / target.getHp() * Math.pow(2, num);
+						}
+						return eff * num;
 					},
 				})
 				.set("map", map);
@@ -7745,8 +7759,8 @@ const skills = {
 							player.storage.dccuijin_map.targets[idx].remove(target);
 							player.draw(2);
 							if (source && source.isIn()) {
-								player.line(trigger.player, "green");
-								trigger.player.damage();
+								player.line(source, "green");
+								source.damage();
 							}
 						}
 					}
@@ -8313,7 +8327,7 @@ const skills = {
 				return dialog;
 			},
 			filter: function (button, player) {
-				return !player.hasSkill("dcquanjian_" + button.link, null, null, false);
+				return !player.getStorage("dcquanjian_used").includes(button.link);
 			},
 			check: () => 1 + Math.random(),
 			backup: function (links) {
@@ -8330,6 +8344,10 @@ const skills = {
 		},
 		subSkill: {
 			backup: { audio: "dcquanjian" },
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			damage: {
 				audio: "dcquanjian",
 				selectTarget: 2,
@@ -8345,7 +8363,8 @@ const skills = {
 				multitarget: true,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcquanjian_damage", "phaseUseAfter");
+					player.addTempSkill("dcquanjian_used", "phaseUseAfter");
+					player.markAuto("dcquanjian_used", "damage");
 					targets[0]
 						.chooseControl()
 						.set("choiceList", ["对" + get.translation(targets[1]) + "造成1点伤害", "本回合下次受到的伤害+1"])
@@ -8381,7 +8400,8 @@ const skills = {
 				selectCard: -1,
 				content: function () {
 					"step 0";
-					player.addTempSkill("dcquanjian_draw", "phaseUseAfter");
+					player.addTempSkill("dcquanjian_used", "phaseUseAfter");
+					player.markAuto("dcquanjian_used", "draw");
 					var num1 = target.countCards("h"),
 						num2 = target.getHandcardLimit();
 					var num = 0;
