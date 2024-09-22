@@ -1,4 +1,9 @@
 export default {
+	"#twciyin1": "虽为纤弱之身，亦当为吾儿遮风挡雨。",
+	"#twciyin2": "纵有狼虎于前，定保吾儿平安。",
+	"#twchenglong1": "这次，换孩儿来保护母亲！",
+	"#twchenglong2": "儿虽年幼，亦当立丈夫之志！",
+	"#licuilianzhaoquanding:die": "李翠莲：吾儿，前路坎坷，为母恐不能再行……<br>全定：母亲，母亲！（哭泣声）",
 	"#twzongquan1": "大权不可旁落，且由老夫暂领。",
 	"#twzongquan2": "将在外而君死社稷，自不受他人之制！",
 	"#twguimou1": "再立大魏新政，招天下怀魏之人！",
@@ -7,7 +12,7 @@ export default {
 	"#twqiji1": "久攻不克？待我奇功灭敌！",
 	"#twqiji2": "依我此计，魏都不日可下！",
 	"#twpiankuang1": "有延一人，足为我主克魏吞吴！",
-	"#twpiankuang2": "非我居功自傲，实为无畏之辈不足一提！",
+	"#twpiankuang2": "非我居功自傲，实为吴魏之辈不足一提！",
 	"#huan_weiyan:die": "若无粮草之急，何致有今日之败……",
 	"#twguihan1": "天下分合，终不改汉祚之名。",
 	"#twguihan2": "平南安北，终携百姓治太平。",
