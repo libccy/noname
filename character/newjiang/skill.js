@@ -253,7 +253,7 @@ const skills = {
 					if (ui.selected.buttons.length + 1 >= _status.event.maxNum) return 5 - get.value(button.link);
 					return get.value(button.link);
 				}).set("maxNum", num).forResult();
-				if (result.bool && result.links.length >= num) await player.executeDelayCardEffect("shandian");
+				if (result?.bool && result.links?.length >= num) await player.executeDelayCardEffect("shandian");
 			}
 		},
 		derivation: "new_reyiji",

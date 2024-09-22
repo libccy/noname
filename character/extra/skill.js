@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//神黄忠
 	//丁真神将，赤矢神将，爆头神将，吃人神将
-	"dclieqiong": {
+	dclieqiong: {
 		audio: 2,
 		trigger: { source: "damageSource" },
 		filter(event, player) {
@@ -24,8 +24,6 @@ const skills = {
 			});
 			if (!places.length) return;
 			//射击部位-by 鸽子
-			//牢萌负责精修断后
-			//一个团队要有XX的X，YY的Y，ZZ的Z...
 			await Promise.all(event.next);
 			event.videoId = lib.status.videoId++;
 			if (player.isUnderControl()) game.swapPlayerAuto(player);
@@ -338,7 +336,8 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		async cost(event, trigger, player) {
-			let list = ["摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。", "摸已损失体力值张牌，此阶段下一次造成伤害后，回复等量体力。"];
+			const hps = [player.getHp(), player.getDamagedHp()];
+			let list = [(hps[0] > 0 ? "摸" + get.cnNumber(hps[0]) + "张牌，" : "") + "此阶段使用的下一张【杀】无距离限制且不能被响应。", (hps[1] > 0 ? "摸" + get.cnNumber(hps[1]) + "张牌" : "") + "此阶段下一次造成伤害后，回复等量体力。"];
 			let result = await player
 				.chooseControlList(list)
 				.set("ai", function () {
@@ -713,7 +712,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
-			return event.respondTo && event.respondTo[0] !==player && !event.result.bool;
+			return event.respondTo && event.respondTo[0] !== player && !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
@@ -5383,10 +5382,17 @@ const skills = {
 							game.countPlayer(i => {
 								if (i.hasSkill("lingce", null, null, false)) {
 									nohave = false;
-									if (i.isIn() && lib.skill.lingce.filter({
-										card: card,
-										cards: card.cards ? card.cards : [card]
-									}, i)) num += get.sgnAttitude(player, i);
+									if (
+										i.isIn() &&
+										lib.skill.lingce.filter(
+											{
+												card: card,
+												cards: card.cards ? card.cards : [card],
+											},
+											i
+										)
+									)
+										num += get.sgnAttitude(player, i);
 								}
 							}, true);
 							if (nohave) game.removeGlobalSkill("lingce_global");
