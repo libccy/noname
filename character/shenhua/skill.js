@@ -1295,6 +1295,17 @@ const skills = {
 	},
 	drlt_xiongluan: {
 		audio: 2,
+		mod: {
+			aiOrder(player, card, num) {
+				if (num <= 0 || !player.isPhaseUsing() || player.needsToDiscard() || !get.tag(card, "damage")) return;
+				return 0;
+			},
+			aiUseful(player, card, num) {
+				if (num <= 0 || !get.tag(card, "damage")) return;
+				return num * player.getHp();
+			},
+		},
+		locked: false,
 		unique: true,
 		enable: "phaseUse",
 		mark: true,
@@ -1377,7 +1388,13 @@ const skills = {
 		ai: {
 			effect: {
 				target(card, player, target) {
-					if (get.tag(card, "damage")) return [0, -999999];
+					if (!target._drlt_xiongluan2_effect && get.tag(card, "damage")) {
+						target._drlt_xiongluan2_effect = true;
+						const eff = get.effect(target, card, player, target);
+						delete target._drlt_xiongluan2_effect;
+						if (eff > 0) return [1, -999999];
+						if (eff < 0) return 114514;
+					}
 				},
 			},
 		},
