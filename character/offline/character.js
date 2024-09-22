@@ -34,7 +34,7 @@ const characters = {
 	jd_ol_huaxin: ["male", "wei", 3, ["jdcaozhao", "olxibing"], ["character:ol_huaxin", "die:ol_huaxin"]],
 	jd_sp_yangwan: ["female", "qun", 3, ["jdmingxuan", "spxianchou"], ["character:sp_yangwan", "die:sp_yangwan"]],
 	jd_sb_huangyueying: ["female", "shu", 3, ["jdjizhi", "jdqicai"], ["character:sb_huangyueying", "die:sb_huangyueying"]],
-	jd_sb_zhaoyun: ["male", "shu", 4, ["jdlongdan", "sbjizhu"], ["character:sb_zhaoyun", "die:sb_zhaoyun"]],
+	jd_sb_zhaoyun: ["male", "shu", 4, ["jdlongdan", "jdjizhu"], ["character:sb_zhaoyun", "die:sb_zhaoyun"]],
 	jd_sb_ganning: ["male", "wu", 4, ["jdqixi", "jdfenwei"], ["character:sb_ganning", "die:sb_ganning"]],
 	jd_sb_pangtong: ["male", "shu", 3, ["jdlianhuan", "oldniepan"], ["tempname:sb_pangtong", "character:sb_pangtong", "die:sb_pangtong"]],
 	jd_hanlong: ["male", "wei", 4, ["duwang", "jdcibei"], ["character:hanlong", "die:hanlong"]],

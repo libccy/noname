@@ -3453,6 +3453,13 @@ const skills = {
 			},
 		},
 	},
+	jdjizhu: {
+		inherit: "sbjizhu",
+		audio: ["sbjizhu", 3],
+		ai: {
+			combo: "jdlongdan",
+		},
+	},
 	//九鼎-甘宁
 	jdqixi: {
 		audio: "sbqixi",
