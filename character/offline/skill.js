@@ -6721,9 +6721,9 @@ const skills = {
 		content() {
 			"step 0";
 			if (!_status.vtbtaoyan_count) {
-				_status.vtbtaoyan_count = 5;
+				_status.vtbtaoyan_count = 6;
 			}
-			player.chooseTarget(get.prompt("vtbtaoyan"), "令一或两名其他角色摸一张牌并从游戏外获得一张【桃】（♥6）", lib.filter.notMe, [1, 2]).set("ai", target => {
+			player.chooseTarget(get.prompt("vtbtaoyan"), "令一或两名其他角色摸一张牌并从游戏外获得一张【桃】指示物", lib.filter.notMe, [1, 2]).set("ai", target => {
 				var player = _status.event.player;
 				return get.recoverEffect(target, player, player) / 2 + get.attitude(player, target);
 			});
@@ -6743,7 +6743,7 @@ const skills = {
 					if (!_status.vtbtaoyan_count) continue;
 					if (!_status.vtbtaoyan_cards) _status.vtbtaoyan_cards = [];
 					_status.vtbtaoyan_count--;
-					var card = game.createCard("tao", "heart", 6);
+					var card = game.createCard("tao");
 					_status.vtbtaoyan_cards.push(card.cardid);
 					target.gain(card, "gain2");
 				}
