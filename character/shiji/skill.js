@@ -5345,16 +5345,17 @@ const skills = {
 		enable: "phaseUse",
 		usable: 2,
 		filter: function (event, player) {
+			const list = player.getStorage("muzhen_used");
 			if (
-				!player.hasSkill("muzhen1") &&
-				player.hasCard(i => get.type(i) == "e", "he") &&
+				!list.includes("gain") &&
+				player.hasCard(i => get.type(i) == "equip", "he") &&
 				game.hasPlayer(function (current) {
 					return current != player && current.countCards("h") > 0;
 				})
 			)
 				return true;
 			if (
-				!player.hasSkill("muzhen2") &&
+				!list.includes("give") &&
 				player.countCards("he") > 1 &&
 				game.hasPlayer(function (current) {
 					return current != player && current.countCards("e") > 0;
@@ -5376,16 +5377,17 @@ const skills = {
 				return choiceList;
 			},
 			filter: function (button, player) {
+				const list = player.getStorage("muzhen_used");
 				if (button.link == 0)
 					return (
-						!player.hasSkill("muzhen1") &&
-						player.hasCard(i => get.type(i) == "e", "he") &&
+						!list.includes("gain") &&
+						player.hasCard(i => get.type(i) == "equip", "he") &&
 						game.hasPlayer(function (current) {
 							return current != player && current.countCards("h") > 0;
 						})
 					);
 				return (
-					!player.hasSkill("muzhen2") &&
+					!list.includes("give") &&
 					player.countCards("he") > 1 &&
 					game.hasPlayer(function (current) {
 						return current != player && current.countCards("e") > 0;
@@ -5420,12 +5422,14 @@ const skills = {
 					delay: false,
 					content: function () {
 						"step 0";
-						player.addTempSkill("muzhen" + cards.length, "phaseUseEnd");
+						player.addTempSkill("muzhen_used", "phaseUseEnd");
 						if (cards.length == 1) {
+							player.markAuto("muzhen_used", "gain");
 							player.$giveAuto(cards[0], target);
 							game.delayx();
 							target.equip(cards[0]);
 						} else {
+							player.markAuto("muzhen_used", "give");
 							player.give(cards, target);
 						}
 						player.gainPlayerCard(target, cards.length == 2 ? "e" : "h", true);
@@ -5436,9 +5440,13 @@ const skills = {
 				return "请选择【睦阵】的牌和目标";
 			},
 		},
+		subSkill: {
+			used: {
+				onremove: true,
+				charlotte: true,
+			},
+		},
 	},
-	muzhen1: {},
-	muzhen2: {},
 	sheyi2: { charlotte: true },
 	sheyi: {
 		audio: 2,

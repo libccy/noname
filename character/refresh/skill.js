@@ -3865,14 +3865,15 @@ const skills = {
 				return ui.create.dialog("###荐言###" + get.translation("rejianyan_info"));
 			},
 			chooseControl: function (event, player) {
-				var list = [];
-				if (!player.hasSkill("rejianyan_color")) list.addArray(["red", "black"]);
-				if (!player.hasSkill("rejianyan_type")) list.addArray(["basic", "trick", "equip"]);
+				const list = [],
+					storage = player.getStorage("rejianyan_used");
+				if (!storage.includes("color")) list.addArray(["red", "black"]);
+				if (!storage.includes("type")) list.addArray(["basic", "trick", "equip"]);
 				list.push("cancel2");
 				return list;
 			},
 			check: function () {
-				if (!_status.event.player.hasSkill("rejianyan_color")) return "red";
+				if (!_status.event.player.getStorage("rejianyan_used").includes("color")) return "red";
 				return "trick";
 			},
 			backup: function (result, player) {
@@ -3883,15 +3884,16 @@ const skills = {
 					info: result.control,
 					content: function () {
 						"step 0";
-						var card = false,
+						let card = false,
 							info = lib.skill.rejianyan_backup.info;
+						player.addTempSkill("rejianyan_used", "phaseUseEnd");
 						if (info == "red" || info == "black") {
-							player.addTempSkill("rejianyan_color", "phaseUseEnd");
+							player.markAuto("rejianyan_used", "color");
 							card = get.cardPile2(function (card) {
 								return get.color(card) == info;
 							});
 						} else {
-							player.addTempSkill("rejianyan_type", "phaseUseEnd");
+							player.markAuto("rejianyan_used", "type");
 							card = get.cardPile2(function (card) {
 								return get.type(card) == info;
 							});
@@ -3931,7 +3933,7 @@ const skills = {
 				},
 			},
 		},
-		subSkill: { type: {}, color: {}, backup: {} },
+		subSkill: { used: { charlotte: true, onremove: true }, backup: {} },
 	},
 	//野兽高顺
 	decadexianzhen: {
@@ -5697,7 +5699,8 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		filter: function (event, player) {
-			return player.getExpansions("xinquanji").length > 0 && (!player.hasSkill("xinpaiyi_0") || !player.hasSkill("xinpaiyi_1"));
+			if (player.getStorage("xinpaiyi_used").length > 1) return false;
+			return player.getExpansions("xinquanji").length > 0;
 		},
 		chooseButton: {
 			check: function (button) {
@@ -5735,7 +5738,7 @@ const skills = {
 			},
 			select: 2,
 			filter: function (button, player) {
-				if (typeof button.link == "number" && player.hasSkill("xinpaiyi_" + button.link)) return false;
+				if (typeof button.link == "number" && player.getStorage("xinpaiyi_used").includes(button.link)) return false;
 				if (ui.selected.buttons.length) return typeof ui.selected.buttons[0].link != typeof button.link;
 				return true;
 			},
@@ -5759,8 +5762,10 @@ const skills = {
 			combo: "xinquanji",
 		},
 		subSkill: {
-			0: {},
-			1: {},
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 			backup0: {
 				audio: "xinpaiyi",
 				filterCard: () => false,
@@ -5769,7 +5774,8 @@ const skills = {
 				delay: false,
 				content: function () {
 					"step 0";
-					player.addTempSkill("xinpaiyi_0", "phaseUseEnd");
+					player.addTempSkill("xinpaiyi_used", "phaseUseEnd");
+					player.markAuto("xinpaiyi_used", [0]);
 					var card = lib.skill.xinpaiyi_backup.card;
 					player.loseToDiscardpile(card);
 					"step 1";
@@ -5799,7 +5805,8 @@ const skills = {
 				content: function () {
 					"step 0";
 					targets.sortBySeat();
-					player.addTempSkill("xinpaiyi_1", "phaseUseEnd");
+					player.addTempSkill("xinpaiyi_used", "phaseUseEnd");
+					player.markAuto("xinpaiyi_used", [1]);
 					var card = lib.skill.xinpaiyi_backup.card;
 					player.loseToDiscardpile(card);
 					"step 1";
@@ -6786,18 +6793,13 @@ const skills = {
 		frequent: true,
 		preHidden: true,
 		filter: function (event, player, name) {
-			//if(name=='damageEnd') return true;
-			//if(!event.card) return false;
-			if (
-				player.hasHistory("useSkill", function (evt) {
-					return evt.skill == "gzquanji" && evt.event.triggername == name;
-				})
-			)
-				return false;
+			if (player.getStorage("gzquanji_used").includes(name)) return false;
 			return true;
 		},
 		content: function () {
 			"step 0";
+			player.addTempSkill("gzquanji_used");
+			player.markAuto("gzquanji_used", event.triggername);
 			player.draw();
 			"step 1";
 			var hs = player.getCards("he");
@@ -6827,6 +6829,12 @@ const skills = {
 		},
 		ai: {
 			notemp: true,
+		},
+		subSkill: {
+			used: {
+				onremove: true,
+				charlotte: true,
+			},
 		},
 	},
 	gzpaiyi: {

@@ -2016,8 +2016,8 @@ const skills = {
 		},
 		content: function () {
 			var cards = player.getCards("h");
-			player.addTempSkill("dcjiaoxia_used", "phaseUseAfter");
-			player.addGaintag(cards, "dcjiaoxia_used");
+			player.addTempSkill("dcjiaoxia_viewas", "phaseUseAfter");
+			player.addGaintag(cards, "dcjiaoxia_viewas");
 		},
 		group: "dcjiaoxia_load",
 		subSkill: {
@@ -2043,18 +2043,18 @@ const skills = {
 				charlotte: true,
 				onremove: true,
 			},
-			used: {
+			viewas: {
 				mod: {
 					aiOrder: function (player, card, num) {
-						if (get.itemtype(card) == "card" && card.hasGaintag("dcjiaoxia_used")) return num + 1;
+						if (get.itemtype(card) == "card" && card.hasGaintag("dcjiaoxia_viewas")) return num + 1;
 					},
 					cardname: function (card, player) {
-						if (get.itemtype(card) == "card" && card.hasGaintag("dcjiaoxia_used")) return "sha";
+						if (get.itemtype(card) == "card" && card.hasGaintag("dcjiaoxia_viewas")) return "sha";
 					},
 				},
 				charlotte: true,
 				onremove: function (player) {
-					player.removeGaintag("dcjiaoxia_used");
+					player.removeGaintag("dcjiaoxia_viewas");
 				},
 				trigger: { player: "useCardAfter" },
 				filter: function (event, player) {
@@ -2065,7 +2065,7 @@ const skills = {
 						player.getHistory("lose", evt => {
 							if (evt.getParent() != event) return false;
 							for (var i in evt.gaintag_map) {
-								if (evt.gaintag_map[i].includes("dcjiaoxia_used")) return true;
+								if (evt.gaintag_map[i].includes("dcjiaoxia_viewas")) return true;
 							}
 							return false;
 						}).length &&
@@ -2082,9 +2082,10 @@ const skills = {
 	},
 	dchumei: {
 		subSkill: {
-			0: { charlotte: true },
-			1: { charlotte: true },
-			2: { charlotte: true },
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 		},
 		onChooseToUse: function (event) {
 			if (!game.online && !event.dchumei_num) {
@@ -2108,9 +2109,10 @@ const skills = {
 		},
 		filterTarget: function (card, player, target) {
 			if (target.getHp() > _status.event.dchumei_num) return false;
-			if (!player.hasSkill("dchumei_0")) return true;
-			if (!player.hasSkill("dchumei_1") && target.countCards("he")) return true;
-			if (!player.hasSkill("dchumei_2") && target.isDamaged()) return true;
+			const list = player.getStorage("dchumei_used");
+			if (!list.includes("draw")) return true;
+			if (!list.includes("give") && target.countCards("he")) return true;
+			if (!list.includes("recover") && target.isDamaged()) return true;
 			return false;
 		},
 		content: function () {
@@ -2122,13 +2124,13 @@ const skills = {
 						"狐魅：请选择一项",
 						[
 							[
-								[0, "令" + str + "摸一张牌"],
-								[1, "令" + str + "交给你一张牌"],
-								[2, "令" + str + "回复1点体力"],
+								["draw", "令" + str + "摸一张牌"],
+								["give", "令" + str + "交给你一张牌"],
+								["recover", "令" + str + "回复1点体力"],
 							].filter(list => {
-								if (player.hasSkill("dchumei_" + list[0])) return false;
-								if (list[0] == 1 && !target.countCards("he")) return false;
-								if (list[0] == 2 && target.isHealthy()) return false;
+								if (player.getStorage("dchumei_used").includes(list[0])) return false;
+								if (list[0] == "give" && !target.countCards("he")) return false;
+								if (list[0] == "recover" && target.isHealthy()) return false;
 								return true;
 							}),
 							"textbutton",
@@ -2138,32 +2140,43 @@ const skills = {
 				)
 				.set("filterButton", button => {
 					const { player, target } = get.event();
-					if (player.hasSkill("dchumei_" + button.link)) return false;
-					if (button.link == 1 && !target.countCards("he")) return false;
-					if (button.link == 2 && target.isHealthy()) return false;
+					if (player.getStorage("dchumei_used").includes(button.link)) return false;
+					if (button.link == "give" && !target.countCards("he")) return false;
+					if (button.link == "recover" && target.isHealthy()) return false;
 					return true;
 				})
 				.set("ai", function (button) {
-					var target = _status.event.target;
-					return [get.effect(target, { name: "draw" }, player, player), get.effect(target, { name: "shunshou_copy2" }, player, player), get.recoverEffect(target, player, player)][button.link];
+					let target = _status.event.target;
+					switch(button.link) {
+						case "draw": {
+							return get.effect(target, { name: "draw" }, player, player);
+						}
+						case "give": {
+							return get.effect(target, { name: "shunshou_copy2" }, player, player);
+						}
+						case "recover": {
+							return get.recoverEffect(target, player, player);
+						}
+					}
+					return 0;
 				})
 				.set("target", target);
 			"step 1";
 			if (result.bool) {
-				var num = result.links[0];
-				player.addTempSkill("dchumei_" + num, "phaseUseAfter");
-				switch (num) {
-					case 0:
+				player.addTempSkill("dchumei_used", "phaseUseAfter");
+				player.markAuto("dchumei_used", result.links);
+				switch (result.links[0]) {
+					case "draw":
 						target.draw();
 						break;
-					case 1:
+					case "give":
 						target.chooseCard("狐魅：交给" + get.translation(player) + "一张牌", "he", true);
 						break;
-					case 2:
+					case "recover":
 						target.recover();
 						break;
 				}
-				if (num != 1) event.finish();
+				if (result.links[0] != "give") event.finish();
 			} else event.finish();
 			"step 2";
 			if (result.bool) player.gain(result.cards, target, "giveAuto");
@@ -2172,9 +2185,10 @@ const skills = {
 			order: 1,
 			result: {
 				target: function (player, target) {
-					if (!player.hasSkill("dchumei_0")) return 1;
-					if (!player.hasSkill("dchumei_1")) return -1;
-					if (!player.hasSkill("dchumei_2")) return 1;
+					const list = player.getStorage("dchumei_used");
+					if (!list.includes("draw")) return 1;
+					if (!list.includes("give")) return -1;
+					if (!list.includes("recover")) return 1;
 				},
 			},
 		},
@@ -3557,7 +3571,7 @@ const skills = {
 		usable: 4,
 		filter: function (event, player) {
 			var hs = player.getCards("h"),
-				suits = player.getStorage("dcbingji_mark");
+				suits = player.getStorage("dcbingji_used");
 			if (!hs.length) return false;
 			var suit = get.suit(hs[0], player);
 			if (suit == "none" || suits.includes(suit)) return false;
@@ -3625,9 +3639,10 @@ const skills = {
 						player.logSkill("dcbingji");
 						delete event.result.skill;
 						var hs = player.getCards("h");
+						event.getParent().addCount = false;
 						player.showCards(hs, get.translation(player) + "发动了【秉纪】");
-						player.markAuto("dcbingji_mark", [get.suit(hs[0], player)]);
-						player.addTempSkill("dcbingji_mark");
+						player.markAuto("dcbingji_used", [get.suit(hs[0], player)]);
+						player.addTempSkill("dcbingji_used");
 					},
 				};
 			},
@@ -3636,20 +3651,9 @@ const skills = {
 			},
 		},
 		subSkill: {
-			mark: {
+			used: {
 				charlotte: true,
 				onremove: true,
-				trigger: { player: "useCard1" },
-				forced: true,
-				popup: false,
-				firstDo: true,
-				filter: function (event, player) {
-					return event.addCount !== false && event.card.name == "sha" && event.card.storage && event.card.storage.dcbingji;
-				},
-				content: function () {
-					trigger.addCount = false;
-					player.getStat("card").sha--;
-				},
 			},
 		},
 	},

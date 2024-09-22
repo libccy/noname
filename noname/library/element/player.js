@@ -1464,6 +1464,10 @@ export class Player extends HTMLDivElement {
 		} else {
 			rangex.push(...new Set(ranges));
 		}
+		if (get.itemtype(name) == "card") {
+			const owner = get.owner(name, "judge");
+			if (owner && !lib.filter.canBeGained(name, this, owner)) return false;
+		}
 		for (let range of rangex) {
 			let num = this.countEquipableSlot(range);
 			let num2 = get.numOf(rangex, range);
@@ -1984,6 +1988,25 @@ export class Player extends HTMLDivElement {
 			}
 		}
 		next.setContent("chooseToMove");
+		next.filterOk = function () {
+			return true;
+		};
+		next.filterMove = function () {
+			return true;
+		};
+		return next;
+	}
+	chooseToMove_new() {
+		var next = game.createEvent("chooseToMove_new");
+		next.player = this;
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] == "boolean") {
+				next.forced = arguments[i];
+			} else if (typeof arguments[i] == "string") {
+				next.prompt = arguments[i];
+			}
+		}
+		next.setContent("chooseToMove_new");
 		next.filterOk = function () {
 			return true;
 		};

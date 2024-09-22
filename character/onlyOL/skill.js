@@ -1741,29 +1741,38 @@ const skills = {
 			var cards = player.getExpansions(skill);
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
-		group: ["olchunlao_save", "olchunlao_gain"],
+		group: ["olchunlao_save"],
 		subSkill: {
 			save: {
 				inherit: "chunlao2",
 				filter(event, player) {
-					return event.type == "dying" && event.dying && event.dying.hp <= 0 && player.getExpansions("olchunlao").length;
+					const num = player.getRoundHistory("useCard", evt => {
+						return evt.card?.name == "jiu" && evt.card?.storage?.olchunlao;
+					}).length + 1;
+					return event.type == "dying" && event.dying && event.dying.hp <= 0 && player.getExpansions("olchunlao").length >= num;
 				},
 				async content(event, trigger, player) {
 					const target = event.targets[0];
+					const num = player.getRoundHistory("useCard", evt => {
+						return evt.card?.name == "jiu" && evt.card?.storage?.olchunlao;
+					}).length + 1;
 					const {
 						result: { bool, links },
-					} = await player.chooseCardButton(get.translation("olchunlao"), player.getExpansions("olchunlao"), true);
+					} = await player.chooseCardButton(get.translation("olchunlao"), player.getExpansions("olchunlao"), true, num);
 					if (bool) {
 						player.logSkill("olchunlao", target);
 						await player.loseToDiscardpile(links);
 						event.type = "dying";
-						await target.useCard({ name: "jiu", isCard: true }, target);
+						await target.useCard({ name: "jiu", isCard: true, storage: { olchunlao: true }}, target);
 					}
 				},
 				ai: {
 					save: true,
 					skillTagFilter(player) {
-						return player.getExpansions("olchunlao").length;
+						const num = player.getRoundHistory("useCard", evt => {
+							return evt.card?.name == "jiu" && evt.card?.storage?.olchunlao;
+						}).length + 1;
+						return player.getExpansions("olchunlao").length >= num;
 					},
 					order: 6,
 					result: { target: 1 },

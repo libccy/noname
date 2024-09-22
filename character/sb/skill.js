@@ -7572,18 +7572,19 @@ const skills = {
 		enable: "phaseUse",
 		filterCard: true,
 		selectCard: function () {
-			var player = _status.event.player;
-			if (player.hasSkill("sbkeji_discard")) return [0, 0];
-			if (player.hasSkill("sbkeji_losehp")) return [1, 1];
+			let player = _status.event.player,
+				list = player.getStorage("sbkeji_used");
+			if (list.includes("discard")) return [0, 0];
+			if (list.includes("losehp")) return [1, 1];
 			return [0, 1];
 		},
 		locked: false,
 		usable: 2,
 		prompt: function (event) {
-			var player = _status.event.player,
+			let player = _status.event.player,
 				str = "出牌阶段" + (player.storage.sbkeji ? "" : "各") + "限一次。你可以";
-			var discard = player.hasSkill("sbkeji_discard"),
-				losehp = player.hasSkill("sbkeji_losehp");
+			let discard = player.getStorage("sbkeji_used").includes("discard"),
+				losehp = player.getStorage("sbkeji_used").includes("losehp");
 			if (!discard) str += "弃置一张手牌并获得1点护甲";
 			if (!losehp) str += (!discard ? "，或" : "") + "点击“确定”失去1点体力并获得2点护甲";
 			return str;
@@ -7598,16 +7599,17 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
+			player.addTempSkill("sbkeji_used", "phaseUseAfter");
 			if (cards.length) {
 				player.changeHujia(1, null, true);
-				player.addTempSkill("sbkeji_discard", "phaseUseAfter");
+				player.markAuto("sbkeji_used", "discard");
 				event.finish();
 			} else {
 				player.loseHp();
 			}
 			"step 1";
 			player.changeHujia(2, null, true);
-			player.addTempSkill("sbkeji_losehp", "phaseUseAfter");
+			player.markAuto("sbkeji_used", "losehp");
 		},
 		mod: {
 			maxHandcard: function (player, num) {
@@ -7639,8 +7641,7 @@ const skills = {
 			},
 		},
 		subSkill: {
-			discard: { charlotte: true },
-			losehp: { charlotte: true },
+			used: { charlotte: true, onremove: true },
 		},
 	},
 	sbdujiang: {

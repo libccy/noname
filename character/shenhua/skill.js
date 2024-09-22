@@ -2190,6 +2190,12 @@ const skills = {
 		zhuanhuanji: true,
 		marktext: "☯",
 		intro: {
+			markcount(storage, player) {
+				if (player.storage.nzry_chenglve1) {
+					return get.translation(player.storage.nzry_chenglve1);
+				}
+				return null;
+			},
 			content(storage, player, skill) {
 				let str = player.storage.nzry_chenglve ? "出牌阶段限一次，你可以摸两张牌，然后弃置一张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制" : "出牌阶段限一次，你可以摸一张牌，然后弃置两张手牌。若如此做，直到本回合结束，你使用与弃置牌花色相同的牌无距离和次数限制";
 				if (player.storage.nzry_chenglve1) {
@@ -2246,7 +2252,10 @@ const skills = {
 				if (suit == "unsure" || player.getStorage("nzry_chenglve1").includes(suit)) return true;
 			},
 		},
-		onremove: true,
+		onremove(player, skill) {
+			delete player.storage[skill];
+			player.markSkill("nzry_chenglve");
+		},
 	},
 	nzry_shicai: {
 		audio: "nzry_shicai_2",
@@ -2273,7 +2282,7 @@ const skills = {
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
 		filter(event, player, name) {
-			let evt = event.name == "useCardToTargeted" ? event : event.getParent();
+			let evt = event.name == "useCard" ? event : event.getParent();
 			let type = get.type2(evt.card, false);
 			if (
 				player.hasHistory(
@@ -5937,23 +5946,24 @@ const skills = {
 		audio: "qiangxi",
 		enable: "phaseUse",
 		filter(event, player) {
-			if (player.hasSkill("xinqiangxi2")) {
-				return !player.hasSkill("xinqiangxi3");
-			} else if (player.hasSkill("xinqiangxi3")) {
-				return !player.hasSkill("xinqiangxi2") && player.countCards("he", { type: "equip" }) > 0;
+			const list = player.getStorage("xinqiangxi_used");
+			if (list.includes("discard")) {
+				return !list.includes("losehp");
+			} else if (list.includes("losehp")) {
+				return !list.includes("discard") && player.countCards("he", { type: "equip" }) > 0;
 			} else {
 				return true;
 			}
 		},
 		filterCard(card) {
 			const player = _status.event.player;
-			if (player.hasSkill("xinqiangxi2")) return false;
+			if (player.getStorage("xinqiangxi_used").includes("discard")) return false;
 			return get.type(card) == "equip";
 		},
 		selectCard() {
 			const player = _status.event.player;
-			if (player.hasSkill("xinqiangxi2")) return -1;
-			if (player.hasSkill("xinqiangxi3")) return [1, 1];
+			if (player.getStorage("xinqiangxi_used").includes("discard")) return -1;
+			if (player.getStorage("xinqiangxi_used").includes("losehp")) return [1, 1];
 			return [0, 1];
 		},
 		filterTarget(card, player, target) {
@@ -5961,11 +5971,12 @@ const skills = {
 			return player.inRange(target);
 		},
 		async content(event, trigger, player) {
+			player.addTempSkill("xinqiangxi_used");
 			if (event.cards.length == 0) {
-				player.addTempSkill("xinqiangxi3");
+				player.markAuto("xinqiangxi_used", "losehp");
 				await player.loseHp();
 			} else {
-				player.addTempSkill("xinqiangxi2");
+				player.markAuto("xinqiangxi_used", "discard");
 			}
 			await event.target.damage("nocard");
 		},
@@ -5986,9 +5997,13 @@ const skills = {
 			},
 		},
 		threaten: 1.5,
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
+		},
 	},
-	xinqiangxi2: {},
-	xinqiangxi3: {},
 	tianyi: {
 		audio: 2,
 		audioname: ["re_taishici"],
