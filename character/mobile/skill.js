@@ -1521,7 +1521,7 @@ const skills = {
 					return target !== player && target.hasEnabledSlot(1);
 				})
 				.set("ai", target => {
-					return -get.attitude(get.player(), target);
+					return 1 - get.attitude(get.player(), target);
 				})
 				.forResult();
 		},
@@ -1529,6 +1529,9 @@ const skills = {
 		async content(event, trigger, player) {
 			const targets = event.targets.slice().sortBySeat();
 			for (const target of targets) {
+				if (target.identityShown) {
+					if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+				}
 				await target.disableEquip(1);
 			}
 			await game.delay();
