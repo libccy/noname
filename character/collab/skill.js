@@ -2132,6 +2132,7 @@ const skills = {
 	},
 	//美猴王
 	dcjinjing: {
+		audio: 2,
 		locked: true,
 		ai: {
 			viewHandcard: true,
