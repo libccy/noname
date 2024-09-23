@@ -6860,17 +6860,19 @@ export const Content = {
 				filterCard = get.event("filter");
 			if (ui.selected.targets.length == 0) {
 				if (att > 0) {
+					let noEffect = true;
 					if (
 						!_status.event.nojudge &&
 						target.countVCards("j", function (card) {
 							if (!filterCard(card)) return false;
+							if (get.effect(target, card, target, target) <= -5) noEffect = false;
 							return game.hasPlayer(function (current) {
 								if (!aimTargets.includes(current)) return false;
 								return current != target && current.canAddJudge(card) && get.attitude(player, current) < 0;
 							});
 						})
 					)
-						return 14;
+						return noEffect ? 8 : 14;
 					if (
 						target.countVCards("e", function (card) {
 							if (!filterCard(card)) return false;
@@ -6900,26 +6902,20 @@ export const Content = {
 				}
 				return 0;
 			}
-			var es = ui.selected.targets[0].getVCards("e", filterCard);
-			var i;
-			var att2 = get.sgn(get.attitude(player, ui.selected.targets[0]));
-			for (i = 0; i < es.length; i++) {
-				if (sgnatt != 0 && att2 != 0 && sgnatt != att2 && get.sgn(get.value(es[i], ui.selected.targets[0])) == -att2 && get.sgn(get.effect(target, es[i], player, target)) == sgnatt && target.canEquip(es[i], _status.event.canReplace)) {
-					return Math.abs(att);
-				}
+			const current = ui.selected.targets[0],
+				pos = get.event("nojudge") ? "e" : "ej",
+				cards = current.getVCards(pos, filterCard),
+				att2 = get.sgn(get.attitude(player, current));
+			let maxEff = 0;
+			for(let card of cards) {
+				if (att2 <= 0 && get.sgn(get.value(card, current)) < 0) continue;
+				let att3 = get.sgn(get.attitude(player, target)),
+					val = get.effect(target, card, player, target);
+				if (att3 != get.sgn(val)) continue;
+				if (att2 > 0 && get.position(card) == "e") val /= 2;
+				if (Math.abs(val) > maxEff) maxEff = Math.abs(val);
 			}
-			if (
-				i == es.length &&
-				(_status.event.nojudge ||
-					!ui.selected.targets[0].countVCards("j", function (card) {
-						if (!filterCard(card)) return false;
-						return target.canAddJudge(card);
-					}) ||
-					att2 <= 0)
-			) {
-				return 0;
-			}
-			return -att * att2;
+			return maxEff;
 		});
 		next.set("multitarget", true);
 		next.set("targetprompt", _status.event.targetprompt || ["被移走", "移动目标"]);
