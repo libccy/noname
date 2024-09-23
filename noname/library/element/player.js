@@ -378,7 +378,7 @@ export class Player extends HTMLDivElement {
 	 * 设置提示文字，有则更改，无则加之。
 	 * @param {string} index 给标记起一个名字，名字任意
 	 * @param {string} message 设置提示标记的内容
-	 * @param { SkillTrigger | string | boolean | (event:GameEventPromise, player:Player, name:string) => boolean } isTemp 确定失去的时间阶段，不填则不失去
+	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 确定失去的时间阶段，不填则不失去
 	 * @param { object } [css] 自定义的样式
 	 * @returns { HTMLDivElement }
 	 * @author Curpond
@@ -482,7 +482,7 @@ export class Player extends HTMLDivElement {
 	 * when(xxx1,xxx2)//解析为player:[xxx1,xxx2]
 	 * 
 	 * when({player: 'xxAfter'}, {global: 'yyBegin'})//合并解析
-	 * @param  {[signal[]]|signal[]|SkillTrigger[]} triggerNames 
+	 * @param  {[Signal[]]|Signal[]|SkillTrigger[]} triggerNames 
 	 * @returns {_When}
 	 */
 	when(...triggerNames) {
@@ -8642,6 +8642,12 @@ export class Player extends HTMLDivElement {
 		}
 		return skill;
 	}
+	/**
+	 * 
+	 * @param {SAAType<string>} skillsToAdd 
+	 * @param {SAAType<Signal>|SkillTrigger} [expire] 
+	 * @returns 
+	 */
 	addTempSkills(skillsToAdd, expire) {
 		//请注意，该方法的底层实现并非tempSkill，而是additionalSkills和player.when！
 		if (typeof skillsToAdd == "string") skillsToAdd = [skillsToAdd];
@@ -8686,7 +8692,7 @@ export class Player extends HTMLDivElement {
 	 * 添加临时技能
 	 * @overload
 	 * @param { string | string[] } skill 技能名(数组)
-	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
+	 * @param { SkillTrigger |SAAType<Signal> } [expire]
 	 * @param { boolean } [checkConflict]
 	 */
 	addTempSkill(skill, expire, checkConflict) {
