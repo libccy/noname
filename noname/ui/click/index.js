@@ -3312,6 +3312,7 @@ export class Click {
 			lib.config.show_characternamepinyin == "showCodeIdentifier2" ||
 			lib.config.show_skillnamepinyin == "showCodeIdentifier2"
 		) {
+			var nameinfo = get.character(name);
 			var intro = ui.create.div(".characterintro", get.characterIntro(name), uiintro);
 			if (
 				lib.config.show_characternamepinyin == "showPinyin2" ||
@@ -3322,7 +3323,6 @@ export class Click {
 					lib.config.show_characternamepinyin == "showCodeIdentifier2"
 						? name
 						: get.pinyin(charactername);
-				var nameinfo = get.character(name);
 				var charactersex = get.translation(nameinfo[0]);
 				const charactergroups = get.is.double(name, true);
 				let charactergroup;

@@ -11760,7 +11760,7 @@ const skills = {
 	},
 	jiangchi3: {
 		mod: {
-			cardEnabled: function (card) {
+			cardEnabled2(card) {
 				if (card.name == "sha") return false;
 			},
 		},
