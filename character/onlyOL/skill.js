@@ -2134,6 +2134,8 @@ const skills = {
 					global: ["useCardEnd"],
 				},
 				filter(event, player) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
 					if (!event.card || !player.storage.olsbyufeng_block) return false;
 					return player.getStorage("olsbyufeng_block").includes(event.card);
 				},

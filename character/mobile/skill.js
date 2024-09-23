@@ -5338,6 +5338,8 @@ const skills = {
 					delete player.storage.scschihe_blocker;
 				},
 				filter: function (event, player) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
 					if (!event.card || !player.storage.scschihe_block) return false;
 					for (var i of player.storage.scschihe_block) {
 						if (i[0] == event.card) return true;
