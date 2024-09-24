@@ -1521,7 +1521,8 @@ const skills = {
 					return target !== player && target.hasEnabledSlot(1);
 				})
 				.set("ai", target => {
-					return -get.attitude(get.player(), target);
+					const player = get.event("player");
+					return (1 - get.attitude(player, target)) * Math.sqrt(get.distance(player, target));
 				})
 				.forResult();
 		},
@@ -1529,6 +1530,9 @@ const skills = {
 		async content(event, trigger, player) {
 			const targets = event.targets.slice().sortBySeat();
 			for (const target of targets) {
+				if (target.identityShown) {
+					if (get.mode() != "identity" || player.identity != "nei") player.addExpose(0.3);
+				}
 				await target.disableEquip(1);
 			}
 			await game.delay();
@@ -1590,6 +1594,11 @@ const skills = {
 		},
 		ai: {
 			neg: true,
+			effect: {
+				target(card, player, target) {
+					if (player && player.isIn() && get.tag(card, "damage") && player.hasDisabledSlot(1)) return [1, 0, 1, 1.5];
+				}
+			}
 		},
 	},
 	//曹髦  史?! 我求你别改了
@@ -5338,6 +5347,8 @@ const skills = {
 					delete player.storage.scschihe_blocker;
 				},
 				filter: function (event, player) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
 					if (!event.card || !player.storage.scschihe_block) return false;
 					for (var i of player.storage.scschihe_block) {
 						if (i[0] == event.card) return true;

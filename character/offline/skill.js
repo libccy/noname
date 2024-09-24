@@ -3453,6 +3453,13 @@ const skills = {
 			},
 		},
 	},
+	jdjizhu: {
+		inherit: "sbjizhu",
+		audio: ["sbjizhu", 3],
+		ai: {
+			combo: "jdlongdan",
+		},
+	},
 	//九鼎-甘宁
 	jdqixi: {
 		audio: "sbqixi",
@@ -6714,9 +6721,9 @@ const skills = {
 		content() {
 			"step 0";
 			if (!_status.vtbtaoyan_count) {
-				_status.vtbtaoyan_count = 5;
+				_status.vtbtaoyan_count = 6;
 			}
-			player.chooseTarget(get.prompt("vtbtaoyan"), "令一或两名其他角色摸一张牌并从游戏外获得一张【桃】（♥6）", lib.filter.notMe, [1, 2]).set("ai", target => {
+			player.chooseTarget(get.prompt("vtbtaoyan"), "令一或两名其他角色摸一张牌并从游戏外获得一张【桃】指示物", lib.filter.notMe, [1, 2]).set("ai", target => {
 				var player = _status.event.player;
 				return get.recoverEffect(target, player, player) / 2 + get.attitude(player, target);
 			});
@@ -6736,7 +6743,7 @@ const skills = {
 					if (!_status.vtbtaoyan_count) continue;
 					if (!_status.vtbtaoyan_cards) _status.vtbtaoyan_cards = [];
 					_status.vtbtaoyan_count--;
-					var card = game.createCard("tao", "heart", 6);
+					var card = game.createCard("tao");
 					_status.vtbtaoyan_cards.push(card.cardid);
 					target.gain(card, "gain2");
 				}
@@ -6900,7 +6907,6 @@ const skills = {
 				charlotte: true,
 				trigger: { player: "useCard2" },
 				forced: true,
-				popup: false,
 				onremove: true,
 				nopop: true,
 				filter(event, player) {
@@ -6908,6 +6914,7 @@ const skills = {
 				},
 				content() {
 					"step 0";
+					player.removeSkill("vtbyaoli_effect");
 					trigger.directHit.addArray(game.filterPlayer());
 					var num = player.countMark("vtbyaoli_effect");
 					if (
@@ -6937,7 +6944,6 @@ const skills = {
 					"step 2";
 					player.logSkill("vtbyaoli_effect", event.targets);
 					trigger.targets.addArray(event.targets);
-					player.removeSkill("vtbyaoli_effect");
 				},
 				marktext: "媱",
 				intro: {

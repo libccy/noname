@@ -512,6 +512,8 @@ const skills = {
 				charlotte: true,
 				onremove: ["sbgongqi_block", "sbgongqi_blocker"],
 				filter(event, player) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
 					if (!event.card || !player.storage.sbgongqi_block) return false;
 					return player.getStorage("sbgongqi_block").some(info => {
 						return info[0] === event.card;
@@ -5333,6 +5335,7 @@ const skills = {
 			return { type: "basic" };
 		},
 		group: "sblongdan_charge",
+		derivation: "sblongdan_shabi",
 		onremove: function (player) {
 			player.removeSkill("sblongdan_mark");
 		},
@@ -5417,12 +5420,14 @@ const skills = {
 				},
 				content: function () {
 					game.log(player, "和", trigger.player, "的协力成功");
-					player.addTempSkill("sblongdan_mark", { player: "phaseJieshuBegin" });
+					player.addTempSkill(
+						"sblongdan_mark",
+						player.hasSkill("jdlongdan", null, null, false) ? { player: "phaseAfter" } : { player: "phaseJieshuBegin" }
+					);
 					game.delayx();
 				},
 			},
 		},
-		derivation: "sblongdan_shabi",
 		ai: {
 			combo: "sblongdan",
 		},
@@ -7951,6 +7956,8 @@ const skills = {
 					delete player.storage.sbliegong_blocker;
 				},
 				filter: function (event, player) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
 					if (!event.card || !player.storage.sbliegong_block) return false;
 					for (var i of player.storage.sbliegong_block) {
 						if (i[0] == event.card) return true;

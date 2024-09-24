@@ -394,12 +394,11 @@ export class Player extends HTMLDivElement {
 				player.tips.get(index).css(css);
 
 				const width = player.node.avatar.clientWidth;
-				let w = width * (player.classList.contains('fullskin2') ? 2 : 1);
-				player.style.setProperty('--w', `${w}px`);
+				let w = width * (player.classList.contains("fullskin2") ? 2 : 1);
+				player.style.setProperty("--w", `${w}px`);
 
 				//检查tip的高度，使其不覆盖装备
-				game.callHook('checkTipBottom', [player]);
-
+				game.callHook("checkTipBottom", [player]);
 			},
 			player,
 			index,
@@ -1115,10 +1114,10 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-			this.getVEquips(type).reduce((num, card) => {
-				let types = get.subtypes(card, false);
-				return num + get.numOf(types, type);
-			}, 0)
+				this.getVEquips(type).reduce((num, card) => {
+					let types = get.subtypes(card, false);
+					return num + get.numOf(types, type);
+				}, 0)
 		);
 	}
 	/**
@@ -1147,11 +1146,11 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-			this.getVEquips(type).reduce((num, card) => {
-				let types = get.subtypes(card, false);
-				if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
-				return num;
-			}, 0)
+				this.getVEquips(type).reduce((num, card) => {
+					let types = get.subtypes(card, false);
+					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
+					return num;
+				}, 0)
 		);
 	}
 	/**
@@ -1499,11 +1498,11 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @deprecated
 	 */
-	$disableEquip() { }
+	$disableEquip() {}
 	/**
 	 * @deprecated
 	 */
-	$enableEquip() { }
+	$enableEquip() {}
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");
@@ -2236,10 +2235,10 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
 		const equips1 = from.getVCards("e", function (card) {
-			return !card.cards?.some(card => {
-				return ui.selected.cards?.includes(card);
-			});
-		}),
+				return !card.cards?.some(card => {
+					return ui.selected.cards?.includes(card);
+				});
+			}),
 			equips2 = to.getVCards("e", function (card) {
 				return !card.cards?.some(card => {
 					return ui.selected.cards?.includes(card);
@@ -3484,10 +3483,13 @@ export class Player extends HTMLDivElement {
 			const maxHp = hidden ? 1 : this.maxHp;
 			if (maxHp == Infinity) {
 				hp.innerHTML = this.hp == Infinity ? "∞" : this.hp + "<br>/<br>" + "∞" + "<div></div>";
+				/*
 			} else if (game.layout == "default" && maxHp > 14) {
 				hp.innerHTML = this.hp + "/" + maxHp;
 				hp.classList.add("text");
 			} else if (get.is.newLayout() && (maxHp > 9 || (maxHp > 5 && this.classList.contains("minskin")) || ((game.layout == "mobile" || game.layout == "long") && this.dataset.position == 0 && maxHp > 7))) {
+			 */
+			} else if (maxHp > 5) {
 				hp.innerHTML = this.hp + "<br>/<br>" + maxHp + "<div></div>";
 				if (this.hp == 0) {
 					hp.lastChild.classList.add("lost");
@@ -3568,7 +3570,7 @@ export class Player extends HTMLDivElement {
 			game.addVideo("update", this, [this.countCards("h"), this.hp, this.maxHp, this.hujia]);
 		}
 		this.updateMarks();
-		game.callHook('checkTipBottom', [this]);
+		game.callHook("checkTipBottom", [this]);
 		return this;
 	}
 	/**
@@ -11877,5 +11879,3 @@ export class Player extends HTMLDivElement {
 }
 
 CacheContext.inject(Player.prototype, ["hasCard", "hasValueTarget", "getModableSkills", "getCardIndex", "countCards", "getSkills", "getUseValue", "canUse"]);
-
-
