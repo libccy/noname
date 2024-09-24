@@ -124,6 +124,9 @@ const skills = {
 				let list = [];
 				for (let i = 0; i < position.length; i++) {
 					const num_px = document.createElement("div");
+					num_px.classList.add("nodeintro");
+					num_px.nodeTitle = get.translation(position[i]);
+					num_px.nodeContent = get.skillInfoTranslation(position[i]);
 					num_px.style.width = "15%";
 					num_px.style.height = "15%";
 					num_px.id = position[i];
@@ -165,6 +168,14 @@ const skills = {
 							} else if (event.control2) event.control2.open();
 						}
 					});
+					if (!lib.config.touchscreen) {
+						if (lib.config.hover_all) {
+							lib.setHover(num_px, ui.click.hoverplayer);
+						}
+						if (lib.config.right_info) {
+							num_px.oncontextmenu = ui.click.rightplayer;
+						}
+					}
 					list.push(num_px);
 				}
 				const selectedList = list.filter(i => places.includes(i.id));

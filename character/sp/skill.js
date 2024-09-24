@@ -14932,6 +14932,7 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseBegin" },
 		direct: true,
+		derivation: ["zhuangshu_basic", "zhuangshu_trick", "zhuangshu_equip"],
 		filter: function (event, player) {
 			return event.player.isIn() && event.player.hasEmptySlot(5) && player.hasCard(lib.skill.zhuangshu.filterCard, "he");
 		},
@@ -15055,6 +15056,7 @@ const skills = {
 		},
 	},
 	zhuangshu_basic: {
+		audio: true,
 		equipSkill: true,
 		trigger: { player: "damageBegin2" },
 		direct: true,
@@ -15121,6 +15123,7 @@ const skills = {
 		},*/
 	},
 	zhuangshu_trick: {
+		audio: true,
 		trigger: { player: ["phaseJudgeBefore"] },
 		equipSkill: true,
 		direct: true,
@@ -15164,6 +15167,7 @@ const skills = {
 		},
 	},
 	zhuangshu_equip: {
+		audio: true,
 		trigger: { player: "phaseUseEnd" },
 		forced: true,
 		equipSkill: true,

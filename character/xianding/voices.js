@@ -1,4 +1,9 @@
 export default {
+	"#dcsbyaozuo1": "明公馈墨，琳当还以锦绣。",
+	"#dcsbyaozuo2": "识时务者，应势而为，当为俊杰。",
+	"#dcsbzhuanwen1": "夺人妻子，掘人祖陵，彼与桀纣何异。",
+	"#dcsbzhuanwen2": "奸宦之后，权佞之子，安敢居南而大！",
+	"#dc_sb_chenlin:die": "矢在弦上，不得不发，请曹公恕罪。",
 	"#dcsbkongwu1": "莫说兵器，取汝首级也易如反掌。",
 	"#dcsbkongwu2": "臂有千斤力，何惧万人敌。",
 	"#dc_sb_hucheer:die": "典……典将军，您还没睡啊。",
