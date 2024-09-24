@@ -775,7 +775,7 @@ const skills = {
 			*/
 			mark(dialog, storage = {}) {
 				const addNewRow = lib.element.dialog.addNewRow.bind(dialog);
-				dialog.css({ width: "50%", transform: 'translateY(40vh)' });
+				dialog.css({ width: "50%" });
 				if (get.is.phoneLayout()) dialog.classList.add("fullheight");
 				let types = ["basic", "trick", "equip"].concat(Object.keys(storage).map(list => list.split("+")[1])).toUniqued();
 				let suits = lib.suit

@@ -76,6 +76,7 @@ export class Dialog extends HTMLDivElement {
 	 */
 	addNewRow(...args) {
 		this.classList.add("addNewRow");
+		this.classList.remove('nobutton');
 		//参数归一化
 		let itemOptions = parameterNormolize();
 		//设置比例字符串
@@ -198,7 +199,7 @@ export class Dialog extends HTMLDivElement {
 				itemContainer.classList.add("popup");
 				let button = ui.create.button(item, get.itemtype(item), itemContainer, itemOption.ItemNoclick);
 				button.css(itemOption.itemCss ?? {});
-				if(item._custom) item._custom(button);
+				if (item._custom) item._custom(button);
 				items.push(button);
 			} else {
 				for (let i of item) {
