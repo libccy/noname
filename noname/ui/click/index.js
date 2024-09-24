@@ -3151,7 +3151,9 @@ export class Click {
 		};
 		var uiintro = ui.create.div(".menubg.charactercard", layer);
 		var playerbg = ui.create.div(".menubutton.large.ava", uiintro);
+		let iSTemp = false;
 		if (!lib.character[audioName] && lib.characterSubstitute[name]?.some(skin => skin[0] == audioName)) {
+			iSTemp = true;
 			lib.character[audioName] = ["", "", 0, [], (lib.characterSubstitute[name].find(i => i[0] == audioName) || [audioName, []])[1]];
 		}
 		var bg = ui.create
@@ -3161,7 +3163,7 @@ export class Click {
 				}
 			})
 			.setBackground(audioName || name, "character");
-		delete lib.character[audioName];
+		if (iSTemp) delete lib.character[audioName];
 		var changeskinfunc = null;
 		var nameskin = name;
 		var nameskin2 = name;
