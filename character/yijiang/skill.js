@@ -5176,6 +5176,8 @@ const skills = {
 		charlotte: true,
 		sourceSkill: "reqingxi",
 		filter: function (event, player) {
+			const evt = event.getParent("useCard", true, true);
+			if (evt && evt.effectedCount < evt.effectCount) return false;
 			return player.storage.reqingxi2 && event.card && player.storage.reqingxi2.includes(event.card);
 		},
 		silent: true,
@@ -8043,6 +8045,8 @@ const skills = {
 		},
 		charlotte: true,
 		filter: function (event, player) {
+			const evt = event.getParent("useCard", true, true);
+			if (evt && evt.effectedCount < evt.effectCount) return false;
 			return player.storage.reanjian2 && event.card && player.storage.reanjian2.includes(event.card);
 		},
 		silent: true,
