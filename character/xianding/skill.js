@@ -1279,6 +1279,9 @@ const skills = {
 			const target = event.targets[0];
 			await target.damage(2);
 		},
+		ai: {
+			combo: "dcyanzuo"
+		},
 	},
 	//凌操
 	dcdufeng: {
