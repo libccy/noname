@@ -8624,7 +8624,7 @@ const skills = {
 			order(item, player) {
 				if (player.hasUnknown()) return 0;
 				let list = [];
-				for (let i of cards) {
+				for (let i of player.getCards('h')) {
 					list.add(get.suit(i, player));
 					if (list.length >= 3) return 10;
 				}
