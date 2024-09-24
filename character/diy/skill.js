@@ -7467,7 +7467,7 @@ const skills = {
 		content() {
 			"step 0";
 			player
-				.chooseToDiscard("he", true, [1, 4], function (card, player) {
+				.chooseToDiscard("he", true, [1, Infinity], function (card, player) {
 					if (!ui.selected.cards.length) return true;
 					var suit = get.suit(card, player);
 					for (var i of ui.selected.cards) {

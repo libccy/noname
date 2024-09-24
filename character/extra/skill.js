@@ -3254,7 +3254,8 @@ const skills = {
 		},
 		forced: true,
 		filter(event, player) {
-			return typeof get.number(event.card) == "number";
+			const number = get.number(event.card);
+			return typeof number == "number" && number > 0;
 		},
 		marktext: "黄",
 		intro: {
