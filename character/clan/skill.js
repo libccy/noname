@@ -131,9 +131,9 @@ const skills = {
 					return (
 						event.skill == "clanchengqi_backup" &&
 						get.cardNameLength(event.card) ==
-							(event.cards || []).reduce((sum, card) => {
-								return sum + get.cardNameLength(card);
-							}, 0)
+						(event.cards || []).reduce((sum, card) => {
+							return sum + get.cardNameLength(card);
+						}, 0)
 					);
 				},
 				async cost(event, trigger, player) {
@@ -421,7 +421,7 @@ const skills = {
 			evt.set("norestore", true);
 			evt.set("custom", {
 				add: {},
-				replace: { window() {} },
+				replace: { window() { } },
 			});
 			evt.goto(0);
 		},
@@ -564,8 +564,8 @@ const skills = {
 			let str = "";
 			const card = new lib.element.VCard({ name: "sha" });
 			const targets = game.filterPlayer(target => {
-					return event.player.getPrevious() == target || event.player.getNext() == target;
-				}),
+				return event.player.getPrevious() == target || event.player.getNext() == target;
+			}),
 				bool = !targets.some(target => {
 					return target.getHistory("useCard").length;
 				}),
@@ -591,8 +591,8 @@ const skills = {
 		check(event, player) {
 			const card = new lib.element.VCard({ name: "sha" });
 			const targets = game.filterPlayer(target => {
-					return event.player.getPrevious() == target || event.player.getNext() == target;
-				}),
+				return event.player.getPrevious() == target || event.player.getNext() == target;
+			}),
 				bool = !targets.some(target => {
 					return target.getHistory("useCard").length;
 				}),
@@ -612,8 +612,8 @@ const skills = {
 			player.awakenSkill("clanjianji");
 			const card = new lib.element.VCard({ name: "sha" });
 			const targets = game.filterPlayer(target => {
-					return trigger.player.getPrevious() == target || trigger.player.getNext() == target;
-				}),
+				return trigger.player.getPrevious() == target || trigger.player.getNext() == target;
+			}),
 				boolx = !targets.some(target => {
 					return target.getHistory("useCard").length;
 				}),
@@ -775,11 +775,8 @@ const skills = {
 			*/
 			mark(dialog, storage = {}) {
 				const addNewRow = lib.element.dialog.addNewRow.bind(dialog);
-				dialog.css({
-					width: "30%",
-					transform: 'translateY(45vh)',
-				});
-				if(get.is.phoneLayout()) dialog.classList.add("fullheight");
+				dialog.css({ width: "50%" });
+				if (get.is.phoneLayout()) dialog.classList.add("fullheight");
 				let types = ["basic", "trick", "equip"].concat(Object.keys(storage).map(list => list.split("+")[1])).toUniqued();
 				let suits = lib.suit
 					.slice()
@@ -1171,10 +1168,10 @@ const skills = {
 					.set(
 						"dying",
 						player.hp +
-							player.countCards("hs", {
-								name: ["tao", "jiu"],
-							}) <
-							1
+						player.countCards("hs", {
+							name: ["tao", "jiu"],
+						}) <
+						1
 					)
 					.set("num", event.num1);
 			} else event.finish();
@@ -1355,7 +1352,7 @@ const skills = {
 				next.set("_backupevent", "clanfuxun_backup");
 				next.set("custom", {
 					add: {},
-					replace: { window() {} },
+					replace: { window() { } },
 				});
 				next.backup("clanfuxun_backup");
 			}
@@ -2376,10 +2373,10 @@ const skills = {
 					player.countCards("hs", card => {
 						return get.name(card) == "jiu" && player.hasUseTarget(card);
 					}) &&
-						player.countCards("hs", card => {
-							if (get.name(card) != "sha") return false;
-							return game.hasNature(card, "linked");
-						})
+					player.countCards("hs", card => {
+						if (get.name(card) != "sha") return false;
+						return game.hasNature(card, "linked");
+					})
 				);
 			"step 1";
 			if (result.bool) {
@@ -2964,7 +2961,7 @@ const skills = {
 						next.set("_backupevent", "clanshenjun_backup");
 						next.set("custom", {
 							add: {},
-							replace: { window() {} },
+							replace: { window() { } },
 						});
 						next.backup("clanshenjun_backup");
 					}
@@ -3158,7 +3155,7 @@ const skills = {
 				filter(event, player) {
 					return player.getStorage("clanfenchai").length;
 				},
-				content() {},
+				content() { },
 			},
 		},
 		mod: {
@@ -3541,7 +3538,7 @@ const skills = {
 				player.countCards("h", function (card) {
 					return lib.skill.clanyirong.checkx(card) > 0;
 				}) +
-					1 <
+				1 <
 				player.countCards("h") - player.getHandcardLimit()
 			)
 				return 0;

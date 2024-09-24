@@ -55,7 +55,7 @@
 }
 
 .dialog.addNewRow:not(.fullheight) {
-    top: 10% !important;
+    top: 10% ;
     max-height: 55%;
 }
 
