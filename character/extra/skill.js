@@ -7799,7 +7799,6 @@ const skills = {
 				gains.removeArray(player.getCards("h"));
 				if (!pushs.length || pushs.length != gains.length) return;
 				player.addToExpansion(pushs, player, "giveAuto").gaintag.add("qixing");
-				//game.log(player,'将',pushs,'作为“星”置于武将牌上');
 				player.gain(gains, "draw");
 			}
 		},
@@ -7869,7 +7868,6 @@ const skills = {
 				if (!pushs.length || pushs.length != gains.length) return;
 				player.logSkill("qixing2");
 				player.addToExpansion(pushs, player, "giveAuto").gaintag.add("qixing");
-				game.log(player, "将", pushs, "作为“星”置于武将牌上");
 				player.gain(gains, "draw");
 			}
 		},

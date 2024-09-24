@@ -9282,6 +9282,11 @@ const skills = {
 				forced: true,
 				popup: false,
 				charlotte: true,
+				filter(event) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
+					return true;
+				},
 				content: function () {
 					player.removeSkill("jsrgfendi_blocker");
 				},

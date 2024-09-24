@@ -1830,7 +1830,7 @@ const skills = {
 						{ item: target.getCards('h', { suit: 'club' }), ratio: 3 },
 					);
 					if (target.hasCard({ suit: "none" }, 'h')) {
-						dialog.classList.add( 'fullheight' );
+						dialog.classList.add('fullheight');
 						dialog.addNewRow(
 							{ item: get.translation('none'), retio: 1 },
 							{ item: target.getCards('h', { suit: 'none' }), ratio: 8 },
@@ -5347,6 +5347,8 @@ const skills = {
 					delete player.storage.scschihe_blocker;
 				},
 				filter: function (event, player) {
+					const evt = event.getParent("useCard", true, true);
+					if (evt && evt.effectedCount < evt.effectCount) return false;
 					if (!event.card || !player.storage.scschihe_block) return false;
 					for (var i of player.storage.scschihe_block) {
 						if (i[0] == event.card) return true;
@@ -7111,7 +7113,7 @@ const skills = {
 				var list = ["《诗经》", "《尚书》", "《仪礼》", "《易经》", "《乐经》", "《春秋》"];
 				var desc = ["伤害类锦囊牌", "基本牌", "无懈可击", "无中生有", "乐不思蜀", "装备牌"];
 				const addNewRow = lib.element.dialog.addNewRow.bind(dialog);
-				dialog.css({ width: "60%" });
+				dialog.css({ width: "60%", });
 				for (var i = 0; i < 6; i++) {
 					var card = lib.skill.chengye.getLiujing(player, i);
 					(i <= 2 ? list1 : list2).addArray([
@@ -11290,7 +11292,7 @@ const skills = {
 					player.skip("phaseUse");
 					player.skip("phaseDiscard");
 					break;
-					
+
 				default:
 					break;
 			}
