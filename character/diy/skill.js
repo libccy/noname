@@ -7467,13 +7467,8 @@ const skills = {
 		content() {
 			"step 0";
 			player
-				.chooseToDiscard("he", true, [1, 4], function (card, player) {
-					if (!ui.selected.cards.length) return true;
-					var suit = get.suit(card, player);
-					for (var i of ui.selected.cards) {
-						if (get.suit(i, player) == suit) return false;
-					}
-					return true;
+				.chooseToDiscard("he", true, [1, player.getCards("he").reduce((list, card) => list.add(get.suit(card, player)), []).length], function (card, player) {
+					return !ui.selected.cards.reduce((list, card) => list.add(get.suit(card, player)), []).includes(get.suit(card, player));
 				})
 				.set("complexCard", true)
 				.set("ai", function (card) {
