@@ -401,7 +401,7 @@ const skills = {
 	},
 	//谋孙坚
 	olsbhulie: {
-		audio: 2,
+		audio: 3,
 		trigger: {
 			player: "useCardToPlayered",
 		},
@@ -448,7 +448,7 @@ const skills = {
 		},
 	},
 	olsbyipo: {
-		audio: 2,
+		audio: 3,
 		trigger: {
 			player: "changeHp",
 		},
