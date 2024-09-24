@@ -4560,6 +4560,9 @@ export class Get extends GetCompatible {
 			if (uiintro.content.firstChild) {
 				uiintro.content.firstChild.style.paddingTop = "3px";
 			}
+		} else if (node.classList.contains("nodeintro")) {
+			if (node.nodeTitle) uiintro.add(node.nodeTitle);
+			uiintro.add('<div class="text" style="display:inline">' + node.nodeContent + "</div>");
 		}
 		if (lib.config.touchscreen) {
 			lib.setScroll(uiintro.contentContainer);
