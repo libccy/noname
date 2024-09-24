@@ -393,9 +393,11 @@ export class Player extends HTMLDivElement {
 				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
 				player.tips.get(index).css(css);
 
+				let double = player.classList.contains('fullskin2') && lib.config.layout !== 'long2';
+
 				const width = player.node.avatar.clientWidth;
-				let w = width * (player.classList.contains("fullskin2") ? 2 : 1);
-				player.style.setProperty("--w", `${w}px`);
+				let w = width * (double ? 2 : 1);
+				player.style.setProperty('--w', `${w}px`);
 
 				//检查tip的高度，使其不覆盖装备
 				game.callHook("checkTipBottom", [player]);
@@ -443,8 +445,11 @@ export class Player extends HTMLDivElement {
 						player.tips.delete(index);
 					}
 				}
-				if (!player.tips?.size) player.node.tipContainer?.remove();
-				delete player.node.tipContainer;
+				if (!player.tips?.size) {
+					player.node.tipContainer?.remove();
+					delete player.node.tipContainer;
+				}
+
 			},
 			this,
 			index
@@ -1114,10 +1119,10 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					return num + get.numOf(types, type);
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				return num + get.numOf(types, type);
+			}, 0)
 		);
 	}
 	/**
@@ -1146,11 +1151,11 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
-					return num;
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
+				return num;
+			}, 0)
 		);
 	}
 	/**
@@ -1498,11 +1503,11 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @deprecated
 	 */
-	$disableEquip() {}
+	$disableEquip() { }
 	/**
 	 * @deprecated
 	 */
-	$enableEquip() {}
+	$enableEquip() { }
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");
@@ -2235,10 +2240,10 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
 		const equips1 = from.getVCards("e", function (card) {
-				return !card.cards?.some(card => {
-					return ui.selected.cards?.includes(card);
-				});
-			}),
+			return !card.cards?.some(card => {
+				return ui.selected.cards?.includes(card);
+			});
+		}),
 			equips2 = to.getVCards("e", function (card) {
 				return !card.cards?.some(card => {
 					return ui.selected.cards?.includes(card);
