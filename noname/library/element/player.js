@@ -483,7 +483,7 @@ export class Player extends HTMLDivElement {
 	 * 
 	 * when({player: 'xxAfter'}, {global: 'yyBegin'})//合并解析
 	 * @param  {[Signal[]]|Signal[]|SkillTrigger[]} triggerNames 
-	 * @returns {_When}
+	 * @returns {When}
 	 */
 	when(...triggerNames) {
 		const player = this;
