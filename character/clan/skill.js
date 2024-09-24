@@ -3409,37 +3409,29 @@ const skills = {
 		clanSkill: true,
 		content() {
 			"step 0";
-			var skills = player.getSkills(null, false, false).filter(skill => {
-				var info = get.info(skill);
+			let skills = player.getSkills(null, false, false).filter(skill => {
+				let info = get.info(skill);
 				if (!info || info.charlotte || !get.is.locked(skill) || get.skillInfoTranslation(skill, player).length == 0) return false;
 				return true;
 			});
+			let list = [];
+			for (let skill of skills) {
+				list.push([skill, '<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【' + get.translation(skill) + "】</div><div>" + lib.translate[skill + "_info"] + "</div></div>"]);
+			}
 			player
-				.chooseControl(skills, "cancel2")
-				.set(
-					"choiceList",
-					skills.map(i => {
-						return '<div class="skill">【' + get.translation(lib.translate[i + "_ab"] || get.translation(i).slice(0, 2)) + "】</div><div>" + get.skillInfoTranslation(i, player) + "</div>";
-					})
-				)
+				.chooseButton(["蹈节：失去一个锁定技，或点“取消”失去1点体力", [list, "textbutton"]])
 				.set("displayIndex", false)
-				.set("prompt", "蹈节：失去一个锁定技，或点“取消”失去1点体力")
-				.set("ai", () => {
-					var player = _status.event.player,
-						choices = _status.event.controls.slice();
-					var negs = choices.filter(i => {
-						var info = get.info(i);
-						if (!info || !info.ai) return false;
-						return info.ai.neg || info.ai.halfneg;
-					});
-					if (negs.length) return negs.randomGet();
-					if (get.effect(player, { name: "losehp" }, player, player) >= 0) return "cancel2";
-					if (player.hp > 3) return "cancel2";
-					return Math.random() < 0.75 ? "clandaojie" : choices.randomGet();
+				.set("ai", (button) => {
+					const player = get.player();
+					let info = get.info(button.link);
+					if (info?.ai?.neg || info?.ai?.halfneg) return 3;
+					if (get.effect(player, { name: "losehp" }, player, player) >= 0 || player.hp > 3) return 0;
+					if (Math.random() < 0.75 && button.link == "clandaojie") return 2;
+					return 1;
 				});
 			"step 1";
-			if (result.control != "cancel2") {
-				player.removeSkills(result.control);
+			if (result.bool) {
+				player.removeSkills(result.links[0]);
 			} else {
 				player.loseHp();
 			}
