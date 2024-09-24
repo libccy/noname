@@ -393,8 +393,10 @@ export class Player extends HTMLDivElement {
 				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
 				player.tips.get(index).css(css);
 
+				let double = player.classList.contains('fullskin2') && lib.config.layout !== 'long2';
+
 				const width = player.node.avatar.clientWidth;
-				let w = width * (player.classList.contains('fullskin2') ? 2 : 1);
+				let w = width * (double ? 2 : 1);
 				player.style.setProperty('--w', `${w}px`);
 
 				//检查tip的高度，使其不覆盖装备
@@ -444,8 +446,11 @@ export class Player extends HTMLDivElement {
 						player.tips.delete(index);
 					}
 				}
-				if (!player.tips?.size) player.node.tipContainer?.remove();
-				delete player.node.tipContainer;
+				if (!player.tips?.size) {
+					player.node.tipContainer?.remove();
+					delete player.node.tipContainer;
+				}
+
 			},
 			this,
 			index
