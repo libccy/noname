@@ -1,4 +1,68 @@
 const characters = {
+	scl_zhenji: {
+		sex: "female",
+		group: "wei",
+		hp: 3,
+		skills: ["scls_luoshen", "qingguo"],
+		dieAudios: ["re_zhenji"],
+		trashBin: ["character:re_zhenji"]
+	},
+	scl_maliang: {
+		sex: "male",
+		group: "shu",
+		hp: 3,
+		skills: ["scls_zishu", "scls_yingyuan"],
+		dieAudios: ["maliang"],
+		trashBin: ["character:maliang"]
+	},
+	scl_pangdegong: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["scls_yinshi", "scls_pingcai"],
+		dieAudios: ["pangdegong"],
+		trashBin: ["character:pangdegong"]
+	},
+	scl_sunhanhua: {
+		sex: "female",
+		group: "wu",
+		hp: 3,
+		skills: ["scls_chongxu", "scls_miaojian", "scls_lianhua"],
+		dieAudios: ["sunhanhua"],
+		trashBin: ["character:sunhanhua"]
+	},
+	scl_miheng: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["scls_kuangcai", "scls_shejian"],
+		dieAudios: ["miheng"],
+		trashBin: ["character:miheng"]
+	},
+	scl_peixiu: {
+		sex: "male",
+		group: "qun",
+		hp: 3,
+		skills: ["xingtu", "scls_juezhi"],
+		dieAudios: ["peixiu"],
+		trashBin: ["character:peixiu"]
+	},
+	scl_caoying: {
+		sex: "female",
+		group: "wei",
+		hp: 4,
+		skills: ["scls_lingren"],
+		dieAudios: ["caoying"],
+		trashBin: ["character:caoying"]
+	},
+	scl_luotong: {
+		sex: "male",
+		group: "wu",
+		hp: 4,
+		skills: ["scls_qinzheng"],
+		dieAudios: ["luotong"],
+		trashBin: ["character:luotong"]
+	},
 	ty_anyingx: ["male", "qun", 4, ["tyzhuiling", "tyxihun", "tyxianqi", "tyfansheng"]],
 	ty_anying: ["male", "qun", 4 , ["tyliupo", "tyzhuiling", "tyxihun", "tyxianqi"]],
 	ty_wuque: ["male", "qun", 4 , ["tyansha", "tycangshen", "tyxiongren"]],

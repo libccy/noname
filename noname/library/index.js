@@ -14037,6 +14037,20 @@ export class Library {
 				nature: "black",
 			},
 		],
+		[
+			"SCL",
+			{
+				getSpan: () => {
+					const span = document.createElement("span"),
+						style = span.style;
+					style.writingMode = style.webkitWritingMode = "horizontal-tb";
+					style.fontFamily = "MotoyaLMaru";
+					style.transform = "scaleY(0.85)";
+					span.textContent = "SCL";
+					return span.outerHTML;
+				},
+			},
+		],
 	]);
 	groupnature = {
 		shen: "shen",

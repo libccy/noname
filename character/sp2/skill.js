@@ -11602,33 +11602,32 @@ const skills = {
 		trigger: {
 			player: "phaseZhunbeiBegin",
 		},
-		direct: true,
 		filter: function (event, player) {
 			return game.hasPlayer(function (current) {
 				return current != player && current.hp <= player.hp;
 			});
 		},
-		content: function () {
-			"step 0";
-			player
-				.chooseTarget(get.prompt("xinfu_langxi"), "对一名体力值不大于你的其他角色造成0-2点随机伤害", function (card, player, target) {
-					return target.hp <= player.hp && target != player;
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt(event.name.slice(0, -5)), "对一名体力值不大于你的其他角色造成0-2点随机伤害", (card, player, target) => {
+					return target !== player && target.hp <= player.hp;
 				})
-				.set("ai", function (target) {
-					var player = _status.event.player;
+				.set("ai", target => {
+					const player = get.event().player, att = get.attitude(player, target);
+					if (att > 0) return 0;
 					return get.damageEffect(target, player, player);
-				});
-			"step 1";
-			if (result.bool && result.targets && result.targets.length) {
-				player.logSkill("xinfu_langxi", result.targets);
-				var num = [1, 2, 0].randomGet();
-				if (get.isLuckyStar(player)) num = 2;
-				player.line(result.targets[0], "green");
-				result.targets[0].damage(num);
-			}
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			if (get.mode() !== "identity" || player.identity !== "nei") player.addExpose(0.3);
+			event.num = get.rand(1, 6);
+			const num = Math.ceil(event.num / 2 - 1);
+			player.popup(num ? get.cnNumber(num) + "点" : "🐏袭");
+			await target.damage(Math.ceil(event.num / 2 - 1));
 		},
 		ai: {
-			expose: 0.25,
 			threaten: 1.7,
 		},
 	},
