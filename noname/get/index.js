@@ -369,10 +369,10 @@ export class Get extends GetCompatible {
 	}
 	/**
 	 * 用于获取武将的姓氏和名字
-	 * @param { string } str
-	 * @param { string|undefined } defaultSurname
-	 * @param { string|undefined } defaultName
-	 * @returns { Array }
+	 * @param { string } str 武将ID
+	 * @param { string | undefined } defaultSurname 默认姓氏
+	 * @param { string | undefined } defaultName 默认名字，为空则设“某”
+	 * @returns { Array } 返回由[姓氏, 名字]组成的数组
 	 */
 	characterSurname(str, defaultSurname, defaultName) {
 		const info = get.character(str).names;

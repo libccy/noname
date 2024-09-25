@@ -52,6 +52,7 @@ window.noname_character_rank = {
 		"jd_simayan",
 	],
 	ap: [
+		"scl_miheng",
 		"zhugejing",
 		"xia_guanyu",
 		"ol_sb_yuanshao",
@@ -160,6 +161,8 @@ window.noname_character_rank = {
 		"mb_sp_zhenji",
 	],
 	a: [
+		"scl_caoying",
+		"scl_luotong",
 		"dc_mateng",
 		"dc_jiangqing",
 		"dc_tianfeng",
@@ -428,6 +431,8 @@ window.noname_character_rank = {
 		"wangkuang",
 	],
 	am: [
+		"scl_pangdegong",
+		"scl_peixiu",
 		"dc_sb_chengyu",
 		"jx_shen_caoren",
 		"jx_shen_liubiao",
@@ -768,6 +773,9 @@ window.noname_character_rank = {
 		"new_simayi",
 	],
 	bp: [
+		"scl_zhenji",
+		"scl_maliang",
+		"scl_sunhanhua",
 		"ty_anying",
 		"ty_anyingx",
 		"ty_wuque",
@@ -2153,6 +2161,9 @@ window.noname_character_rank = {
 			"jd_simayan",
 		],
 		epic: [
+			"scl_miheng",
+			"scl_caoying",
+			"scl_luotong",
 			"old_jiakui",
 			"ty_anying",
 			"ty_anyingx",
@@ -2505,6 +2516,11 @@ window.noname_character_rank = {
 			"wangkuang",
 		],
 		rare: [
+			"scl_pangdegong",
+			"scl_peixiu",
+			"scl_zhenji",
+			"scl_maliang",
+			"scl_sunhanhua",
 			"dc_mateng",
 			"dc_jiangqing",
 			"dc_tianfeng",

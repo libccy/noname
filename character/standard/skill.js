@@ -612,13 +612,15 @@ const skills = {
 						}
 					}
 					if (event.cards.length) {
+						// 异步函数最后一个Promise事件可以省略await
 						player.gain(event.cards, "gain2");
 					}
 					return;
 				}
 				if (!bool) {
 					if (event.cards.length) {
-						player.gain(event.cards, "gain2");
+						// 但还是建议加上
+						await player.gain(event.cards, "gain2");
 					}
 					return;
 				}

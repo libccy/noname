@@ -845,17 +845,8 @@ export class Game extends GameCompatible {
 		return next;
 	}
 	/**
-	 * @overload
-	 * @returns { void }
-	 */
-	/**
-	 * @overload
-	 * @param { Card } cards
-	 * @returns { GameEventPromise }
-	 */
-	/**
-	 * @overload
-	 * @param {Card[]} cards
+	 * 将cards移动到处理区
+	 * @param { Card[] | Card } cards
 	 * @returns { GameEventPromise }
 	 */
 	cardsGotoOrdering(cards) {
