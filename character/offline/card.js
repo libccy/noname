@@ -1,6 +1,30 @@
 import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 const cards = {
+	sclc_wolong: {
+		type: "takaramono",
+		fullskin: true,
+		cardimage: "wolong_card",
+		//derivation:"scl_pangdegong",
+	},
+	sclc_fengchu: {
+		type: "takaramono",
+		fullskin: true,
+		cardimage: "fengchu_card",
+		//derivation:"scl_pangdegong",
+	},
+	sclc_shuijing: {
+		fullskin: true,
+		type: "takaramono",
+		cardimage: "shuijing_card",
+		//derivation:"scl_pangdegong",
+	},
+	sclc_xuanjian: {
+		fullskin: true,
+		type: "takaramono",
+		cardimage: "xuanjian_card",
+		//derivation:"scl_pangdegong",
+	},
 	yanxiao_card: {
 		type: "special_delay",
 		fullimage: true,

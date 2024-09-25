@@ -206,6 +206,7 @@ const skills = {
 	scls_pingcai: {
 		audio: ["xinfu_pingcai", 5],
 		enable: "phaseUse",
+		usable: 1,
 		filterCard: true,
 		selectCard() {
 			if (get.mode() === "doudizhu") return 0;
@@ -252,7 +253,9 @@ const skills = {
 			});
 			const result = await player
 				//斗地主有四名角色？
-				.chooseTarget("请选择至多" + (ingame ? "四名" : "三名") + "要横置的角色", ingame ? [1, 4] : [1, 3], true)
+				.chooseTarget("请选择至多" + (ingame ? "四名" : "三名") + "要横置的角色", ingame ? [1, 4] : [1, 3], (card, player, target) => {
+					return !target.isLinked();
+				}, true)
 				.set("ai", target => {
 					const player = get.event("player");
 					return get.effect(target, { name: "tiesuo" }, player, player);
@@ -402,6 +405,7 @@ const skills = {
 				.forResult();
 			if (result.bool && result.targets.length) {
 				player.line(result.targets, "thunder");
+				const target = result.targets[0];
 				await target.draw();
 				await target.recover();
 				if (ingame) await player.draw();
@@ -409,13 +413,13 @@ const skills = {
 		},
 		takaramonoValue(name, player) {
 			switch (name) {
-				case 0: case "diamond":
+				case "sclc_wolong": case "diamond":
 					return Math.max(...game.filterPlayer(cur => {
 						return cur !== player;
 					}).map(tar => {
 						return get.damageEffect(tar, player, player);
 					}));
-				case 1: case "club":
+				case "sclc_fengchu": case "club":
 					return game.filterPlayer(cur => {
 							return cur !== player && !cur.isLinked();
 						})
@@ -425,10 +429,10 @@ const skills = {
 						.sort((a, b) => b - a)
 						.slice(0, 3)
 						.reduce((acc, val) => acc + val, 0);
-				case 2: case "spade":
+				case "sclc_shuijing": case "spade":
 					if (player.canMoveCard(true)) return 12;
 					return 0;
-				case 3: case "heart":
+				case "sclc_xuanjian": case "heart":
 					return Math.max(...game.filterPlayer().map(tar => {
 						return get.recoverEffect(tar, player, player) + get.effect(tar, { name: "draw" }, player, player);
 					}));
@@ -436,7 +440,6 @@ const skills = {
 					return 0;
 			}
 		},
-		takaramonoCard: ["wolong_card", "fengchu_card", "shuijing_card", "xuanjian_card"],
 		logAudio(event, player) {
 			const suit = get.suit(event.cards[0], player);
 			switch (suit) {
@@ -454,21 +457,16 @@ const skills = {
 					.chooseButton([
 						"评才：选择你要擦拭的宝物",
 						[
-							lib.skill.scls_pingcai.takaramonoCard.map(name => ["", "", name]),
+							lib.skill.scls_pingcai.derivation.map(name => ["", "", name]),
 							"vcard"
 						]
 					])
 					.set("ai", button => {
-						return lib.skill.scls_pingcai.takaramonoValue(
-							lib.skill.scls_pingcai.takaramonoCard.indexOf(result.links[0][2]),
-							get.event("player")
-						);
+						return lib.skill.scls_pingcai.takaramonoValue(button.link[2], get.event("player"));
 					})
 					.forResult();
 				if (!result.bool) return;
-				name = lib.skill.scls_pingcai.derivation[
-					lib.skill.scls_pingcai.takaramonoCard.indexOf(result.links[0][2])
-				];
+				name = result.links[0][2];
 			}
 			else {
 				await player.showCards(event.cards);
@@ -844,7 +842,7 @@ const skills = {
 			player: "useCardToPlayered",
 		},
 		filter(event, player) {
-			if (!player.isPhaseUsing() || player.countSkill("scls_lingren")) return false;
+			if (!player.isPhaseUsing() || player.hasSkill("scls_lingren_used")) return false;
 			if (event.getParent().triggeredTargets3.length > 1) return false;
 			if (event.card.name === "sha") return true;
 			return get.tag(event.card, "damage") && get.type(event.card) === "trick";
@@ -862,6 +860,7 @@ const skills = {
 				.forResult();
 		},
 		async content(event, trigger, player) {
+			player.addTempSkill("scls_lingren_used", "phaseUseAfter");
 			const target = event.targets[0];
 			const result = await player.chooseButton(["凌人：猜测其有哪些类别的手牌", [["basic", "trick", "equip"], "vcard"]], [0, 3], true)
 				.set("ai", button => {
@@ -889,30 +888,19 @@ const skills = {
 			["basic", "trick", "equip"].forEach(type => {
 				if (choices.includes(type) === target.hasCard(card => get.type2(card, target) === type, "h")) num++;
 			});
-			player.popup("猜对" + get.cnNumber(event.num) + "项");
-			game.log(player, "猜对了" + get.cnNumber(event.num) + "项");
+			player.popup("猜对" + get.cnNumber(num) + "项");
+			game.log(player, "猜对了" + get.cnNumber(num) + "项");
 			switch (num) {
 				case 3:
 					player.addTempSkills(["scls_lingren_jianxiong", "scls_lingren_xingshang"], { player: "phaseBegin" });
 				case 2:
 					target.addTempSkill("lingren_adddamage");
-				target.storage.lingren = {
-					card: trigger.card,
-					//player:event.targett,
-				};
-			}
-			if (num > 0) {
-				target.addTempSkill("lingren_adddamage");
-				target.storage.lingren = {
-					card: trigger.card,
-					//player:event.targett,
-				};
-			}
-			if (event.num > 1) player.draw(2);
-			if (event.num > 2) {
-				player.addTempSkills(["scls_lingren_jianxiong", "scls_lingren_xingshang"], {
-					player: "phaseBegin",
-				});
+					target.storage.lingren = {
+						card: trigger.card,
+						//player:event.targett,
+					};
+				case 1:
+					await player.draw(2);
 			}
 		},
 		ai: {
@@ -935,6 +923,9 @@ const skills = {
 				},
 				inherit: 'xingshang'
 			},
+			used: {
+				charlotte: true,
+			},
 		},
 	},
 	scls_qinzheng: {
@@ -949,9 +940,9 @@ const skills = {
 		forced: true,
 		async content(event, trigger, player) {
 			let num = 0, total = player.getAllHistory("useCard").length + player.getAllHistory("respond").length;
-			if (num % 3 === 0) num++;
-			if (num % 5 === 0) num++;
-			if (num % 8 === 0) num++;
+			if (total % 3 === 0) num++;
+			if (total % 5 === 0) num++;
+			if (total % 8 === 0) num++;
 			if (num) await player.draw(num);
 		},
 		group: "scls_qinzheng_count",
