@@ -378,7 +378,7 @@ export class Player extends HTMLDivElement {
 	 * 设置提示文字，有则更改，无则加之。
 	 * @param {string} index 给标记起一个名字，名字任意
 	 * @param {string} message 设置提示标记的内容
-	 * @param { SkillTrigger | string | boolean | (event:GameEventPromise, player:Player, name:string) => boolean } isTemp 确定失去的时间阶段，不填则不失去
+	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 确定失去的时间阶段，不填则不失去
 	 * @param { object } [css] 自定义的样式
 	 * @returns { HTMLDivElement }
 	 * @author Curpond
@@ -473,24 +473,21 @@ export class Player extends HTMLDivElement {
 		this.markSkill("stratagem_fury");
 	}
 	/**
-	 * version 1.7
-	 *
-	 * 链式创建一次性技能的api。
-	 *
-	 * 使用者只需要关注技能的效果，而不是技能的本身。
-	 *
-	 * v1.7 可传递作用域
-	 * @example
-	 * ```js
-	 * (function () {
-	 * 	let _var = 1;
-	 * 	let me = player;
-	 * 	player.when('drawAfter')
-	 * 		.apply(code => eval(code))
-	 * 		.then(() => console.log(_var))
-	 * 		.then('me.gainMaxHp(5)');
-	 * })();
-	 * ```
+	 * 
+	 * 链式创建一次性的API。
+	 * 
+	 * 使用者只需关注技能的效果，而不是技能本身
+	 * 
+	 *  @example
+	 * when('xxx') when([xxx1,xxx2])//均会被解析为：player:xxx或player:[xxx1,xxx2]
+	 * 
+	 * when({player:xxx})或when({gloal:[xxx]})//对象类型将直接应用
+	 * 
+	 * when(xxx1,xxx2)//解析为player:[xxx1,xxx2]
+	 * 
+	 * when({player: 'xxAfter'}, {global: 'yyBegin'})//合并解析
+	 * @param  {[Signal[]]|Signal[]|SkillTrigger[]} triggerNames 
+	 * @returns {When}
 	 */
 	when(...triggerNames) {
 		const player = this;
@@ -8652,6 +8649,12 @@ export class Player extends HTMLDivElement {
 		}
 		return skill;
 	}
+	/**
+	 * 
+	 * @param {SAAType<string>} skillsToAdd 
+	 * @param {SAAType<Signal>|SkillTrigger} [expire] 
+	 * @returns 
+	 */
 	addTempSkills(skillsToAdd, expire) {
 		//请注意，该方法的底层实现并非tempSkill，而是additionalSkills和player.when！
 		if (typeof skillsToAdd == "string") skillsToAdd = [skillsToAdd];
@@ -8696,7 +8699,7 @@ export class Player extends HTMLDivElement {
 	 * 添加临时技能
 	 * @overload
 	 * @param { string | string[] } skill 技能名(数组)
-	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
+	 * @param { SkillTrigger |SAAType<Signal> } [expire]
 	 * @param { boolean } [checkConflict]
 	 */
 	addTempSkill(skill, expire, checkConflict) {
