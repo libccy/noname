@@ -858,7 +858,7 @@ const skills = {
 			global: "dying",
 		},
 		filter(event, player) {
-			return event.player.hp <= 0 && event.player.countCards("hej") > 0;
+			return event.player.hp <= 0 && event.player.countCards("he") > 0;
 		},
 		logTarget: "player",
 		async cost(event, trigger, player) {
@@ -867,12 +867,12 @@ const skills = {
 			if (trigger.player.isUnderControl(true, player)) {
 				check = player.hasCard(card => {
 					return get.type(card) != "basic";
-				}, "hej");
+				}, "he");
 			} else {
 				check = get.attitude(player, target) > 0;
 			}
 			event.result = await player
-				.choosePlayerCard(target, get.prompt(event.name.slice(0, -5), target), "hej")
+				.choosePlayerCard(target, get.prompt(event.name.slice(0, -5), target), "he")
 				.set("ai", button => {
 					if (!get.event().check) return 0;
 					if (get.event().target.isUnderControl(true, get.player())) {

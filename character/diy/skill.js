@@ -7466,8 +7466,9 @@ const skills = {
 		},
 		content() {
 			"step 0";
+			const num = player.getCards("h").reduce((arr, card) => arr.add(get.suit(card, player)), []).length;
 			player
-				.chooseToDiscard("he", true, [1, Infinity], function (card, player) {
+				.chooseToDiscard("he", true, [1, num], function (card, player) {
 					if (!ui.selected.cards.length) return true;
 					var suit = get.suit(card, player);
 					for (var i of ui.selected.cards) {
@@ -7483,7 +7484,7 @@ const skills = {
 			"step 1";
 			if (result.bool) {
 				var skills = lib.skill.junkyuheng.derivation.randomGets(result.cards.length);
-				player.addAdditionalSkills("junkyuheng", skills);
+				player.addAdditionalSkills("junkyuheng", skills, true);
 			}
 		},
 		group: "junkyuheng_remove",
