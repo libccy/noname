@@ -5989,7 +5989,7 @@ export class Game extends GameCompatible {
 
 		if (event.isMine() && game.chess && get.config("show_distance") && game.me) {
 			const players = game.players.slice();
-			if (event.deadTarget) players.addArray(game.dead);
+			if (event.deadTarget || (event.skill && get.info(event.skill)?.deadTarget)) players.addArray(game.dead);
 			players.forEach(player => {
 				if (player === game.me) return player.node.action.hide();
 				player.node.action.show();
@@ -6023,8 +6023,7 @@ export class Game extends GameCompatible {
 	uncheck(...args) {
 		if (args.length === 0) args = ["button", "card", "target"];
 		const event = _status.event;
-		const players = game.players.slice();
-		if (_status.event.deadTarget) players.addArray(game.dead);
+		const players = game.players.slice().concat(game.dead);
 
 		game.callHook("uncheckBegin", [event, args]);
 

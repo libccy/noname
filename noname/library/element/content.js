@@ -7689,7 +7689,7 @@ export const Content = {
 			}
 		}
 		var info = get.info(event.skill);
-		if ((targets[num] && targets[num].isDead()) || (targets[num] && targets[num].isOut()) || (targets[num] && targets[num].removed)) {
+		if ((targets[num] && targets[num].isDead() && !info?.deadTarget) || (targets[num] && targets[num].isOut() && !info?.includeOut) || (targets[num] && targets[num].removed)) {
 			if (!info.multitarget && num < targets.length - 1) {
 				event.num++;
 				event.redo();
