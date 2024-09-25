@@ -16632,7 +16632,7 @@ const skills = {
 			prompt += "要横置的角色";
 			var range = ingame ? [1, 4] : [1, 3];
 			player.chooseTarget(prompt, range, (card, player, target) => {
-				return target.isLinked();
+				return !target.isLinked();
 			}).set("ai", function (target) {
 				var player = _status.event.player;
 				return get.effect(target, { name: "tiesuo" }, player, player);
