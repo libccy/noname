@@ -812,7 +812,7 @@ const skills = {
 					.chooseButton(["拥族：请选择一项执行", [list.filter(effect => choosed !== effect[0][0]), "textbutton"]], true)
 					.set("filterButton", button => {
 						const effect = button.link[1];
-						return !effect.filter || effect.filter(current);
+						return !effect.filter || effect.filter(get.player());
 					})
 					.set("ai", button => {
 						const effect = button.link[1];
