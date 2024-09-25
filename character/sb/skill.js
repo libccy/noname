@@ -6759,6 +6759,9 @@ const skills = {
 			combo: "sbjushou",
 			order: 8,
 			result: {
+				player(player, target) {
+					return player.hujia - 3.6;
+				},
 				target: -1,
 			},
 		},
