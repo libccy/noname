@@ -242,12 +242,12 @@
     position: absolute;
     box-sizing: border-box;
     width: 100%;
-    bottom: max(46%, var(--bottom, 46%));
+    bottom: max(48%, var(--bottom, 46%));
     height: fit-content;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    z-index: 3;
+    z-index: 2;
 }
 
 .player[data-position="0"] .tipContainer {

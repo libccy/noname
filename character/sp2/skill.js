@@ -5716,7 +5716,7 @@ const skills = {
 			var skill = result.control;
 			if (skill != "cancel2") {
 				event.skills.remove(skill);
-				target.addAdditionalSkills("jinghe_" + player.playerid, skill);
+				target.addAdditionalSkills("jinghe_" + player.playerid, skill, true);
 				target.popup(skill);
 			}
 			if (event.num < event.targets.length) event.goto(1);

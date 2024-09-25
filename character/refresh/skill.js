@@ -10680,7 +10680,7 @@ const skills = {
 			player.removeMark(event.name, event.count, false);
 			"step 1";
 			event.count--;
-			player.chooseToDiscard("是否弃置一张牌并令一名其他角色进行一个额外回合？").set("logSkill", "olfangquan").ai = function (card) {
+			player.chooseToDiscard("是否弃置一张手牌并令一名其他角色进行一个额外回合？").set("logSkill", "olfangquan").ai = function (card) {
 				return 20 - get.value(card);
 			};
 			"step 2";

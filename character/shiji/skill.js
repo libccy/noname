@@ -1497,8 +1497,9 @@ const skills = {
 			}
 			"step 1";
 			if (result.bool) num += result.cards.length;
-			if (event.num > 2) player.loseHp();
 			player.draw(num);
+			"step 2"
+			if (event.num > 2) player.loseHp();
 		},
 		mod: {
 			cardEnabled2: function (card, player) {
