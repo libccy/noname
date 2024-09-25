@@ -3450,7 +3450,7 @@ const skills = {
 			return player.countMark("fangquan2") || 1;
 		},
 		async cost(event, trigger, player) {
-			const chooseToDiscard = player.chooseToDiscard("是否弃置一张牌并令一名其他角色进行一个额外回合？");
+			const chooseToDiscard = player.chooseToDiscard("是否弃置一张手牌并令一名其他角色进行一个额外回合？");
 			chooseToDiscard.ai = function (card) {
 				return 20 - get.value(card);
 			};
