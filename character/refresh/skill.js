@@ -11787,10 +11787,19 @@ const skills = {
 				player.logSkill("xinleiji");
 				player.recover();
 			}
-			player.chooseTarget("雷击：是否对一名角色造成" + event.num + "点雷电伤害？").ai = function (target) {
-				var player = _status.event.player;
-				return get.damageEffect(target, player, player, "thunder");
-			};
+			player.chooseTarget("雷击：是否对一名角色造成" + event.num + "点雷电伤害？").set("ai", target => {
+				const player = _status.event.player;
+				let eff = get.damageEffect(target, player, player, "thunder");
+				if (get.event("num") > 1 && !target.hasSkillTag("filterDamage", null, {
+					player: player,
+					card: null,
+					nature: "thunder"
+				})) {
+					if (eff > 0) eff -= 25;
+					else if (eff < 0) eff *= 2;
+				} 
+				return eff;
+			}).set("num", event.num);
 			"step 1";
 			if (result.bool && result.targets && result.targets.length) {
 				if (!event.logged) player.logSkill("xinleiji", result.targets);
