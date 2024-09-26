@@ -162,6 +162,9 @@ const skills = {
 		check(card) {
 			return 4.5 - get.value(card);
 		},
+		async precontent(event) {
+			event.getParent().addCount = false;
+		},
 		ai: {
 			skillTagFilter(player) {
 				if (!player.countCards("hes")) return false;
