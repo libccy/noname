@@ -2,6 +2,191 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//黄舞蝶
+	dcshuangrui: {
+		audio: 2,
+		trigger: {
+			player: "phaseZhunbeiBegin",
+		},
+		filter(event, player) {
+			return game.hasPlayer(current => {
+				return current != player && player.canUse({ name: "sha", isCard: true}, current, false);
+			});
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2("dcshuangrui"), function(card, player, target) {
+					return target != player && player.canUse({ name: "sha", isCard: true}, target, false);
+				})
+				.set("ai", target => {
+					const player = get.player(),
+						card = { name: "sha", isCard: true };
+					return get.effect(target, card, player, player);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0];
+			let directHit = [],
+				baseDamage = 1;
+			if (player.inRange(target)) {
+				baseDamage++;
+				await player.addTempSkills("dcshaxue");
+			}
+			else {
+				directHit.addArray(game.players);
+				await player.addTempSkills("dcshouxing");
+			}
+			await player
+				.useCard({ name: "sha", isCard: true }, target, false)
+				.set("directHit", directHit)
+				.set("baseDamage", baseDamage);
+		},
+		ai: {
+			skillTagFilter(player, tag, arg) {
+				if (!_status.event.getParent("dcshuangrui_cost", true, true)) return false;
+				return !player.inRange(arg.target);
+			},
+			directHit_ai: true,
+		},
+		derivation: ["dcshouxing", "dcshaxue"],
+	},
+	dcfuxie: {
+		audio: 2,
+		enable: "phaseUse",
+		filter(event, player) {
+			return game.hasPlayer(current => current != player && current.countCards("h"));
+		},
+		chooseButton: {
+			dialog() {
+				const dialog = ui.create.dialog("伏械：弃置一张武器牌或失去1个技能");
+				dialog.direct = true;
+				return dialog;
+			},
+			chooseControl(event, player) {
+				let list = player.getSkills(null, false, false).filter(skill => {
+					let info = get.info(skill);
+					if (!info || info.charlotte || get.skillInfoTranslation(skill, player).length == 0) return false;
+					return true;
+				});
+				if (player.countCards("he", card => get.subtype(card) == "equip1")) list.unshift("弃置武器牌");
+				list.push("cancel2");
+				return list;
+			},
+			check() {
+				const player = get.player(),
+					list = get.event("controls").slice(0);
+				let getv = function(button, player) {
+					if (button == "弃置武器牌") {
+						if (player.countCards("he", card => get.subtype(card) == "equip1" && get.value(card) < 10)) return 3;
+						return 1;
+					}
+					if (["dcshouxing", "dcshaxue"].includes(button)) return 4;
+					return 2;
+				};
+				const result = list.sort((a, b) => getv(b, player) - getv(a, player))[0];
+				return result;
+			},
+			backup(result, player) {
+				return {
+					audio: "dcfuxie",
+					choice: result.control,
+					filterCard(card) {
+						const { choice } = get.info("dcfuxie_backup");
+						if (choice == "弃置武器牌") return get.subtype(card) == "equip1" && lib.filter.cardDiscardable(card, player, "dcfuxie");
+						return false;
+					},
+					position: "he",
+					selectCard() {
+						const { choice } = get.info("dcfuxie_backup");
+						if (choice == "弃置武器牌") return 1;
+						return -1;
+					},
+					filterTarget(card, player, target) {
+						return target != player && target.countCards("h");
+					},
+					async content(event, trigger, player) {
+						const { choice } = get.info("dcfuxie_backup");
+						if (choice == "弃置武器牌") await player.discard(event.cards);
+						else await player.removeSkills(choice);
+						const target = event.target;
+						await target.chooseToDiscard(2, true, "h");
+					},
+					ai1(card) {
+						return 10 - get.value(card);
+					},
+					ai2(target) {
+						const player = get.player();
+						return get.effect(target, { name: "guohe_copy2" }, player, player);
+					},
+				};
+			},
+			prompt(result, player) {
+				let prompt = result.control == "弃置武器牌" ? "弃置一张武器牌" : `失去【${get.translation(result.control)}】`;
+				return `${prompt}，令一名角色弃置两张手牌`;
+			},
+		},
+		subSkill: {
+			backup: {},
+		},
+		ai: {
+			order: 3,
+			result: {
+				player(player, target) {
+					if (["dcshouxing", "dcshaxue"].some(skill => player.hasSkill(skill))) return 1;
+					if (player.countCards("he", card => get.subtype(card) == "equip1")) return 1;
+					return 0;
+				},
+			},
+		},
+	},
+	dcshouxing: {
+		audio: 2,
+		enable: "chooseToUse",
+		filterCard: true,
+		selectCard: [1, Infinity],
+		position: "hse",
+		viewAs: { name: "sha" },
+		viewAsFilter(player) {
+			if (!player.countCards("hse")) return false;
+		},
+		filterTarget(card, player, target) {
+			const cards = ui.selected.cards;
+			if (!cards || !cards.length) return false;
+			if (player.inRange(target)) return false;
+			if (get.distance(player, target) != cards.length) return false;
+			return lib.filter.targetEnabled(card, player, target);
+		},
+		complexSelect: true,
+		prompt: "将X张牌当杀对一名攻击范围外的角色使用（X为你计算与其的距离）",
+		check(card) {
+			return 4.5 - get.value(card);
+		},
+		ai: {
+			skillTagFilter(player) {
+				if (!player.countCards("hes")) return false;
+			},
+			respondSha: true,
+		},
+	},
+	dcshaxue: {
+		audio: 2,
+		trigger: {
+			source: "damageSource",
+		},
+		filter(event, player) {
+			return event.player != player;
+		},
+		check(event, player) {
+			return get.distance(player, event.player) <= 2;
+		},
+		logTarget: "player",
+		async content(event, trigger, player) {
+			await player.draw(2);
+			const num = get.distance(player, trigger.player);
+			if (num > 0) await player.chooseToDiscard(num, "he", true);
+		},
+	},
 	//马腾
 	dcxiongyi: {
 		skillAnimation: true,
