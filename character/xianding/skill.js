@@ -1182,6 +1182,7 @@ const skills = {
 			next.gaintag.add("dcyanzuo");
 			await next;
 			const cards = player.getExpansions("dcyanzuo").filter(i => ["trick", "basic"].includes(get.type(i)));
+			if (!cards.length) return;
 			const result = await player
 				.chooseButton(["是否视为使用其中一张牌？", cards])
 				.set("filterButton", button => {
