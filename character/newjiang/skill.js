@@ -381,27 +381,25 @@ const skills = {
 				}
 				else player.flashAvatar("zhinang", map[type][skill])
 				player.popup(skill);
+				if (player.hasSkill(skill, null, null, false)) await player.removeSkills(skill);
 				await player.addSkills(skill);
 			}
 		},
 	},
 	gouzhu: {
 		trigger: {
-			player: ["useSkillAfter", "logSkill"],
+			player: "changeSkillsAfter",
 		},
-		filter(event, player) {
-			if (["global", "equip"].includes(event.type)) return false;
-			let skill = get.sourceSkillFor(event);
-			if (!skill || skill == "gouzhu") return false;
-			let info = get.info(skill);
-			while (true) {
-				if (!info || info.charlotte || info.equipSkill) return false;
-				if (info && !info.sourceSkill) break;
-				skill = info.sourceSkill;
-				info = get.info(skill);
-			}
+		filter(_1, player, _3, skill) {
 			let list = get.skillCategoriesOf(skill, player);
 			return list.length && list.some(item => item in lib.skill.gouzhu.effectMap);
+		},
+		getIndex(event, player) {
+			if (!event.removeSkill.length) return false;
+			return event.removeSkill;
+		},
+		prompt(_1, _2, _3, skill) {
+			return `失去了技能【${get.translation(skill)}】，是否发动【苟渚】？`;
 		},
 		frequent: true,
 		effectMap: {
@@ -426,7 +424,7 @@ const skills = {
 				let player = _status.event.player;
 				player.addMark("gouzhu", 1, false);
 				game.log(player, '手牌上限+1');
-				await game.asyncDelay();
+				await game.delay();
 			},
 			"主公技": async function () {
 				let player = _status.event.player;
@@ -444,13 +442,7 @@ const skills = {
 		locked: false,
 		onremove: true,
 		async content(event, trigger, player) {
-			let skill = get.sourceSkillFor(trigger),
-				info = get.info(skill);
-			while (true) {
-				if (info && !info.sourceSkill) break;
-				skill = info.sourceSkill;
-				info = get.info(skill);
-			}
+			let skill = event.indexedData;
 			let list = get.skillCategoriesOf(skill, player);
 			for (const item of list) {
 				if (item in lib.skill.gouzhu.effectMap) {
