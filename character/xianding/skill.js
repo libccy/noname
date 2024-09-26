@@ -1160,14 +1160,19 @@ const skills = {
 		filter(event, player) {
 			var count = player.getStat("skill").dcyanzuo;
 			if (count && count > player.countMark("dcyanzuo_zuyin")) return false;
-			return player.countCards("he", card => ["trick", "basic"].includes(get.type(card, player)));
+			return player.countCards("he");
 		},
-		filterCard(card, player) {
-			return ["trick", "basic"].includes(get.type(card, player));
-		},
+		filterCard: true,
 		check(card) {
 			const player = _status.event.player;
-			return player.getUseValue(card) + 3;
+			let val = ["trick", "basic"].includes(get.type(card, player)) ? player.getUseValue(card) : 0, now = 0;
+			player.getExpansions("dcyanzuo").forEach(i => {
+				if (!["trick", "basic"].includes(get.type(i))) return;
+				now = Math.max(now, player.getUseValue(i));
+			});
+			if (val > now) return val + 3;
+			if (now <= 0) return val;
+			return now * 2 - get.value(card);
 		},
 		position: "he",
 		lose: false,
@@ -1176,7 +1181,8 @@ const skills = {
 			const next = player.addToExpansion(event.cards, player, "give");
 			next.gaintag.add("dcyanzuo");
 			await next;
-			const cards = player.getExpansions("dcyanzuo");
+			const cards = player.getExpansions("dcyanzuo").filter(i => ["trick", "basic"].includes(get.type(i)));
+			if (!cards.length) return;
 			const result = await player
 				.chooseButton(["是否视为使用其中一张牌？", cards])
 				.set("filterButton", button => {
@@ -1184,6 +1190,7 @@ const skills = {
 					const card = {
 						name: get.name(button.link),
 						suit: get.suit(button.link),
+						nature: button.link.nature,
 						isCard: true,
 					};
 					return player.hasUseTarget(card);
@@ -1265,6 +1272,7 @@ const skills = {
 		filter(event, player) {
 			return player.getExpansions("dcyanzuo").length >= game.countPlayer();
 		},
+		locked: true,
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(get.prompt2("dcpijian"))
