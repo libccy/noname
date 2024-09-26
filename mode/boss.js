@@ -5486,14 +5486,16 @@ export default () => {
 				equipSkill: true,
 				inherit: "cixiong_skill",
 				filter: function (event, player) {
-					return game.hasNature(event.card, "linked");
+					return get.natureList(event.card).some(i => {
+						return i === "thunder" || i === "fire";
+					});
 				},
 			},
 			qicaishenlu: {
 				trigger: { source: "damageBegin1" },
 				forced: true,
 				filter: function (event, player) {
-					return game.hasNature(event.card, "linked");
+					return event.hasNature("linked");
 				},
 				content: function () {
 					trigger.num++;
