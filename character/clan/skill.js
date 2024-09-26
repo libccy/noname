@@ -862,16 +862,14 @@ const skills = {
 				onremove: true,
 				intro: {
 					content(storage, player) {
-						var str = "";
+						var infos = [];
 						for (var i = 0; i < storage.length; i++) {
 							var list = storage[i];
 							var strx = ["【杀】", "任意普通锦囊牌"];
 							if (list[1]) strx.reverse();
-							str += "对" + get.translation(list[0]) + "使用" + strx[0] + "后，视为对其使用" + strx[1];
-							str += "<br>";
+							infos.add("对" + get.translation(list[0]) + "使用" + strx[0] + "后，视为对其使用" + strx[1]);
 						}
-						str = str.slice(0, -4);
-						return str;
+						return infos.join("<br>");
 					},
 				},
 				trigger: { player: "useCardAfter" },
@@ -1079,7 +1077,7 @@ const skills = {
 			threaten: 3,
 			effect: {
 				target(card, player, target) {
-					if (!get.tag(card, "damage") || player.hasSkillTag("jueqing", false, target)) return;
+					if (!lib.translate[card.name] || !get.tag(card, "damage") || player.hasSkillTag("jueqing", false, target)) return;
 					let num = get.cardNameLength(card) - target.getDamagedHp();
 					if (num > 0) return [1, 0.8 * num + 0.1];
 				},
