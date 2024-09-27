@@ -557,6 +557,15 @@ const translates = {
 	dc_mateng_prefix: "新杀",
 	dcxiongyi: "雄异",
 	dcxiongyi_info: "限定技，出牌阶段，你可以选择一名其他角色，与其各摸三张牌，然后若你此前未发动过此技能且体力值为全场唯一最少，你恢复1点体力。你进入濒死状态被救回后，此技能视为未发动过。",
+	dc_huangwudie: "黄舞蝶",
+	dcshuangrui: "双锐",
+	dcshuangrui_info: "准备阶段，你可以选择一名其他角色，视为对其使用一张【杀】；若该角色不在你攻击范围内，你令此【杀】不可被响应并获得〖狩星〗，否则你令此【杀】伤害+1并获得〖铩雪〗。",
+	dcfuxie: "伏械",
+	dcfuxie_info: "出牌阶段，你可以弃置一张武器牌或失去1个技能，令一名其他角色弃置两张牌。",
+	dcshouxing: "狩星",
+	dcshouxing_info: "你可以将X张牌当作一张不计入次数限制的【杀】对一名攻击范围外的角色使用（X为你计算与其的距离）。",
+	dcshaxue: "铩雪",
+	dcshaxue_info: "你对其他角色造成伤害后，可以摸两张牌并弃置X张牌（X为你计算与其的距离）。",
 };
 
 export default translates;

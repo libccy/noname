@@ -18429,7 +18429,7 @@ const skills = {
 				if (get.name(card) == "dz_mantianguohai") return true;
 			},
 			cardDiscardable: function (card, player, name) {
-				if (name == "cardsDiscard" && get.name(card) == "dz_mantianguohai") return false;
+				if (name == "phaseDiscard" && get.name(card) == "dz_mantianguohai") return false;
 			},
 		},
 	},

@@ -323,7 +323,7 @@ const skills = {
 			},
 		},
 	},
-	//荀彧荀攸
+	//荀彧荀攸 - 想你了
 	zhinang: {
 		getMap() {
 			if (!_status.zhinang_map) {
@@ -345,7 +345,7 @@ const skills = {
 							if (!info || (info.ai && info.ai.combo)) return;
 							if (skill in _status.zhinang_map) return;
 							if (get.translation(skill).includes("谋")) _status.zhinang_map.name[skill] = name;
-							const voices = game.parseSkillText(skill, name);
+							const voices = get.Audio.skill({ skill, name }).textList;
 							if (voices.some(data => data.includes("谋"))) {
 								_status.zhinang_map.info[skill] = name;
 							}
@@ -361,14 +361,23 @@ const skills = {
 		filter(event, player) {
 			return ["trick", "equip"].includes(get.type2(event.card));
 		},
-		frequent: true,
+		prompt2(event, player) {
+			const type = get.type2(event.card),
+				name = `zhinang_${type}`,
+				skills = player.getRemovableAdditionalSkills(name);
+			let str = `获得一个技能${type == "trick" ? "台词" : "名"}包含“谋”的技能`;
+			if (skills.length) {
+				str = `失去${skills.map(skill => `【${get.translation(skill)}】`)}并${str}`;
+			}
+			return str;
+		},
 		async content(event, trigger, player) {
 			const map = lib.skill.zhinang.getMap(),
 				type = get.type2(trigger.card) == "equip" ? "name" : "info",
 				list = Object.keys(map[type]);
 			if (list.length > 0) {
 				const skill = list.randomGet(),
-					voiceMap = game.parseSkillTextMap(skill, map[type][skill]);
+					voiceMap = get.Audio.skill({ skill, player: map[type][skill] }).audioList;
 				if (type == "info") {
 					findaudio: for (let data of voiceMap) {
 						if (!data.text) continue;
@@ -381,27 +390,34 @@ const skills = {
 				}
 				else player.flashAvatar("zhinang", map[type][skill])
 				player.popup(skill);
-				await player.addSkills(skill);
+				await player.addAdditionalSkills(`zhinang_${get.type2(trigger.card)}`, skill);
 			}
+		},
+		init(player, skill) {
+			player.addSkill(["zhinang_equip", "zhinang_trick"]);
+		},
+		onremove(player, skill) {
+			player.removeSkill(["zhinang_equip", "zhinang_trick"]);
+		},
+		subSkill: {
+			equip: {},
+			trick: {},
 		},
 	},
 	gouzhu: {
 		trigger: {
-			player: ["useSkillAfter", "logSkill"],
+			player: "changeSkillsAfter",
 		},
-		filter(event, player) {
-			if (["global", "equip"].includes(event.type)) return false;
-			let skill = get.sourceSkillFor(event);
-			if (!skill || skill == "gouzhu") return false;
-			let info = get.info(skill);
-			while (true) {
-				if (!info || info.charlotte || info.equipSkill) return false;
-				if (info && !info.sourceSkill) break;
-				skill = info.sourceSkill;
-				info = get.info(skill);
-			}
+		filter(_1, player, _3, skill) {
 			let list = get.skillCategoriesOf(skill, player);
 			return list.length && list.some(item => item in lib.skill.gouzhu.effectMap);
+		},
+		getIndex(event, player) {
+			if (!event.removeSkill.length) return false;
+			return event.removeSkill;
+		},
+		prompt(_1, _2, _3, skill) {
+			return `失去了技能【${get.translation(skill)}】，是否发动【苟渚】？`;
 		},
 		frequent: true,
 		effectMap: {
@@ -426,7 +442,7 @@ const skills = {
 				let player = _status.event.player;
 				player.addMark("gouzhu", 1, false);
 				game.log(player, '手牌上限+1');
-				await game.asyncDelay();
+				await game.delay();
 			},
 			"主公技": async function () {
 				let player = _status.event.player;
@@ -444,13 +460,7 @@ const skills = {
 		locked: false,
 		onremove: true,
 		async content(event, trigger, player) {
-			let skill = get.sourceSkillFor(trigger),
-				info = get.info(skill);
-			while (true) {
-				if (info && !info.sourceSkill) break;
-				skill = info.sourceSkill;
-				info = get.info(skill);
-			}
+			let skill = event.indexedData;
 			let list = get.skillCategoriesOf(skill, player);
 			for (const item of list) {
 				if (item in lib.skill.gouzhu.effectMap) {

@@ -980,6 +980,10 @@ const skills = {
 		usable: 1,
 		filterCard: true,
 		filterTarget: lib.filter.notMe,
+		filter() {
+			const round = game.roundNumber;
+			return typeof round == "number" && round > 0;
+		},
 		check(card) {
 			const round = game.roundNumber,
 				player = get.player();

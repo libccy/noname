@@ -2758,13 +2758,13 @@ const skills = {
 		},
 		content() {
 			"step 0";
-			var func = function () {
+			var func = function (player) {
 				game.countPlayer(function (target) {
 					if (target != player) target.prompt("三恇" + lib.skill.clansankuang.getNum(target));
 				});
 			};
-			if (event.player == game.me) func();
-			else if (event.isOnline()) player.send(func);
+			if (event.player == game.me) func(player);
+			else if (event.isOnline()) player.send(func, player);
 			var cards = trigger.cards.filterInD("oe");
 			player
 				.chooseTarget("三恇：选择一名其他角色", "令其交给你至少X张牌" + (cards.length ? "，然后其获得" + get.translation(cards) : "") + "（X为以下条件中其满足的项数：场上有牌、已受伤、体力值小于手牌数）", true, lib.filter.notMe)
