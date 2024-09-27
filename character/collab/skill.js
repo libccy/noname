@@ -2,6 +2,130 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//忠曹操
+	oldingxi: {
+		audio: 2,
+		trigger: {
+			global: "cardsDiscardAfter",
+		},
+		filter(event, player) {
+			const evt = event.getParent()?.relatedEvent;
+			if (!evt || evt.name != "useCard" || evt.player != player) return false;
+
+			const target = player.getPrevious();
+			if (!target || !target.isIn()) return false;
+			return event.cards.some(card => {
+				return get.tag(card, "damage") > 0.5 && player.canUse(card, target, false);
+			});
+		},
+		async cost(event, trigger, player) {
+			const target = player.getPrevious(),
+				cards = trigger.cards.filter(card => {
+					return get.tag(card, "damage") > 0.5 && player.canUse(card, target, false);
+				});
+			if (cards.length == 1) {
+				event.result = await player
+					.chooseBool(get.prompt("oldingxi"), `对${get.translation(target)}使用${get.translation(cards)}`)
+					.set("choice", get.effect(target, cards[0], player, player) > 0)
+					.forResult();
+				event.result.cards = cards;
+			} else {
+				const {
+					result: { bool, links },
+				} = await player
+					.chooseButton([get.prompt("oldingxi"), `对${get.translation(target)}使用其中一张牌`, cards])
+					.set("target", target)
+					.set("ai", button => {
+						const { player, target } = get.event();
+						return get.effect(target, button.link, player, player);
+					});
+				event.result = {
+					bool: bool,
+					cards: links,
+				};
+			}
+			event.result.targets = [target];
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				card = event.cards[0];
+			player
+				.when({ global: "cardsDiscardBegin" })
+				.filter((evt, player) => {
+					const evtx = evt.getParent()?.relatedEvent;
+					if (!evtx || evtx.name != "useCard" || evtx.player != player) return false;
+					return evtx.getParent("oldingxi", true)?.player == player;
+				})
+				.then(() => {
+					trigger.cancel();
+					const cards = trigger.cards.filterInD("od");
+					if (cards.length) {
+						player.addToExpansion(cards, "gain2").gaintag.add("oldingxi");
+					}
+				});
+			await player.useCard(card, target, false);
+		},
+		intro: {
+			content: "expansion",
+			markcount: "expansion",
+		},
+		onremove(player, skill) {
+			const cards = player.getExpansions(skill);
+			if (cards.length) player.loseToDiscardpile(cards);
+		},
+	},
+	olnengchen: {
+		audio: 2,
+		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			if (!event.card) return false;
+			return player.getExpansions("oldingxi").some(card => {
+				return card.name == event.card.name;
+			});
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			const cards = player.getExpansions("oldingxi").filter(card => {
+				return card.name == trigger.card.name;
+			}).randomGets(1);
+			await player.gain(cards, "give", player, "bySelf");
+		},
+		ai: {
+			combo: "oldingxi",
+			maixie: true,
+			effect: {
+				target(card, player, target) {
+					if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
+					if (!card.name) return;
+					if (!target.getExpansions("oldingxi").some(cardx => cardx.name == card.name)) return;
+					if (get.tag(card, "damage") && player != target) return [1, Math.min(1, 0.3 * target.hp)];
+				},
+			},
+		},
+	},
+	olhuojie: {
+		audio: 2,
+		trigger: {
+			player: "phaseUseBegin",
+		},
+		forced: true,
+		filter(event, player) {
+			return player.getExpansions("oldingxi").length;
+		},
+		async content(event, trigger, player) {
+			let num = player.getExpansions("oldingxi").length;
+			while(num > 0) {
+				num--;
+				await player.executeDelayCardEffect("shandian");
+			}
+			if (player.hasHistory("damage", evt => evt?.card?.name == "shandian" && evt.getParent(event.name) == event)) {
+				await player.gain(player.getExpansions("oldingxi"), "give", player, "bySelf");
+			}
+		},
+		ai: {
+			neg: true,
+		},
+	},
 	//刘协曹节
 	//我们意念合一×2
 	dcjuanlv: {

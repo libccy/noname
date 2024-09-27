@@ -125,6 +125,15 @@ const translates = {
 	dcqixin_info: "转换技。①出牌阶段，你可以将性别变更为：阴，曹节--女；阳，刘协--男。②当你即将死亡时，你取消之并将性别变更为〖齐心①〗的转换状态，将体力调整至此状态的体力，然后你本局游戏不能发动〖齐心〗。",
 	dcqixin_faq: "关于齐心",
 	dcqixin_faq_info: "<br>〖齐心①〗的两种状态各拥有初始体力上限的体力值，初始状态为“刘协--男”，且两种状态的体力值分别计算。",
+	zy_caocao: "忠曹操",
+	zy_caocao_prefix: "忠",
+	oldingxi: "定西",
+	oldingxi_info: "你使用的伤害牌进入弃牌堆后，你可以对你左侧的角色使用其中一张（无次数限制），然后将此牌置于你的武将牌上。",
+	oldingxi_append: '<span style="font-family: yuanli"><li>注意事项：<br>“左侧角色”即为玩家的上家</span>',
+	olnengchen: "能臣",
+	olnengchen_info: "锁定技，你受到伤害后，随机获得一张与伤害牌牌名相同的“定西”牌。",
+	olhuojie: "祸结",
+	olhuojie_info: "锁定技，出牌阶段开始时，你进行X次【闪电】判定；若你因此受到了伤害，你获得所有“定西”牌。（X为你的“定西”牌数）",
 };
 
 export default translates;
