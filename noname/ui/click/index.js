@@ -3368,12 +3368,12 @@ export class Click {
 			}
 			
 			// 添加台词部分
-			let dieAudios = game.parseDieTextMap(audioName).map(i => i.text).filter(Boolean);
-			if(!dieAudios.length) dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
+			let dieAudios = get.Audio.die({ player: audioName }).audioList.map(i => i.text).filter(Boolean);
+			if(!dieAudios.length) dieAudios = get.Audio.die({ player: name }).audioList.map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameinfo.skills.forEach(skill => {
-				let voiceMap = game.parseSkillText(skill, audioName);
-				if(!voiceMap.length) voiceMap = game.parseSkillText(skill, name);
+				let voiceMap = get.Audio.skill({ skill, player: audioName }).textList;
+				if(!voiceMap.length) voiceMap = get.Audio.skill({ skill, player: name }).textList;
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
 			const derivationSkillAudioMap = new Map();
@@ -3386,8 +3386,8 @@ export class Click {
 					}
 					for(var i=0; i<derivation.length; i++) {
 						if (derivation[i].indexOf('_faq') != -1) continue;
-						let derivationVoiceMap = game.parseSkillText(derivation[i], audioName);
-						if(!derivationVoiceMap.length) derivationVoiceMap = game.parseSkillText(derivation[i], name);
+						let derivationVoiceMap = get.Audio.skill({ skill: derivation[i], player: audioName }).textList;
+						if(!derivationVoiceMap.length) derivationVoiceMap = get.Audio.skill({ skill: derivation[i], player: name }).textList;
 						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
 					}
 				}
@@ -3718,12 +3718,12 @@ export class Click {
 			Array.from(htmlParser.childNodes).forEach((value) => introduction.appendChild(value));
 			
 			// 添加台词部分
-			let dieAudios = game.parseDieTextMap(audioName).map(i => i.text).filter(Boolean);
-			if(!dieAudios.length) dieAudios = game.parseDieTextMap(name).map(i => i.text).filter(Boolean);
+			let dieAudios = get.Audio.die({ player: audioName }).audioList.map(i => i.text).filter(Boolean);
+			if(!dieAudios.length) dieAudios = get.Audio.die({ player: name }).audioList.map(i => i.text).filter(Boolean);
 			const skillAudioMap = new Map();
 			nameInfo.skills.forEach(skill => {
-				let voiceMap = game.parseSkillText(skill, audioName);
-				if(!voiceMap.length) voiceMap = game.parseSkillText(skill, name);
+				let voiceMap = get.Audio.skill({ skill, player: audioName }).textList;
+				if(!voiceMap.length) voiceMap = get.Audio.skill({ skill, player: name }).textList;
 				if(voiceMap.length) skillAudioMap.set(skill, voiceMap);
 			});
 			const derivationSkillAudioMap = new Map();
@@ -3736,8 +3736,8 @@ export class Click {
 					}
 					for(var i=0; i<derivation.length; i++) {
 						if (derivation[i].indexOf('_faq') != -1) continue;
-						let derivationVoiceMap = game.parseSkillText(derivation[i], audioName);
-						if(!derivationVoiceMap.length) derivationVoiceMap = game.parseSkillText(derivation[i], name);
+						let derivationVoiceMap = get.Audio.skill({ skill: derivation[i], player: audioName }).textList;
+						if(!derivationVoiceMap.length) derivationVoiceMap = get.Audio.skill({ skill: derivation[i], player: name }).textList;
 						if(derivationVoiceMap.length) derivationSkillAudioMap.set(derivation[i], derivationVoiceMap);
 					}
 				}
