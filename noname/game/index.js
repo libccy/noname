@@ -1527,9 +1527,9 @@ export class Game extends GameCompatible {
 			args.length === 1 && get.objtype(args[0]) === "object"
 				? args[0]
 				: {
-						path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
-						onError: args.find(arg => typeof arg === "function"),
-					};
+					path: args.filter(arg => typeof arg === "string" || typeof arg === "number").join("/"),
+					onError: args.find(arg => typeof arg === "function"),
+				};
 
 		const {
 			path = "",
@@ -2218,8 +2218,8 @@ export class Game extends GameCompatible {
 				);
 			}
 			const blob = zip.generate({
-					type: "blob",
-				}),
+				type: "blob",
+			}),
 				fileNameToSaveAs = `${exportExtension.replace(/\\|\/|:|\?|"|\*|<|>|\|/g, "-")}.zip`;
 
 			if (lib.device) {
@@ -4217,7 +4217,7 @@ export class Game extends GameCompatible {
 			}
 		}
 		if (!callback) {
-			callback = function () {};
+			callback = function () { };
 		}
 		//try{
 		//	if(noinput){
@@ -7276,9 +7276,7 @@ export class Game extends GameCompatible {
 		});
 		Object.keys(lib.skill).forEach(value => game.finishSkill(value));
 	}
-	/**
-	 * 这玩意至少19种重载了吧
-	 */
+	/**@type {CheckMod} */
 	checkMod() {
 		const argumentArray = Array.from(arguments),
 			name = argumentArray[argumentArray.length - 2];
@@ -7691,59 +7689,59 @@ export class Game extends GameCompatible {
 		return new Promise(
 			query
 				? (resolve, reject) => {
-						lib.status.reload++;
-						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
-						idbRequest.onerror = event => {
-							if (typeof onError == "function") {
-								onError(event);
-								game.reload2();
-								resolve();
-							} else {
-								game.reload2();
-								reject(event);
-							}
-						};
-						idbRequest.onsuccess = event => {
-							const result = event.target.result;
-							if (typeof onSuccess == "function") {
-								_status.dburgent = true;
-								onSuccess(result);
-								delete _status.dburgent;
-							}
+					lib.status.reload++;
+					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).get(query);
+					idbRequest.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
 							game.reload2();
-							resolve(result);
-						};
-					}
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					idbRequest.onsuccess = event => {
+						const result = event.target.result;
+						if (typeof onSuccess == "function") {
+							_status.dburgent = true;
+							onSuccess(result);
+							delete _status.dburgent;
+						}
+						game.reload2();
+						resolve(result);
+					};
+				}
 				: (resolve, reject) => {
-						lib.status.reload++;
-						const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
-							object = {};
-						idbRequest.onerror = event => {
-							if (typeof onError == "function") {
-								onError(event);
-								game.reload2();
-								resolve();
-							} else {
-								game.reload2();
-								reject(event);
-							}
-						};
-						idbRequest.onsuccess = event => {
-							const result = event.target.result;
-							if (result) {
-								object[result.key] = result.value;
-								result.continue();
-								return;
-							}
-							if (typeof onSuccess == "function") {
-								_status.dburgent = true;
-								onSuccess(object);
-								delete _status.dburgent;
-							}
+					lib.status.reload++;
+					const idbRequest = lib.db.transaction([storeName], "readwrite").objectStore(storeName).openCursor(),
+						object = {};
+					idbRequest.onerror = event => {
+						if (typeof onError == "function") {
+							onError(event);
 							game.reload2();
-							resolve(object);
-						};
-					}
+							resolve();
+						} else {
+							game.reload2();
+							reject(event);
+						}
+					};
+					idbRequest.onsuccess = event => {
+						const result = event.target.result;
+						if (result) {
+							object[result.key] = result.value;
+							result.continue();
+							return;
+						}
+						if (typeof onSuccess == "function") {
+							_status.dburgent = true;
+							onSuccess(object);
+							delete _status.dburgent;
+						}
+						game.reload2();
+						resolve(object);
+					};
+				}
 		);
 	}
 	/**
@@ -7780,45 +7778,45 @@ export class Game extends GameCompatible {
 			);
 		return query
 			? new Promise((resolve, reject) => {
-					lib.status.reload++;
-					const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
-					record.onerror = event => {
-						if (typeof onError == "function") {
-							onError(event);
-							game.reload2();
-							resolve();
-						} else {
-							game.reload2();
-							reject(event);
-						}
-					};
-					record.onsuccess = event => {
-						if (typeof onSuccess == "function") onSuccess(event);
+				lib.status.reload++;
+				const record = lib.db.transaction([storeName], "readwrite").objectStore(storeName).delete(query);
+				record.onerror = event => {
+					if (typeof onError == "function") {
+						onError(event);
 						game.reload2();
-						resolve(event);
-					};
-				})
+						resolve();
+					} else {
+						game.reload2();
+						reject(event);
+					}
+				};
+				record.onsuccess = event => {
+					if (typeof onSuccess == "function") onSuccess(event);
+					game.reload2();
+					resolve(event);
+				};
+			})
 			: game.getDB(storeName).then(object => {
-					const keys = Object.keys(object);
-					lib.status.reload += keys.length;
-					const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
-					return Promise.allSettled(
-						keys.map(
-							key =>
-								new Promise((resolve, reject) => {
-									const request = store.delete(key);
-									request.onerror = event => {
-										game.reload2();
-										reject(event);
-									};
-									request.onsuccess = event => {
-										game.reload2();
-										resolve(event);
-									};
-								})
-						)
-					);
-				});
+				const keys = Object.keys(object);
+				lib.status.reload += keys.length;
+				const store = lib.db.transaction([storeName], "readwrite").objectStore(storeName);
+				return Promise.allSettled(
+					keys.map(
+						key =>
+							new Promise((resolve, reject) => {
+								const request = store.delete(key);
+								request.onerror = event => {
+									game.reload2();
+									reject(event);
+								};
+								request.onsuccess = event => {
+									game.reload2();
+									resolve(event);
+								};
+							})
+					)
+				);
+			});
 	}
 	/**
 	 * @param { string } key
