@@ -4505,7 +4505,7 @@ const skills = {
 			},
 			chigang: {
 				audio: 2,
-				trigger: { player: "phaseJudgeBefore" },
+				trigger: { player: "phaseChange" },
 				forced: true,
 				filter(event, player) {
 					if (!player.storage.yuheng) return false;
@@ -4513,13 +4513,11 @@ const skills = {
 					for (var i of list) {
 						if (!player.storage.yuheng.includes(i)) return false;
 					}
-					return true;
+					return event.phaseList[event.num].indexOf("phaseJudge") != -1;
 				},
 				content() {
-					trigger.cancel();
-					var next = player.phaseDraw();
-					event.next.remove(next);
-					trigger.getParent().next.push(next);
+					trigger.phaseList[trigger.num] = "phaseDraw|clanguixiang";
+					game.delayx();
 				},
 				init(player, skill) {
 					player.markAuto("yuheng_current", ["xinfu_guanwei", "bizheng", "xinanguo"]);

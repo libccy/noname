@@ -1275,7 +1275,7 @@ const skills = {
 		locked: true,
 		async cost(event, trigger, player) {
 			event.result = await player
-				.chooseTarget(get.prompt2("dcpijian"))
+				.chooseTarget(get.prompt2("dcpijian"), true)
 				.set("ai", target => {
 					const player = _status.event.player;
 					return get.damageEffect(target, player, player);

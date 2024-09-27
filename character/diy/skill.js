@@ -7637,17 +7637,19 @@ const skills = {
 	},
 	junkchigang: {
 		audio: "dili_chigang",
-		trigger: { player: "phaseJudgeBefore" },
+		trigger: { player: "phaseChange" },
 		forced: true,
 		zhuanhuanji: true,
 		mark: true,
 		marktext: "☯",
+		filter(event, player) {
+			return event.phaseList[event.num].indexOf("phaseJudge") != -1;
+		},
 		content() {
 			player.changeZhuanhuanji("junkchigang");
-			trigger.cancel();
-			var next = player[player.storage.junkchigang ? "phaseDraw" : "phaseUse"]();
-			event.next.remove(next);
-			trigger.getParent().next.push(next);
+			let phase = player.storage.junkchigang ? "phaseDraw" : "phaseUse";
+			trigger.phaseList[trigger.num] = `${phase}|clanguixiang`;
+			game.delayx();
 		},
 		ai: {
 			effect: {
