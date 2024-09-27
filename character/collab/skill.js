@@ -768,7 +768,7 @@ const skills = {
 					list = Object.keys(map);
 				if (list.length > 0) {
 					const skill = list.randomGet(),
-						voiceMap = game.parseSkillTextMap(skill, map[skill]);
+						voiceMap = get.Audio.skill({ skill, player: map[skill] }).audioList;
 					player.storage.dcbenxi_pending = skill;
 					findaudio: for (let data of voiceMap) {
 						if (!data.text) continue;
@@ -834,7 +834,7 @@ const skills = {
 							const info = get.info(skill);
 							if (!info || (info.ai && info.ai.combo)) return;
 							if (skill in _status.dcbenxi_map) return;
-							const voices = game.parseSkillText(skill, name);
+							const voices = get.Audio.skill({ skill, name }).textList;
 							if (
 								voices.some(text => {
 									const pinyins = get.pinyin(text, false);

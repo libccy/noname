@@ -10264,13 +10264,13 @@ const skills = {
 			player.logSkill("spjiedao", trigger.player);
 			var num = event.map[result.control] || 1;
 			trigger.num += num;
-			var next = game.createEvent("spjiedao_after", null, trigger.getParent());
-			next.player = player;
-			next.target = trigger.player;
-			next.num = num;
-			next.setContent(function () {
-				if (target.isIn()) player.chooseToDiscard(num, true, "he");
-			});
+			player
+				.when({ global:"damageEnd" })
+				.filter(evt => evt == trigger)
+				.then(() => {
+					if (trigger.player.isIn()) player.chooseToDiscard(num, true, "he");
+				})
+				.vars({ num: num });
 		},
 	},
 	biaozhao: {
