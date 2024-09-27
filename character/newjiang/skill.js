@@ -323,7 +323,7 @@ const skills = {
 			},
 		},
 	},
-	//荀彧荀攸
+	//荀彧荀攸 - 想你了
 	zhinang: {
 		getMap() {
 			if (!_status.zhinang_map) {
@@ -345,7 +345,7 @@ const skills = {
 							if (!info || (info.ai && info.ai.combo)) return;
 							if (skill in _status.zhinang_map) return;
 							if (get.translation(skill).includes("谋")) _status.zhinang_map.name[skill] = name;
-							const voices = game.parseSkillText(skill, name);
+							const voices = get.Audio.skill({ skill, name }).textList;
 							if (voices.some(data => data.includes("谋"))) {
 								_status.zhinang_map.info[skill] = name;
 							}
@@ -361,14 +361,23 @@ const skills = {
 		filter(event, player) {
 			return ["trick", "equip"].includes(get.type2(event.card));
 		},
-		frequent: true,
+		prompt2(event, player) {
+			const type = get.type2(event.card),
+				name = `zhinang_${type}`,
+				skills = player.getRemovableAdditionalSkills(name);
+			let str = `获得一个技能${type == "trick" ? "台词" : "名"}包含“谋”的技能`;
+			if (skills.length) {
+				str = `失去${skills.map(skill => `【${get.translation(skill)}】`)}并${str}`;
+			}
+			return str;
+		},
 		async content(event, trigger, player) {
 			const map = lib.skill.zhinang.getMap(),
 				type = get.type2(trigger.card) == "equip" ? "name" : "info",
 				list = Object.keys(map[type]);
 			if (list.length > 0) {
 				const skill = list.randomGet(),
-					voiceMap = game.parseSkillTextMap(skill, map[type][skill]);
+					voiceMap = get.Audio.skill({ skill, player: map[type][skill] }).audioList;
 				if (type == "info") {
 					findaudio: for (let data of voiceMap) {
 						if (!data.text) continue;
@@ -381,9 +390,18 @@ const skills = {
 				}
 				else player.flashAvatar("zhinang", map[type][skill])
 				player.popup(skill);
-				if (player.hasSkill(skill, null, null, false)) await player.removeSkills(skill);
-				await player.addSkills(skill);
+				await player.addAdditionalSkills(`zhinang_${get.type2(trigger.card)}`, skill);
 			}
+		},
+		init(player, skill) {
+			player.addSkill(["zhinang_equip", "zhinang_trick"]);
+		},
+		onremove(player, skill) {
+			player.removeSkill(["zhinang_equip", "zhinang_trick"]);
+		},
+		subSkill: {
+			equip: {},
+			trick: {},
 		},
 	},
 	gouzhu: {
