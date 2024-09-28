@@ -689,35 +689,33 @@ const skills = {
 					.chooseControl(["选项一", "选项二", "返回"])
 					.set("prompt", "义从：请选择一项")
 					.set("choiceList", [
-						`你于本轮内至其他角色的距离-1${
-							player.countCards("s", card => {
-								return card.hasGaintag("sbyicong");
-							}) >= 4
-								? ""
-								: `，将牌堆中的${get.cnNumber(
-										Math.min(
-											num,
-											4 -
-												player.countCards("s", card => {
-													return card.hasGaintag("sbyicong");
-												})
-										)
-								  )}张【杀】置于你的武将牌上，称为“扈”`
+						`你于本轮内至其他角色的距离-1${player.countCards("s", card => {
+							return card.hasGaintag("sbyicong");
+						}) >= 4
+							? ""
+							: `，将牌堆中的${get.cnNumber(
+								Math.min(
+									num,
+									4 -
+									player.countCards("s", card => {
+										return card.hasGaintag("sbyicong");
+									})
+								)
+							)}张【杀】置于你的武将牌上，称为“扈”`
 						}`,
-						`其他角色于本轮内至你的距离+1${
-							player.countCards("s", card => {
-								return card.hasGaintag("sbyicong");
-							}) >= 4
-								? ""
-								: `，将牌堆中的${get.cnNumber(
-										Math.min(
-											num,
-											4 -
-												player.countCards("s", card => {
-													return card.hasGaintag("sbyicong");
-												})
-										)
-								  )}张【闪】置于你的武将牌上，称为“扈”`
+						`其他角色于本轮内至你的距离+1${player.countCards("s", card => {
+							return card.hasGaintag("sbyicong");
+						}) >= 4
+							? ""
+							: `，将牌堆中的${get.cnNumber(
+								Math.min(
+									num,
+									4 -
+									player.countCards("s", card => {
+										return card.hasGaintag("sbyicong");
+									})
+								)
+							)}张【闪】置于你的武将牌上，称为“扈”`
 						}`,
 					])
 					.set("ai", () => {
@@ -1590,9 +1588,9 @@ const skills = {
 					}
 					let eff =
 						0.4 *
-							target.countCards("h", card => {
-								return 5 - get.useful(card);
-							}) -
+						target.countCards("h", card => {
+							return 5 - get.useful(card);
+						}) -
 						1;
 					if ((get.attitude(player, target) > 0 && sgn < 0) || (get.attitude(player, target) < 0 && preAtt < 0)) eff = -Math.abs(eff);
 					return eff;
@@ -3204,15 +3202,15 @@ const skills = {
 							var player = _status.event.player;
 							if (
 								player.hp +
-									player.countCards("h", function (card) {
-										var mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
-										if (mod2 != "unchanged") return mod2;
-										var mod = game.checkMod(card, player, player, "unchanged", "cardSavable", player);
-										if (mod != "unchanged") return mod;
-										var savable = get.info(card).savable;
-										if (typeof savable == "function") savable = savable(card, player, player);
-										return savable;
-									}) <=
+								player.countCards("h", function (card) {
+									var mod2 = game.checkMod(card, player, "unchanged", "cardEnabled2", player);
+									if (mod2 != "unchanged") return mod2;
+									var mod = game.checkMod(card, player, player, "unchanged", "cardSavable", player);
+									if (mod != "unchanged") return mod;
+									var savable = get.info(card).savable;
+									if (typeof savable == "function") savable = savable(card, player, player);
+									return savable;
+								}) <=
 								1
 							)
 								return 0;
@@ -3671,16 +3669,16 @@ const skills = {
 					var player = _status.event.player;
 					var limit = player.hasMark("sbjiang")
 						? game.countPlayer(current => {
-								return current.group == "wu" && current != player;
-						  }) + 1
+							return current.group == "wu" && current != player;
+						}) + 1
 						: 1;
 					return "出牌阶段限" + get.cnNumber(limit) + "次。你可以将所有手牌当【决斗】使用";
 				},
 				filter: function (event, player) {
 					var limit = player.hasMark("sbjiang")
 						? game.countPlayer(current => {
-								return current.group == "wu" && current != player;
-						  }) + 1
+							return current.group == "wu" && current != player;
+						}) + 1
 						: 1;
 					if ((player.getStat("skill").sbjiang_qiben || 0) >= limit) return false;
 					var hs = player.getCards("h");
@@ -3705,8 +3703,8 @@ const skills = {
 							if (arg && (!arg.card || get.name(arg.card) !== "tao")) return false;
 							let limit = player.hasMark("sbjiang")
 								? game.countPlayer(current => {
-										return current.group == "wu" && current != player;
-								  }) + 1
+									return current.group == "wu" && current != player;
+								}) + 1
 								: 1;
 							return player.isPhaseUsing() && (player.getStat("skill").sbjiang_qiben || 0) < limit && player.hasCard(card => get.name(card) != "tao", "h");
 						}
@@ -4003,12 +4001,12 @@ const skills = {
 				cards = [0],
 				sbbiyue = player.hasSkill("sbbiyue")
 					? Math.max(
-							0,
-							3 -
-								game.countPlayer2(current => {
-									return current.getHistory("damage").length > 0;
-								})
-					  )
+						0,
+						3 -
+						game.countPlayer2(current => {
+							return current.getHistory("damage").length > 0;
+						})
+					)
 					: 0,
 				alter = [null, 1, 1],
 				temp;
@@ -4030,13 +4028,13 @@ const skills = {
 			targets = targets.slice(
 				0,
 				1 +
-					player.countCards("he", card => {
-						if (lib.filter.cardDiscardable(card, player, "sblijian")) {
-							cards.push(get.value(card));
-							return true;
-						}
-						return false;
-					})
+				player.countCards("he", card => {
+					if (lib.filter.cardDiscardable(card, player, "sblijian")) {
+						cards.push(get.value(card));
+						return true;
+					}
+					return false;
+				})
 			);
 			cards.sort((a, b) => a - b);
 			for (let i = 0; i < targets.length; i++) {
@@ -7913,6 +7911,7 @@ const skills = {
 				},
 				content: function () {
 					player.unmarkSkill("sbliegong");
+					player.removeTip('sbliegong');
 				},
 			},
 			block: {
@@ -7977,6 +7976,7 @@ const skills = {
 				},
 				content: function () {
 					player.markAuto("sbliegong", [get.suit(trigger.card)]);
+					player.addTip("sbliegong", '烈弓' + player.getStorage("sbliegong").map(get.translation).join(''));
 				},
 			},
 		},
@@ -8335,9 +8335,9 @@ const skills = {
 					cards.length == 1
 						? { result: { links: cards.slice(0), bool: true } }
 						: await player.chooseCardButton("连营：请选择要分配的牌", true, cards, [1, cards.length]).set("ai", () => {
-								if (ui.selected.buttons.length == 0) return 1;
-								return 0;
-						  });
+							if (ui.selected.buttons.length == 0) return 1;
+							return 0;
+						});
 				if (!bool) return;
 				cards.removeArray(links);
 				const togive = links.slice(0);

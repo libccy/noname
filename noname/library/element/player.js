@@ -378,7 +378,7 @@ export class Player extends HTMLDivElement {
 	 * 设置提示文字，有则更改，无则加之。
 	 * @param {string} index 给标记起一个名字，名字任意
 	 * @param {string} message 设置提示标记的内容
-	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 确定失去的时间阶段，不填则不失去
+	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 是否是临时的tip。默认为false,表示一直存在；若为true,则回合结束自动失去。也可以填一个具体的自定义时机。
 	 * @param { object } [css] 自定义的样式
 	 * @returns { HTMLDivElement }
 	 * @author Curpond
