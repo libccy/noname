@@ -4566,7 +4566,7 @@ export class Get extends GetCompatible {
 			}
 		} else if (node.classList.contains("nodeintro")) {
 			if (node.nodeTitle) uiintro.add(node.nodeTitle);
-			uiintro.add('<div class="text" style="display:inline">' + node.nodeContent + "</div>");
+			uiintro._place_text = uiintro.add('<div class="text">' + node.nodeContent + "</div>");
 		}
 		if (lib.config.touchscreen) {
 			lib.setScroll(uiintro.contentContainer);

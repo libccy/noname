@@ -1,4 +1,13 @@
 export default {
+	"#dcshuangrui1": "刚柔并济，武学之道可不分男女。",
+	"#dcshuangrui2": "人言女子柔弱，我偏要以武证道。",
+	"#dcfuxie1": "箭射辕角，夏侯老贼必中疑兵之计。",
+	"#dcfuxie2": "借父三矢以诱敌，佯装黄汉升在此。",
+	"#dcshouxing1": "古时后羿射日，今我以星为狩。",
+	"#dcshouxing2": "柔荑挽雕弓，箭出大星落。",
+	"#dcshaxue1": "短兵奋进，杀人于无形。",
+	"#dcshaxue2": "霜刃映雪，三步之内，必取汝性命！",
+	"#dc_huangwudie:die": "谁说，战死沙场专属男儿？",
 	"#dcyunzheng1": "佳人弄青丝，柔荑奏鸣筝。",
 	"#dcyunzheng2": "玉柱冷寒雪，清商怨羽声。",
 	"#dchuoxin1": "闻君精通音律，与我合奏一曲如何？",

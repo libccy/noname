@@ -1,4 +1,11 @@
 export default {
+	"#dcyanzuo1": "提笔欲续出师表，何日重登蜀道？",
+	"#dcyanzuo2": "我族以诗书传家，苑中未绝琅琅。",
+	"#dczuyin1": "蒙先祖之佑，未觉春秋之寒。",
+	"#dczuyin2": "我本孺子，幸得父祖遮风挡雨。",
+	"#dcpijian1": "神思凝慧剑，当悬宵小之颈。",
+	"#dcpijian2": "仗剑凌天下，汝忘武侯否！",
+	"#zhugejing:die": "子孙不肖，徒遗泪胡尘。",
 	"#dcsbyaozuo1": "明公馈墨，琳当还以锦绣。",
 	"#dcsbyaozuo2": "识时务者，应势而为，当为俊杰。",
 	"#dcsbzhuanwen1": "夺人妻子，掘人祖陵，彼与桀纣何异。",

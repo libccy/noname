@@ -290,7 +290,7 @@ const skills = {
 				mark: true,
 				marktext: "伤",
 				intro: {
-					name: "中伤 - 下肢",
+					name: "中伤 - 地机",
 					content: "下次受到的伤害+1",
 				},
 				trigger: { player: "damageBegin2" },
@@ -307,7 +307,7 @@ const skills = {
 				mark: true,
 				marktext: "伤",
 				intro: {
-					name: "中伤 - 胸部",
+					name: "中伤 - 中枢",
 					content: (_, player) => (_status.currentPhase === player ? "" : "下回合") + "使用的下一张牌无效",
 				},
 				trigger: {
@@ -324,7 +324,7 @@ const skills = {
 				mark: true,
 				marktext: "伤",
 				intro: {
-					name: "中伤 - 腹部",
+					name: "中伤 - 气海",
 					content: (_, player) => "不能使用或打出红桃牌",
 				},
 				mod: {
