@@ -176,7 +176,8 @@ export const checkTipBottom = {
 		if ((lib.config.layout == "mobile" || lib.config.layout == "long") && player.dataset.position == '0') {
 			player.style.removeProperty('--bottom');
 		} else {
-			if (!player.node.equips.querySelectorAll(":not(.emptyequip)").length) {
+			//如果全是空的装备栏
+			if (Array.from(player.node.equips.children).every(e => e.classList.contains('emptyequip'))) {
 				player.style.removeProperty('--bottom');
 			} else {
 				let eqipContainerTop = player.node.equips.offsetTop;
