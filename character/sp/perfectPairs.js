@@ -12,7 +12,7 @@ export default {
 	lingcao: ["lingtong"],
 	lingju: ["diaochan", "lvbu"],
 	jiangqing: ["zhoutai"],
-	dingfeng: ["xusheng", "zhugeke"],
+	dingfeng: ["xusheng", "re_xusheng", "zhugeke"],
 	caohong: ["caoren"],
 	daxiaoqiao: ["zhouyu", "sunce"],
 	cuiyan: ["caocao"],
