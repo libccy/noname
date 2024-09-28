@@ -14001,13 +14001,6 @@ export class Library {
 			},
 		],
 		[
-			"忠",
-			{
-				color: "#ffff99",
-				nature: "soilmm",
-			},
-		],
-		[
 			"幻",
 			{
 				color: "#ffff99",
