@@ -3456,17 +3456,18 @@ const skills = {
 				player.countCards("he", card => {
 					if (_status.connectMode && get.position(card) == "h") return true;
 					return lib.filter.cardDiscardable(card, player);
-				}) >= 3 && player.countCards("j")
+				}) >= lib.skill.olfeiyang.getNum && player.countCards("j")
 			);
 		},
 		direct: true,
 		limited: true,
+		getNum: 2,
 		//skillAnimation:true,
 		//animationColor:'orange',
 		content: function () {
 			"step 0";
 			player
-				.chooseToDiscard(get.prompt2("olfeiyang"), "he", 3)
+				.chooseToDiscard(get.prompt2("olfeiyang"), "he", lib.skill.olfeiyang.getNum)
 				.set("ai", function (card) {
 					var player = _status.event.player;
 					if (
