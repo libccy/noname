@@ -1254,13 +1254,13 @@ const skills = {
 				const discards = cards.filter(card => card.name == trigger.card.name);
 				if (discards.length) await player.loseToDiscardpile(discards);
 			} else {
+				if (player.countMark("dcyanzuo_zuyin") < 2 && player.hasSkill("dcyanzuo", null, null, false)) player.addMark("dcyanzuo_zuyin", 1, false);
 				const card = get.cardPile(card => card.name == trigger.card.name);
 				if (card) {
 					const next = player.addToExpansion(card, "gain2");
 					next.gaintag.add("dcyanzuo");
 					await next;
 				}
-				if (player.countMark("dcyanzuo_zuyin") < 2 && player.hasSkill("dcyanzuo", null, null, false)) player.addMark("dcyanzuo_zuyin", 1, false);
 			}
 		},
 	},
