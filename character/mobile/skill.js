@@ -2105,12 +2105,23 @@ const skills = {
 		subSkill: {
 			backup: {},
 			baiban: {
+				init: function (player, skill) {
+					player.addTip(skill, '放逐 技能失效');
+				},
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
 				inherit: "baiban",
 				marktext: "逐",
 			},
 			ban: {
+				init: function (player, skill) {
+					player.addTip(skill, '放逐 限锦');
+				},
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
 				charlotte: true,
-				onremove: true,
 				mark: true,
 				marktext: "禁",
 				intro: {
@@ -17692,10 +17703,11 @@ const skills = {
 		//usable:3,
 		filter: function (event, player) {
 			if (_status.currentPhase != player) return false;
+			var color2 = get.color(event.card);
+			player.addTip('fenyin', '奋音 ' + get.translation(color2), true);
 			var evt = player.getLastUsed(1);
 			if (!evt) return false;
 			var color1 = get.color(evt.card);
-			var color2 = get.color(event.card);
 			return color1 && color2 && color1 != "none" && color2 != "none" && color1 != color2;
 		},
 		content: function () {
