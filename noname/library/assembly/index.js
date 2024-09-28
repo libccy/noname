@@ -195,6 +195,9 @@ export const defaultHookcompatition = {
 	checkDamage2: new NonameAssembly("checkDamage2"),
 	checkDamage3: new NonameAssembly("checkDamage3"),
 	checkDamage4: new NonameAssembly("checkDamage4"),
+
+	addSkillCheck: new NonameAssembly("addSkillCheck"),
+	removeSkillCheck: new NonameAssembly("removeSkillCheck"),
 };
 
 export const defaultAssemblys = {
