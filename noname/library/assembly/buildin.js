@@ -237,3 +237,11 @@ export const checkDamage3 = {
  * 要加接口去node_modules/@types/noname-typings/NonameAssemblyType.d.ts里把类型补了
  */
 export const checkDamage4 = {};
+
+export const addSkillCheck = {};
+
+export const removeSkillCheck = {
+	checkCharge(skill, player) {
+		if (player.countCharge(true) < 0) player.removeCharge(-player.countCharge(true));
+	},
+};

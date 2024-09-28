@@ -8238,6 +8238,7 @@ export class Player extends HTMLDivElement {
 					this.markSkill(skill, null, null, nobroadcast);
 				}
 			}
+			game.callHook("addSkillCheck", [skill, this]);
 		}
 		if (checkConflict) this.checkConflict();
 		return skill;
@@ -8646,6 +8647,7 @@ export class Player extends HTMLDivElement {
 				}
 			}
 			this.enableSkill(skill + "_awake");
+			game.callHook("removeSkillCheck", [skill, this]);
 		}
 		return skill;
 	}
