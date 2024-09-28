@@ -295,7 +295,7 @@ export default () => {
 				guozhan_mobile: ["gz_lingcao", "gz_lifeng", "gz_sp_duyu"],
 				guozhan_qunxiong: ["gz_xf_huangquan", "gz_guohuai", "gz_guanqiujian", "gz_zhujun", "gz_chengong", "gz_re_xugong"],
 				guozhan_tw: ["gz_yangxiu", "gz_tw_tianyu", "gz_tw_xiahoushang", "gz_liaohua", "gz_chendao", "gz_zhugejin", "gz_zumao", "gz_fuwan", "gz_tw_liufuren", "gz_old_huaxiong"],
-				guozhan_others: ["gz_beimihu", "gz_key_ushio", "gz_re_nanhualaoxian"],
+				guozhan_others: ["gz_beimihu", "gz_key_ushio", "gz_re_nanhualaoxian", "gz_re_xusheng"],
 			},
 		},
 		characterPack: {
@@ -410,6 +410,8 @@ export default () => {
 				gz_jiangfei: ["male", "shu", 3, ["shengxi", "gzshoucheng"]],
 				gz_jiangwei: ["male", "shu", 4, ["tiaoxin", "yizhi", "tianfu"], ["gzskin"]],
 				gz_xusheng: ["male", "wu", 4, ["fakeyicheng"], ["gzskin"]],
+				//沟槽线上就使劲薅你的(A+C)/2大宝吧，我没意见（有也没用）
+				gz_re_xusheng: ["male", "wu", 4, ["repojun"]],
 				gz_jiangqing: ["male", "wu", 4, ["gzshangyi", "niaoxiang"]],
 				gz_hetaihou: ["female", "qun", 3, ["zhendu", "qiluan"], ["gzskin"]],
 	
@@ -20491,6 +20493,8 @@ export default () => {
 			fakehuyuan_info: "①你的回合内，当一张装备牌进入一名角色的装备区后，你可以弃置与其距离为1以内的另一名角色区域里的一张牌。②结束阶段，你可以将一张装备牌置入一名角色的装备区。",
 			fakekeshou: "恪守",
 			fakekeshou_info: "①当你受到伤害时，你可以弃置两张颜色相同的牌并令此伤害-1。②当你因弃置而一次性失去至少两张牌后，若你的势力已确定且场上没有与你势力相同的其他角色，则你可以进行判定，若结果判定为红色，你摸一张牌。",
+			gz_re_xusheng: "界徐盛",
+			gz_re_xusheng_prefix: "界",
 	
 			guozhan_default: "国战标准",
 			guozhan_zhen: "君临天下·阵",

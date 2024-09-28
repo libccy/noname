@@ -8,7 +8,7 @@ const translates = {
 	spfengyin: "奉印",
 	spfengyin_info: "其他角色的回合开始时，若其体力值不少于你，你可以交给其一张【杀】，令其跳过出牌阶段和弃牌阶段。",
 	spchizhong: "持重",
-	spchizhong_info: "锁定技，你的手牌上限等于体力上限；其他角色死亡时，你加1点体力上限。",
+	spchiol_jsrg_info: "锁定技，你的手牌上限等于体力上限；其他角色死亡时，你加1点体力上限。",
 	sp_fuhuanghou: "SP伏寿",
 	sp_fuhuanghou_prefix: "SP",
 	spcangni: "藏匿",
@@ -125,6 +125,14 @@ const translates = {
 	dcqixin_info: "转换技。①出牌阶段，你可以将性别变更为：阴，曹节--女；阳，刘协--男。②当你即将死亡时，你取消之并将性别变更为〖齐心①〗的转换状态，将体力调整至此状态的体力，然后你本局游戏不能发动〖齐心〗。",
 	dcqixin_faq: "关于齐心",
 	dcqixin_faq_info: "<br>〖齐心①〗的两种状态各拥有初始体力上限的体力值，初始状态为“刘协--男”，且两种状态的体力值分别计算。",
+	ol_jsrg_caocao: "忠曹操",
+	ol_jsrg_caocao_prefix: "忠",
+	oldingxi: "定西",
+	oldingxi_info: "当你不因〖定西〗使用伤害牌进入弃牌堆后，你可以对上家使用其中一张伤害牌，然后将使用的牌置于武将牌上。",
+	olnengchen: "能臣",
+	olnengchen_info: "锁定技，当你受到牌造成的伤害后，若你拥有与此牌牌名相同的“定西”牌，则你随机获得其中一张。",
+	olhuojie: "祸结",
+	olhuojie_info: "锁定技，出牌阶段开始时，若你有“定西”牌，则你进行X次【闪电】判定（X为你的“定西”牌数），然后若你因此受到了伤害，则你获得所有“定西”牌。",
 };
 
 export default translates;

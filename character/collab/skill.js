@@ -2,6 +2,108 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//忠曹操
+	//江山如故二代目
+	oldingxi: {
+		audio: 2,
+		trigger: { global: "cardsDiscardAfter" },
+		filter(event, player) {
+			if (
+				!player.getPrevious() ||
+				!event.cards.filterInD("d").some(card => {
+					return get.tag(card, "damage") && player.canUse(card, player.getPrevious());
+				})
+			)
+				return false;
+			const evt = event.getParent();
+			if (evt.name != "orderingDiscard") return false;
+			const evtx = evt.relatedEvent || evt.getParent();
+			return player.hasHistory("useCard", evtxx => {
+				if (evtxx.getParent().name === "oldingxi") return false;
+				return evtx.getParent() == (evtxx.relatedEvent || evtxx.getParent()) && get.tag(evtxx.card, "damage");
+			});
+		},
+		async cost(event, trigger, player) {
+			const target = player.getPrevious();
+			const cards = trigger.cards.filterInD("d").filter(card => get.tag(card, "damage"));
+			event.result = await player
+				.chooseButton([get.prompt2("oldingxi", target), cards])
+				.set("filterButton", button => {
+					const player = get.player(),
+						target = get.event().target;
+					return player.canUse(button.link, target);
+				})
+				.set("target", target)
+				.set("ai", button => {
+					const player = get.player(),
+						target = get.event().target;
+					return get.effect(target, button.link, player, player);
+				})
+				.forResult();
+			if (event.result.bool) {
+				event.result.cards = event.result.links;
+			}
+		},
+		logTarget(event, player) {
+			return player.getPrevious();
+		},
+		async content(event, trigger, player) {
+			player.$gain2(event.cards, false);
+			await game.delayx();
+			const useCardEvent = player.useCard(event.cards[0], event.targets[0], false);
+			await useCardEvent;
+			const cards = useCardEvent.cards.filterInD("d");
+			if (cards.length) {
+				const next = player.addToExpansion(cards, "gain2");
+				next.gaintag.add("oldingxi");
+				await next;
+			}
+		},
+		intro: {
+			content: "expansion",
+			markcount: "expansion",
+		},
+		onremove(player, skill) {
+			const cards = player.getExpansions(skill);
+			if (cards.length) player.loseToDiscardpile(cards);
+		},
+	},
+	olnengchen: {
+		audio: 2,
+		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			return event.card && player.getExpansions("oldingxi").some(card => card.name === event.card.name);
+		},
+		forced: true,
+		content() {
+			const cards = player.getExpansions("oldingxi").filter(card => card.name === trigger.card.name);
+			player.gain(cards.randomGet(), player, "give");
+		},
+		ai: { combo: "oldingxi" },
+	},
+	olhuojie: {
+		audio: 2,
+		trigger: { player: "phaseUseBegin" },
+		filter(event, player) {
+			return player.hasExpansions("oldingxi");
+		},
+		forced: true,
+		async content(event, trigger, player) {
+			let boom = false,
+				num = player.getExpansions("oldingxi").length;
+			while (num > 0) {
+				num--;
+				const next = player.executeDelayCardEffect("shandian");
+				await next;
+				if (!boom && player.hasHistory("damage", evt => evt.getParent(2) == next)) boom = true;
+			}
+			if (boom && player.hasExpansions("oldingxi")) {
+				const cards = player.getExpansions("oldingxi");
+				await player.gain(cards.randomGet(), player, "give");
+			}
+		},
+		ai: { combo: "oldingxi" },
+	},
 	//刘协曹节
 	//我们意念合一×2
 	dcjuanlv: {

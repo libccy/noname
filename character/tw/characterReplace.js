@@ -1,5 +1,5 @@
 const characterReplaces = {
-	tw_caocao: ["tw_caocao", "jsrg_caocao", "yj_caocao"],
+	tw_caocao: ["tw_caocao", "jsrg_caocao", "yj_caocao", "ol_jsrg_caocao"],
 	mateng: ["tw_mateng", "mateng", "std_mateng", "dc_mateng"],
 	tw_xiahouen: ["tw_xiahouen", "jsrg_xiahouen"],
 	jiangji: ["dc_jiangji", "tw_jiangji", "jiangji"],
