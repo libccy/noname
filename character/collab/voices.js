@@ -65,4 +65,11 @@ export default {
 	"#dchuanli1": "金乌当空，汝欲与我辩日否？",
 	"#dchuanli2": "童言无忌，童言有理！",
 	"#xin_sunquan:die": "阿娘，大哥抢我糖人！",
+	"#oldingxi1": "今天，我曹操誓要踏平祁连山！",
+	"#oldingxi2": "饮马瀚海，封狼居胥，大丈夫当如此！",
+	"#olnengchen1": "当今四海升平，可为治世之能臣。",
+	"#olnengchen2": "为大汉江山鞠躬尽瘁，臣死犹生。",
+	"#olhuojie1": "国虽大，忘战必危，好战必亡。",
+	"#olhuojie2": "这穷兵黩武的罪，让我一人受便可。",
+	"#ol_jsrg_caocao:die": "此征西将军曹操之墓……",
 };

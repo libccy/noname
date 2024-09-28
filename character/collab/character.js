@@ -24,6 +24,7 @@ const characters = {
 	xin_sunquan: ["male", "wu", 3, ["dchuiwan", "dchuanli"]],
 	wuhujiang: ["male", "shu", 4, ["olhuyi"], ["name:关|羽-张|飞-赵|云-马|超-黄|忠", "die:true", "die:5"]],
 	dc_noname: ["male", "qun", 3, ["dcchushan"], ["name:null|null"]],
+	ol_jsrg_caocao: ["male", "qun", 4, ["oldingxi", "olnengchen", "olhuojie"], ["character:jsrg_caocao"]],
 };
 
 export default characters;

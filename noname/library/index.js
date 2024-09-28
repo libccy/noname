@@ -14051,6 +14051,13 @@ export class Library {
 				},
 			},
 		],
+		[
+			"忠",
+			{
+				color: "#ffd700",
+				nature: "metal",
+			},
+		],
 	]);
 	groupnature = {
 		shen: "shen",
