@@ -13708,6 +13708,7 @@ const skills = {
 			}, player);
 			player.addAdditionalSkill("mouduan", ["jiang", "qianxun"]);
 		},
+		derivation: ["jiang", "qianxun", "yingzi", "keji"],
 		onremove(player) {
 			game.broadcastAll(function (player) {
 				if (player._mouduan_mark) {
