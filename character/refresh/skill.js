@@ -10499,6 +10499,7 @@ const skills = {
 		filter: function (event, player) {
 			return event.card.name == "sha" && event.target.hp > 0 && event.target.countCards("he") > 0;
 		},
+		preHidden: true,
 		content: function () {
 			"step 0";
 			var next = player.choosePlayerCard(trigger.target, "he", [1, Math.min(trigger.target.hp, trigger.target.countCards("he"))], get.prompt("repojun", trigger.target));
@@ -10510,6 +10511,7 @@ const skills = {
 			});
 			next.set("goon", get.attitude(player, trigger.target) <= 0);
 			next.set("forceAuto", true);
+			next.setHiddenSkill(event.name);
 			"step 1";
 			if (result.bool) {
 				var target = trigger.target;
@@ -10541,6 +10543,10 @@ const skills = {
 		forced: true,
 		locked: false,
 		logTarget: "player",
+		preHidden: true,
+		check: function (event, player) {
+			return get.attitude(player, event.player) < 0;
+		},
 		content: function () {
 			trigger.num++;
 		},

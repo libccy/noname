@@ -156,6 +156,10 @@ const translates = {
 	stdshushen: "淑慎",
 	stdshushen_info: "当你回复1点体力时，你可以令一名其他角色摸一张牌（若其没有手牌则改为摸两张牌）。",
 	old_re_lidian: "李典",
+	std_yuejin: "标乐进",
+	std_yuejin_prefix: "标",
+	stdxiaoguo: "骁果",
+	stdxiaoguo_info: "其他角色的结束阶段开始时，你可以弃置一张基本牌，令该角色选择一项：1.弃置一张装备牌；2.受到你对其造成的1点伤害。",
 };
 
 export default translates;
