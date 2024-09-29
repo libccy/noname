@@ -3758,7 +3758,7 @@ export class Player extends HTMLDivElement {
 		let max = 0;
 		for (let skill of skills) {
 			let info = get.info(skill);
-			if (!info.chargeSkill || typeof info.chargeSkill != "number") continue;
+			if (!info || !info.chargeSkill || typeof info.chargeSkill != "number") continue;
 			max += info.chargeSkill;
 		}
 		max = game.checkMod(this, max, "maxCharge", this);

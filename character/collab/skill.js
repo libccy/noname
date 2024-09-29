@@ -621,6 +621,7 @@ const skills = {
 				},
 				charlotte: true,
 				skillBlocker(skill) {
+					if (lib.skill[skill].persevereSkill) return false;
 					return !["zhijian", "guzheng"].includes(skill) && skill != "dchuanli_zhangzhang" && !lib.skill[skill].charlotte;
 				},
 			},
@@ -634,6 +635,7 @@ const skills = {
 				},
 				charlotte: true,
 				skillBlocker(skill) {
+					if (lib.skill[skill].persevereSkill) return false;
 					return !["reyingzi", "refanjian"].includes(skill) && skill != "dchuanli_zhouyu" && !lib.skill[skill].charlotte;
 				},
 			},

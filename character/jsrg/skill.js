@@ -9662,6 +9662,7 @@ const skills = {
 			return !player.countCards("h", { type: "basic" });
 		},
 		locked: false,
+		frequent: true,
 		content: function () {
 			"step 0";
 			player.showHandcards();
