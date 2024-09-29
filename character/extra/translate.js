@@ -398,6 +398,8 @@ const translates = {
 	"dclieqiong_place6_info": "令其使用的下一张牌无效直到其回合结束",
 	"dclieqiong_place7": "气海",
 	"dclieqiong_place7_info": "令其不能使用或打出红桃牌直到其下个回合结束",
+	"dclieqiong_place8": "玉泉",
+	"dclieqiong_place8_info": "令其将性别变为女性、将【女装】置入装备区且体力上限+1。",
 	dczhanjue: "斩决",
 	dczhanjue_info: "出牌阶段开始时，你可以选择一项：1.摸体力值张牌，此阶段使用的下一张【杀】无距离限制且不能被响应。2.摸已损失体力值张牌，此阶段下一次造成伤害后，回复等量体力。",
 	junk_sunquan: "牢神孙权",
