@@ -1,20 +1,4 @@
 const characters = {
-	scl_zhenji: {
-		sex: "female",
-		group: "wei",
-		hp: 3,
-		skills: ["scls_luoshen", "qingguo"],
-		dieAudios: ["re_zhenji"],
-		trashBin: ["character:re_zhenji"]
-	},
-	scl_maliang: {
-		sex: "male",
-		group: "shu",
-		hp: 3,
-		skills: ["scls_zishu", "scls_yingyuan"],
-		dieAudios: ["maliang"],
-		trashBin: ["character:maliang"]
-	},
 	scl_pangdegong: {
 		sex: "male",
 		group: "qun",
