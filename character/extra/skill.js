@@ -15,7 +15,9 @@ const skills = {
 		prompt2: (event, player) => "击伤其一个部位",
 		async cost(event, trigger, player) {
 			const target = trigger.player;
-			const places = lib.skill["dclieqiong"].derivation.slice().filter(i => {
+			let places = lib.skill["dclieqiong"].derivation.slice();
+			if (target.hasSex("male")) places.push("dclieqiong_place8");
+			places = places.filter(i => {
 				let storage = target.getStorage("dclieqiong_injury");
 				if (!storage.length && i == "dclieqiong_place1") {
 					return false;
@@ -87,7 +89,8 @@ const skills = {
 				dialog.classList.add("fullwidth");
 				dialog.classList.add("fullheight");
 				const target_img = document.createElement("div");
-				const position = lib.skill["dclieqiong"].derivation;
+				const position = lib.skill["dclieqiong"].derivation.slice();
+				if (target.hasSex("male")) position.push("dclieqiong_place8");
 				target_img.style.width = "50%";
 				target_img.style.height = "100%";
 				target_img.style.position = "relative";
@@ -111,6 +114,7 @@ const skills = {
 						["9", "13"],
 						["7", "3"],
 						["7", "6"],
+						["7", "8"],
 					]
 					: [
 						["7", "1"],
@@ -255,6 +259,20 @@ const skills = {
 					break;
 				case 7:
 					target.addTempSkill("dclieqiong_respond", { player: "phaseEnd" });
+					break;
+				case 8:
+					game.broadcastAll(
+						(player, sex) => {
+							player.sex = sex;
+						},
+						target,
+						"female"
+					);
+					game.log(target, "将性别变为了", "#y女性");
+					const nvzhuang = get.cardPile("nvzhuang") || game.createCard("nvzhuang", "diamond", 6);
+					await game.delayx();
+					if (target.canEquip(nvzhuang, true)) await target.equip(nvzhuang);
+					await target.gainMaxHp();
 					break;
 			}
 		},

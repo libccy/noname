@@ -2,6 +2,54 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//标准版乐进
+	stdxiaoguo: {
+		audio: "xiaoguo",
+		trigger: { global: "phaseJieshuBegin" },
+		filter(event, player) {
+			return (
+				event.player.isIn() &&
+				event.player != player &&
+				player.countCards("h", card => {
+					if (_status.connectMode) return true;
+					return get.type(card) == "basic" && lib.filter.cardDiscardable(card, player);
+				})
+			);
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			const next = player.chooseToDiscard(get.prompt(event.name.slice(0, -5)), (card, player) => {
+				return get.type(card) == "basic";
+			});
+			next.set("ai", card => {
+				return get.event("eff") - get.useful(card);
+			});
+			next.set(
+				"eff",
+				(function () {
+					if (target.hasSkillTag("noe")) return get.attitude(_status.event.player, target);
+					return get.damageEffect(target, player, _status.event.player);
+				})()
+			);
+			next.set("logSkill", [event.name.slice(0, -5), target]);
+			event.result = await next.forResult();
+		},
+		popup: false,
+		async content(event, trigger, player) {
+			const target = trigger.player;
+			const bool = await target
+				.chooseToDiscard("he", "弃置一张装备牌，或受到1点伤害", { type: "equip" })
+				.set("ai", card => {
+					if (get.event("damage") > 0) return 0;
+					if (get.event("noe")) return 12 - get.value(card);
+					return -get.event("damage") - get.value(card);
+				})
+				.set("damage", get.damageEffect(target, player, target))
+				.set("noe", target.hasSkillTag("noe"))
+				.forResultBool();
+			if (!bool) await target.damage();
+		},
+	},
 	//标准版甘夫人
 	stdshushen: {
 		audio: "shushen",
