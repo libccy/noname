@@ -2353,9 +2353,6 @@ const skills = {
 				return `###血途###<div class="text center">${str}</div>`;
 			},
 		},
-		subSkill: {
-			backup: {},
-		},
 		mark: true,
 		marktext: "☯",
 		intro: {
@@ -2385,6 +2382,7 @@ const skills = {
 				charlotte: true,
 				onremove: true,
 			},
+			backup: {},
 		},
 	},
 	mbweiming: {

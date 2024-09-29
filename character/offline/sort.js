@@ -1,5 +1,5 @@
 const characterSort = {
-	offline_scl2024: ["scl_zhenji", "scl_maliang", "scl_pangdegong", "scl_sunhanhua", "scl_miheng", "scl_peixiu", "scl_caoying", "scl_luotong"],
+	offline_scl: ["scl_pangdegong", "scl_sunhanhua", "scl_miheng", "scl_peixiu", "scl_caoying", "scl_luotong"],
 	offline_star: ["jsp_ganfuren", "sp_xiahoushi", "jsp_zhaoyun", "huangjinleishi", "sp_pangtong", "sp_daqiao", "sp_ganning", "sp_xiahoudun", "sp_lvmeng", "sp_zhangfei", "sp_liubei", "old_machao", "zhangliang", "jsp_caoren"],
 	offline_sticker: ["sp_gongsunzan", "sp_simazhao", "sp_wangyuanji", "sp_xinxianying", "sp_liuxie"],
 	offline_yijiang: ["ol_xinxianying"],
@@ -18,7 +18,7 @@ const characterSort = {
 };
 
 const characterSortTranslate = {
-	offline_scl2024: "王者之战2024",
+	offline_scl: "王者之战",
 	offline_star: "桌游志·SP",
 	offline_sticker: "桌游志·贴纸",
 	offline_yijiang: "一将成名",
