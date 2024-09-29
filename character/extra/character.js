@@ -1,7 +1,7 @@
 const characters = {
 	junk_zhangjiao: ["male", "shen", 3, ["yizhao", "junksijun", "tianjie"], ["qun", "die:shen_zhangjiao"]],
 	junk_sunquan: ["male", "shen", 4, ["dili", "yuheng"], ["wu", "die:shen_sunquan"]],
-	shen_huangzhong: ["male", "shen", 4, ["dclieqiong", "dczhanjue"], ["shu"]],
+	shen_huangzhong: ["male", "shen", 4, ["dclieqiong_new", "dczhanjue"], ["shu"]],
 	new_simayi: ["male", "shen", 4, ["jilin", "yingyou", "yingtian"], ["wei", "name:司马|懿"]],
 	xin_simayi: ["male", "shen", 4, ["xinrenjie", "xinbaiyin", "xinlianpo"], ["tempname:shen_simayi", "wei", "name:司马|懿", "die:shen_simayi"]],
 	dc_shen_huatuo: ["male", "shen", 3, ["jingyu", "lvxin", "huandao"], ["qun"]],
