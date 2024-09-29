@@ -551,7 +551,8 @@ export async function boot() {
 	} else {
 		Reflect.get(ui, "css").phone = lib.init.css();
 	}
-	ui.css.others = lib.init.css(lib.assetURL + "layout/" + "others", "dialog")
+	ui.css._others = lib.init.css(lib.assetURL + "layout/" + "others", "dialog");
+	ui.css._skill = lib.init.css(lib.assetURL + "layout/" + "others", "skill");
 	initSheet(Reflect.get(lib, "config"));
 
 	config.set("duration", 500);

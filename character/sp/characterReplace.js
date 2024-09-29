@@ -1,4 +1,5 @@
 const characterReplaces = {
+	yuejin: ["yuejin", "std_yuejin"],
 	chenlin: ["chenlin", "dc_sb_chenlin"],
 	shamoke: ["shamoke", "ty_shamoke"],
 	guanyinping: ["guanyinping", "old_guanyinping", "ty_guanyinping"],

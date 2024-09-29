@@ -1847,6 +1847,7 @@ window.noname_character_rank = {
 		"jsrg_chenfan",
 		"jsrg_zhangju",
 		"yadan",
+		"std_yuejin",
 	],
 	c: [
 		"xiahoudun",

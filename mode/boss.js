@@ -10539,7 +10539,7 @@ export default () => {
 			jinwuluorigong: "金乌落日弓",
 			iwasawa_crowbow: "金乌落日弓",
 			lingsheji_info:
-				"出牌阶段结束时，你可选择：1.摸一张牌。2.将一张武将牌置于武将牌上，并于回合结束后获得此牌。",
+				"出牌阶段结束时，你可选择：1.摸一张牌。2.将一张牌置于武将牌上，并于回合结束后获得此牌。",
 			shanrangzhaoshu_info:
 				"其他角色于回合外得到牌后，若是其本回合内第一次得到牌，则你可以选择一项：交给其一张牌，或令其交给你一张牌。",
 			xingtianpojunfu_info:
