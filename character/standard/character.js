@@ -1,4 +1,5 @@
 const characters = {
+	std_yuejin: ["male", "wei", 4, ["stdxiaoguo"], ["die:yuejin","character:gz_yuejin"]],
 	old_re_lidian: ["male", "wei", 3, ["xunxun", "wangxi"], ["die:lidian"]],
 	ganfuren: ["female", "shu", 3, ["stdshushen", "shenzhi"], ["name:甘|null"]],
 	std_panfeng: ["male", "qun", 4, ["stdkuangfu"]],
