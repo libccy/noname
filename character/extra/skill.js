@@ -104,23 +104,23 @@ const skills = {
 				target_img.style.backgroundPosition = "center center";
 				const number = target.hasSex("male")
 					? [
-							["7", "1"],
-							//["5", "3"],
-							//["4", "7"],
-							["9", "5"],
-							["9", "13"],
-							["7", "3"],
-							["7", "6"],
-					  ]
+						["7", "1"],
+						//["5", "3"],
+						//["4", "7"],
+						["9", "5"],
+						["9", "13"],
+						["7", "3"],
+						["7", "6"],
+					]
 					: [
-							["7", "1"],
-							//["8", "3"],
-							//["4", "7"],
-							["9", "5"],
-							["9", "13"],
-							["6", "3"],
-							["6", "6"],
-					  ];
+						["7", "1"],
+						//["8", "3"],
+						//["4", "7"],
+						["9", "5"],
+						["9", "13"],
+						["6", "3"],
+						["6", "6"],
+					];
 				let list = [];
 				for (let i = 0; i < position.length; i++) {
 					const num_px = document.createElement("div");
@@ -340,6 +340,181 @@ const skills = {
 				},
 			},
 		},
+	},
+	dclieqiong_new: {
+		audio: 2,
+		trigger: { source: "damageSource" },
+		filter(event, player) {
+			return event.player.isIn() && event.source != event.player;
+		},
+		frequent: true,
+		logTarget: "player",
+		prompt2: (event, player) => "击伤其一个部位",
+		//定义一个属性，保存所有的可击伤部位
+		positions: {
+			'head': {
+				name: '头部',
+				info: '令其失去所有体力，若其因此死亡，你增加一点体力上限',
+				css_male: {
+					left: '50%',
+					top: '14%'
+				},
+				css_female: {
+					left: '50%',
+					top: '14%'
+				},
+				/**@type {ContentFuncByAll} */
+				async content({ target, position }, trigger, player) {
+					//灵活的使用when和addTip可以使代码更加优雅
+					target.addTip('击伤', '击伤 ' + position.name, true);
+					player.draw(3);
+					target.draw(2);
+				}
+			},
+			'hand': {
+				name: '手臂',
+				info: '令其失去所有体力，若其因此死亡，你增加一点体力上限',
+				css_male: {
+					left: '30%',
+					top: '40%'
+				},
+				css_female: {
+					left: '30%',
+					top: '40%'
+				},
+				async content(event, trigger, player) {
+
+				}
+			},
+
+		},
+		async cost(event, trigger, player) {
+			const target = trigger.player;
+			await Promise.all(event.next);
+			event.videoId = lib.status.videoId++;
+			//获得所有的可击伤部位数组
+			let list = Object.keys(lib.skill[event.skill].positions);
+			//若本回合未击伤过该角色,去掉头部选项.【这里我没仔细调试，需要检查一下】
+			if (!player.getHistory('useSkill', e => e.name == event.skill && e.result.targets.includes(target))) {
+				list.remove('head');
+			}
+			if (!list?.length) return;
+			const switchToAuto = function () {
+				_status.imchoosing = false;
+				if (event.dialog) event.dialog.close();
+				if (event.control) event.control.close();
+				game.resume();
+				return Promise.resolve({
+					bool: true,
+					position: list.randomGet(),
+				});
+			};
+			/**
+			 * 
+			 * @param {Player} player 
+			 * @param {string[]} list 
+			 */
+			const choosePosition = function (player, list) {
+				const { promise, resolve } = Promise.withResolvers();
+				const event = _status.event;
+				event.switchToAuto = function () {
+					_status.imchoosing = false;
+					resolve({
+						bool: true,
+						position: list.randomGet(),
+					});
+					if (event.dialog) event.dialog.close();
+					if (event.control_cancel) event.control_cancel.close();
+					if (event.control_ok) event.control_ok.close();
+				};
+				event.control_cancel = ui.create.control("cancel2", function (link) {
+					event.dialog.close();
+					event.control_cancel.close();
+					if (event.control_ok) event.control_ok.close();
+					game.resume();
+					_status.imchoosing = false;
+					event._result = { bool: false };
+					resolve(event._result);
+				});
+				event.control_ok = ui.create.control("ok", function (link) {
+					event.dialog.close();
+					event.control_cancel.close();
+					event.control_ok.close();
+					game.resume();
+					_status.imchoosing = false;
+					resolve({
+						bool: true,
+						position: event.selectedPos
+					});
+				});
+				event.control_ok.classList.add('disabled');
+				//创建对话框
+				const dialog = event.dialog = ui.create.dialog("forcebutton", "hidden");
+				dialog.classList.add('dclieqiong', "fixed", 'fullheight');
+				dialog.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
+				dialog.innerHTML = '';
+				//添加部位
+				for (let pos of list) {
+					let position = lib.skill[event.skill].positions[pos];
+					let div = ui.create.div('.position', dialog, () => {
+						let allPosDiv = Array.from(dialog.querySelectorAll('.position'));
+						allPosDiv.forEach(p => p.classList.remove('selected_cp'));
+						div.classList.add('selected_cp');
+						event.selectedPos = pos;
+						if (allPosDiv.some(p => p.classList.contains('selected_cp')) && event.selectedPos) {
+							event.control_ok.classList.remove('disabled');
+						} else {
+							event.control_ok.classList.add('disabled');
+						}
+					});
+					let sex = target.hasSex("male") ? "male" : "female";
+					div.css(position['css_' + sex] || {});
+					div.style.setProperty('--info', `"【${position.name}】:${position.info}"`);
+				}
+				dialog.open();
+				game.pause();
+				game.countChoose();
+				return promise;
+			};
+			/** @type {Promise<{bool:boolean,position:string}>} */
+			let next;
+			if (event.isMine()) {
+				next = choosePosition(player, list);
+			} else if (event.isOnline()) {
+				const { promise, resolve } = Promise.withResolvers();
+				event.player.send(choosePosition, player, list);
+				event.player.wait(async result => {
+					if (result == "ai") result = await switchToAuto();
+					resolve(result);
+				});
+				game.pause();
+				next = promise;
+			} else {
+				next = switchToAuto();
+			}
+
+			const result = await next;
+			if (event.control2) event.control2.close();
+			game.resume();
+			event.result = {
+				bool: result.bool,
+				targets: [target],
+				cost_data: {
+					position: result.position,
+					target: target,
+				},
+
+			};
+		},
+		async content(event, trigger, player) {
+			const { target, position } = event.cost_data;
+			const positionObj = lib.skill[event.name].positions[position];
+			/**执行击伤后的效果 */
+			let next = game.createEvent(event.name + 'effect');
+			next.setContent(positionObj.content).set('target', target).set('player', player).set('position', positionObj);
+			await next;
+		}
+
 	},
 	dczhanjue: {
 		audio: 2,
@@ -3014,10 +3189,10 @@ const skills = {
 		filter(event, player) {
 			if (!event._dccuixin || get.type(event.card, null, false) == "delay" || get.type(event.card, null, false) == "equip") return false;
 			var card = {
-					name: event.card.name,
-					nature: event.card.nature,
-					isCard: true,
-				},
+				name: event.card.name,
+				nature: event.card.nature,
+				isCard: true,
+			},
 				list = event._dccuixin;
 			for (var target of list) {
 				var targetx = player[target]();
@@ -3820,8 +3995,8 @@ const skills = {
 					return 15;
 				})
 				.set("forceDie", true).judge2 = function (result) {
-				return result.bool;
-			};
+					return result.bool;
+				};
 			"step 1";
 			var num = game.countPlayer(function (current) {
 				return current != player && current.hasMark("twwuhun");
@@ -4098,7 +4273,7 @@ const skills = {
 					evt.set("norestore", true);
 					evt.set("custom", {
 						add: {},
-						replace: { window() {} },
+						replace: { window() { } },
 					});
 				} else {
 					delete evt.result.skill;
@@ -4281,11 +4456,11 @@ const skills = {
 					return [
 						1,
 						0.8 *
-							game.countPlayer(current => {
-								return current.countCards("e", card => {
-									return get.suit(card, current) == suit;
-								});
-							}),
+						game.countPlayer(current => {
+							return current.countCards("e", card => {
+								return get.suit(card, current) == suit;
+							});
+						}),
 					];
 				},
 				target: (card, player, target) => {
@@ -5091,9 +5266,9 @@ const skills = {
 							return (
 								numx +
 								num *
-									game.countPlayer(function (current) {
-										return current.hasSkill("yingba");
-									})
+								game.countPlayer(function (current) {
+									return current.hasSkill("yingba");
+								})
 							);
 					},
 				},
@@ -5790,8 +5965,8 @@ const skills = {
 					return 1;
 				})
 				.set("callback", lib.skill.reshuishi.callback).judge2 = function (result) {
-				return result.bool ? true : false;
-			};
+					return result.bool ? true : false;
+				};
 			"step 2";
 			var cards = cards.filterInD();
 			if (cards.length)
@@ -6594,8 +6769,8 @@ const skills = {
 				num == 3
 					? event.numFixed
 					: !game.hasPlayer(function (current) {
-							return current.hasEnabledSlot();
-					  })
+						return current.hasEnabledSlot();
+					})
 			)
 				return false;
 			return (
@@ -6909,12 +7084,12 @@ const skills = {
 						!target._new_guixin_eff &&
 						get.tag(card, "damage") &&
 						target.hp >
-							(player.hasSkillTag("damageBonus", true, {
-								card: card,
-								target: target,
-							})
-								? 2
-								: 1)
+						(player.hasSkillTag("damageBonus", true, {
+							card: card,
+							target: target,
+						})
+							? 2
+							: 1)
 					) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						target._new_guixin_eff = true;
@@ -7729,12 +7904,12 @@ const skills = {
 						!target._guixin_eff &&
 						get.tag(card, "damage") &&
 						target.hp >
-							(player.hasSkillTag("damageBonus", true, {
-								card: card,
-								target: target,
-							})
-								? 2
-								: 1)
+						(player.hasSkillTag("damageBonus", true, {
+							card: card,
+							target: target,
+						})
+							? 2
+							: 1)
 					) {
 						if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
 						target._guixin_eff = true;
@@ -7903,10 +8078,10 @@ const skills = {
 				.set(
 					"allUse",
 					player.getExpansions("qixing").length >=
-						game.countPlayer(function (current) {
-							return get.attitude(player, current) > 4;
-						}) *
-							2
+					game.countPlayer(function (current) {
+						return get.attitude(player, current) > 4;
+					}) *
+					2
 				);
 			"step 1";
 			if (result.bool) {
@@ -8144,10 +8319,10 @@ const skills = {
 			if (!targets.length) return false;
 			if (targets.length == 1 || targets.some(target => get.attitude(player, target) < 0 && target.identity && target.identity.indexOf("zhu") != -1)) {
 				let suits = player.getDiscardableCards(player, "h").reduce((map, card) => {
-						const suit = get.suit(card, player);
-						if (!map[suit]) map[suit] = [];
-						return map;
-					}, {}),
+					const suit = get.suit(card, player);
+					if (!map[suit]) map[suit] = [];
+					return map;
+				}, {}),
 					cards = [];
 				Object.keys(suits).forEach(i => {
 					suits[i].addArray(player.getDiscardableCards(player, "h").filter(card => get.suit(card) == i));
@@ -9087,9 +9262,9 @@ const skills = {
 			return (
 				player.storage.nzry_junlve >= num &&
 				num ==
-					game.countPlayer(function (current) {
-						return get.attitude(player, current) < 0;
-					})
+				game.countPlayer(function (current) {
+					return get.attitude(player, current) < 0;
+				})
 			);
 		},
 		filterTarget(card, player, target) {
@@ -9114,8 +9289,8 @@ const skills = {
 					return _status.event.targets.includes(target);
 				})
 				.set("targets", targets).ai = function () {
-				return 1;
-			};
+					return 1;
+				};
 			"step 2";
 			if (result.bool) {
 				result.targets[0].damage("fire", "nocard");
