@@ -359,88 +359,161 @@ const skills = {
 			},
 		},
 	},
-	dclieqiong_new: {
-		audio: 2,
+	new_dclieqiong: {
+		audio: "dclieqiong",
 		trigger: { source: "damageSource" },
 		filter(event, player) {
 			return event.player.isIn() && event.source != event.player;
 		},
-		frequent: true,
-		logTarget: "player",
-		prompt2: (event, player) => "击伤其一个部位",
-		//定义一个属性，保存所有的可击伤部位
+		derivation: ["dclieqiong_place1", "dclieqiong_place4", "dclieqiong_place5", "dclieqiong_place6", "dclieqiong_place7"],
 		positions: {
-			'head': {
-				name: '头部',
+			head: {
+				name: '天冲',
 				info: '令其失去所有体力，若其因此死亡，你增加一点体力上限',
 				css_male: {
 					left: '50%',
 					top: '14%'
 				},
 				css_female: {
-					left: '50%',
-					top: '14%'
+					left: '45%',
+					top: '10%'
 				},
-				/**@type {ContentFuncByAll} */
-				async content({ target, position }, trigger, player) {
-					//灵活的使用when和addTip可以使代码更加优雅
-					target.addTip('击伤', '击伤 ' + position.name, true);
-					player.draw(3);
-					target.draw(2);
+				async content(event, trigger, player) {
+					const { target, position } = event;
+					if (target.getHp() > 0) {
+						await target.loseHp(target.getHp());
+						if (
+							game.getGlobalHistory("everything", evt => {
+								if (evt.name != "die" || evt.player != target) return false;
+								return evt.reason?.getParent() == event;
+							}).length > 0
+						) {
+							await player.gainMaxHp();
+						}
+					}
 				}
 			},
-			'hand': {
-				name: '手臂',
-				info: '令其失去所有体力，若其因此死亡，你增加一点体力上限',
+			hand: {
+				name: '力烽',
+				info: '令其随机弃置一半手牌（向上取整）',
 				css_male: {
-					left: '30%',
+					left: '28%',
 					top: '40%'
 				},
 				css_female: {
-					left: '30%',
+					left: '72%',
 					top: '40%'
 				},
 				async content(event, trigger, player) {
-
+					const { target, position } = event;
+					const cardx = target.getDiscardableCards(target, "h");
+					const num = Math.ceil(cardx.length / 2);
+					if (cardx.length) await target.discard(cardx.randomGets(num));
 				}
 			},
-
+			leg: {
+				name: '地机',
+				info: '令其下一次受到的伤害+1直到其下个回合结束',
+				css_male: {
+					left: '35%',
+					top: '80%'
+				},
+				css_female: {
+					left: '67%',
+					top: '80%'
+				},
+				async content(event, trigger, player) {
+					const { target, position } = event;
+					target.addTip("new_dclieqiong_leg", "裂穹 地机");
+					target
+						.when({
+							player: ["damageBegin3", "phaseEnd"],
+						})
+						.then(() => {
+							player.removeTip("new_dclieqiong_leg");
+							if (trigger.name == "damage") trigger.num++;
+						});
+				}
+			},
+			chest: {
+				name: '中枢',
+				info: '令其使用的下一张牌无效直到其回合结束',
+				css_male: {
+					left: '50%',
+					top: '30%'
+				},
+				css_female: {
+					left: '40%',
+					top: '25%'
+				},
+				async content(event, trigger, player) {
+					const { target, position } = event;
+					target.addTip("new_dclieqiong_chest", "裂穹 中枢");
+					target
+						.when({
+							player: ["useCard", "phaseEnd"],
+						})
+						.then(() => {
+							player.removeTip("new_dclieqiong_chest");
+							if (trigger.name == "useCard") {
+								trigger.targets.length = 0;
+								trigger.all_excluded = true;
+							}
+						});
+				}
+			},
+			abdomen: {
+				name: '气海',
+				info: '令其不能使用或打出♥️牌直到其回合结束',
+				css_male: {
+					left: '50%',
+					top: '42%'
+				},
+				css_female: {
+					left: '40%',
+					top: '35%'
+				},
+				async content(event, trigger, player) {
+					const { target, position } = event;
+					target.addTempSkill("new_dclieqiong_abdomen", {player: "phaseEnd"});
+				}
+			},
 		},
 		async cost(event, trigger, player) {
 			const target = trigger.player;
 			await Promise.all(event.next);
 			event.videoId = lib.status.videoId++;
-			//获得所有的可击伤部位数组
 			let list = Object.keys(lib.skill[event.skill].positions);
-			//若本回合未击伤过该角色,去掉头部选项.【这里我没仔细调试，需要检查一下】
-			if (!player.getHistory('useSkill', e => e.name == event.skill && e.result.targets.includes(target))) {
+			if (!player.hasHistory('useSkill', evt => {
+				return evt.skill == event.name.slice(0, -5) && evt?.targets.includes(target);
+			})) {
 				list.remove('head');
 			}
-			if (!list?.length) return;
+			if (!list?.length) {
+				event.result = { bool: false };
+				return;
+			}
 			const switchToAuto = function () {
 				_status.imchoosing = false;
 				if (event.dialog) event.dialog.close();
 				if (event.control) event.control.close();
 				game.resume();
-				return Promise.resolve({
+				event._result = {
 					bool: true,
 					position: list.randomGet(),
-				});
+				};
+				return Promise.resolve(event._result);
 			};
-			/**
-			 * 
-			 * @param {Player} player 
-			 * @param {string[]} list 
-			 */
-			const choosePosition = function (player, list) {
+			const choosePosition = function (player, target, list) {
 				const { promise, resolve } = Promise.withResolvers();
 				const event = _status.event;
 				event.switchToAuto = function () {
 					_status.imchoosing = false;
-					resolve({
+					event._result = {
 						bool: true,
 						position: list.randomGet(),
-					});
+					};
+					resolve(event._result);
 					if (event.dialog) event.dialog.close();
 					if (event.control_cancel) event.control_cancel.close();
 					if (event.control_ok) event.control_ok.close();
@@ -460,20 +533,23 @@ const skills = {
 					event.control_ok.close();
 					game.resume();
 					_status.imchoosing = false;
-					resolve({
+					event._result = {
 						bool: true,
-						position: event.selectedPos
-					});
+						position: event.selectedPos,
+					};
+					resolve(event._result);
 				});
 				event.control_ok.classList.add('disabled');
 				//创建对话框
-				const dialog = event.dialog = ui.create.dialog("forcebutton", "hidden");
+				const dialog = ui.create.dialog("forcebutton", "hidden");
+				event.dialog = dialog;
 				dialog.classList.add('dclieqiong', "fixed", 'fullheight');
 				dialog.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
-				dialog.innerHTML = '';
+				const title = ui.create.div(".title", dialog);
+				title.innerHTML = `裂穹：是否击伤${get.translation(target)}的一个部位？`;
 				//添加部位
 				for (let pos of list) {
-					let position = lib.skill[event.skill].positions[pos];
+					let position = lib.skill.new_dclieqiong.positions[pos];
 					let div = ui.create.div('.position', dialog, () => {
 						let allPosDiv = Array.from(dialog.querySelectorAll('.position'));
 						allPosDiv.forEach(p => p.classList.remove('selected_cp'));
@@ -497,10 +573,10 @@ const skills = {
 			/** @type {Promise<{bool:boolean,position:string}>} */
 			let next;
 			if (event.isMine()) {
-				next = choosePosition(player, list);
+				next = choosePosition(player, target, list);
 			} else if (event.isOnline()) {
 				const { promise, resolve } = Promise.withResolvers();
-				event.player.send(choosePosition, player, list);
+				event.player.send(choosePosition, player, target, list);
 				event.player.wait(async result => {
 					if (result == "ai") result = await switchToAuto();
 					resolve(result);
@@ -527,12 +603,41 @@ const skills = {
 		async content(event, trigger, player) {
 			const { target, position } = event.cost_data;
 			const positionObj = lib.skill[event.name].positions[position];
-			/**执行击伤后的效果 */
-			let next = game.createEvent(event.name + 'effect');
-			next.setContent(positionObj.content).set('target', target).set('player', player).set('position', positionObj);
+			let next = game.createEvent(event.name + 'effect', false);
+			next.setContent(positionObj.content);
+			next.set('target', target);
+			next.set('player', player);
+			next.set('position', positionObj);
 			await next;
-		}
-
+		},
+		subSkill: {
+			abdomen: {
+				init(player, skill) {
+					player.addTip(skill, "裂穹 气海");
+				},
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
+				charlotte: true,
+				mark: true,
+				marktext: "伤",
+				intro: {
+					name: "中伤 - 气海",
+					content: (_, player) => "不能使用或打出红桃牌",
+				},
+				mod: {
+					cardEnabled(card) {
+						if (get.suit(card) == "heart") return false;
+					},
+					cardSavable(card) {
+						if (get.suit(card) == "heart") return false;
+					},
+					cardRespondable(card) {
+						if (get.suit(card) == "heart") return false;
+					},
+				},
+			},
+		},
 	},
 	dczhanjue: {
 		audio: 2,

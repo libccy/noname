@@ -7,7 +7,7 @@
 
     background-size: contain;
     background-position: center;
-    background-color: #706666bf;
+    background-color: hsla(26, 59%, 37%, 0.749);
     left: 50%;
     top: 50%;
     transform: translateX(-50%) !important;
@@ -40,4 +40,10 @@
     overflow: auto;
     color: #ecec3a;
     text-shadow: none;
+}
+.dialog.dclieqiong>.title {
+    left: 50%;
+    width: 100%;
+    transform: translateX(-50%);
+    top: 1%;
 }
