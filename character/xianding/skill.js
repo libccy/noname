@@ -17064,19 +17064,28 @@ const skills = {
 	},
 	jiaoying: {
 		audio: 2,
-		trigger: { source: "gainEnd" },
-		forced: true,
-		filter: function (event, player) {
-			if (player == event.player) return false;
-			var evt = event.getl(player);
-			return evt && evt.hs && evt.hs.length;
+		trigger: {
+			global: ["gainAfter", "loseAsyncAfter"],
 		},
-		logTarget: "player",
-		content: function () {
-			var target = trigger.player;
+		forced: true,
+		getIndex(event, player) {
+			if (!event.getl || !event.getg) return [];
+			let evt = event.getl(player);
+			if (!evt || !evt.hs || !evt.hs.length) return [];
+			return game.filterPlayer(current => {
+				let evtx = event.getg(current);
+				return evtx && evtx.some(card => evt.hs.includes(card));
+			}).sortBySeat();
+		},
+		logTarget(_1, _2, _3, target) {
+			return target;
+		},
+		async content(event, trigger, player) {
+			const target = event.indexedData;
 			if (!target.storage.jiaoying2) target.storage.jiaoying2 = [];
-			var cs = trigger.getl(player).hs;
-			for (var i of cs) target.storage.jiaoying2.add(get.color(i, player));
+			const cs = trigger.getl(player).hs,
+				cards = trigger.getg(target).filter(card => cs.includes(card));
+			for (let i of cards) target.storage.jiaoying2.add(get.color(i, player));
 			target.addTempSkill("jiaoying2");
 			target.markSkill("jiaoying2");
 			player.addTempSkill("jiaoying3");

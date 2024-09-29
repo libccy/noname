@@ -9086,7 +9086,7 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		filterTarget: function (card, player, target) {
-			return !player.getStorage("oljianhe_chosen").includes(target);
+			return !player.getStorage("oljianhe_used").includes(target);
 		},
 		filterCard: function (card, player) {
 			if (ui.selected.cards.length) {
@@ -9107,9 +9107,7 @@ const skills = {
 		position: "he",
 		complexCard: true,
 		discard: false,
-		visible: true,
-		prepare: "throw",
-		loseTo: "discardPile",
+		lose: false,
 		delay: 0.5,
 		check: function (card) {
 			if (get.type(card) == "equip") return 15 - get.value(card);
@@ -9117,11 +9115,12 @@ const skills = {
 		},
 		content: function () {
 			"step 0";
-			player.draw(cards.length);
-			player.addTempSkill("oljianhe_chosen", "phaseUseAfter");
-			player.markAuto("oljianhe_chosen", [target]);
+			event.type = get.type2(cards[0], player);
+			player.recast(cards);
+			player.addTempSkill("oljianhe_used", "phaseUseAfter");
+			player.markAuto("oljianhe_used", [target]);
 			"step 1";
-			var type = get.type2(cards[0]);
+			const type = event.type;
 			target
 				.chooseCard(get.translation(player) + "对你发动了【剑合】", "请重铸" + get.cnNumber(cards.length) + "张" + get.translation(type) + "牌，或点“取消”受到1点雷电伤害", cards.length, "he", (card, player) => {
 					return get.type2(card) == _status.event.type && player.canRecast(card);
@@ -9163,7 +9162,7 @@ const skills = {
 			},
 		},
 		subSkill: {
-			chosen: {
+			used: {
 				charlotte: true,
 				onremove: true,
 				intro: { content: "本阶段已对$发动过技能" },
@@ -19426,7 +19425,7 @@ const skills = {
 				var card = result.cards[0];
 				player.line(target, "green");
 				target.addTempSkills("new_zhixi", "phaseUseAfter");
-				if (card.name != "sha" && get.type(card) != "trick" && get.color(card) != "black") {
+				if (card.name != "sha" && !(get.type(card) == "trick" && get.color(card) == "black")) {
 					target.addTempSkill("new_meibu_range", "phaseUseAfter");
 					target.markAuto("new_meibu_range", player);
 				}

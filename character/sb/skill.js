@@ -1881,6 +1881,7 @@ const skills = {
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 					target.markAuto("sbfangzhu_ban", ["basic"]);
+					lib.skill.sbfangzhu_ban.init(target, "sbfangzhu_ban");
 				},
 				ai: {
 					result: {
@@ -1898,6 +1899,7 @@ const skills = {
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 					target.markAuto("sbfangzhu_ban", ["trick"]);
+					lib.skill.sbfangzhu_ban.init(target, "sbfangzhu_ban");
 				},
 				ai: {
 					result: {
@@ -1915,6 +1917,7 @@ const skills = {
 				async content(player, target) {
 					target.addTempSkill("sbfangzhu_ban", { player: "phaseEnd" });
 					target.markAuto("sbfangzhu_ban", ["equip"]);
+					lib.skill.sbfangzhu_ban.init(target, "sbfangzhu_ban");
 				},
 				ai: {
 					result: {
@@ -1930,7 +1933,7 @@ const skills = {
 				filter: player => get.mode() != "doudizhu" && game.hasPlayer(target => target != player),
 				filterTarget: lib.filter.notMe,
 				async content(player, target) {
-					target.addTempSkill("baiban", { player: "phaseEnd" });
+					target.addTempSkill("sbfangzhu_baiban", { player: "phaseEnd" });
 				},
 				ai: {
 					result: {
@@ -2068,6 +2071,16 @@ const skills = {
 		},
 		subSkill: {
 			backup: {},
+			baiban: {
+				init: function (player, skill) {
+					player.addTip(skill, '放逐 技能失效');
+				},
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
+				inherit: "baiban",
+				marktext: "逐",
+			},
 			kill: {
 				charlotte: true,
 				mark: true,
@@ -2082,6 +2095,12 @@ const skills = {
 				async content(event, trigger, player) {
 					trigger.directHit.add(player);
 				},
+				init(player, skill) {
+					player.addTip(skill, "放逐 无法响应");
+				},
+				onremove(player, skill) {
+					player.removeTip(skill);
+				},
 			},
 			ban: {
 				charlotte: true,
@@ -2094,6 +2113,16 @@ const skills = {
 						if (storage.length > 1) return "不能使用手牌";
 						return "于手牌中只能使用" + get.translation(storage[0]) + "牌";
 					},
+				},
+				init(player, skill) {
+					let storage = player.getStorage(skill);
+					if (storage.length) {
+						if (storage.length > 1) player.addTip(skill, `放逐 限手牌`);
+						else player.addTip(skill, `放逐 限${get.translation(storage[0])[0]}`);
+					}
+				},
+				onremove(player, skill) {
+					player.removeTip(skill);
 				},
 				mod: {
 					cardEnabled(card, player) {
