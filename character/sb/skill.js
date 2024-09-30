@@ -7053,7 +7053,7 @@ const skills = {
 			aiOrder: function (player, card, num) {
 				if (player.countUsed() >= player.getDamagedHp()) return;
 				var numx = get.info(card).usable;
-				if (typeof numx == "function") numx = num(card, player);
+				if (typeof numx == "function") return numx(card, player) + 10;
 				if (typeof numx == "number") return num + 10;
 			},
 		},

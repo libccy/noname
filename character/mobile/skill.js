@@ -7987,20 +7987,30 @@ const skills = {
 		mod: {
 			cardUsable: function (card, player) {
 				if (typeof card == "object") {
-					var evt = lib.skill.dcjianying.getLastUsed(player);
+					let num1 = get.number(card);
+					if (num1 != "unsure" && typeof num1 != "number") return;
+					if (!card.cards) return;
+					for (var i of card.cards) {
+						if (i.hasGaintag("xingtu1")) return Infinity;
+					}
+					let evt = lib.skill.dcjianying.getLastUsed(player);
 					if (!evt || !evt.card) return;
-					var num1 = get.number(card),
-						num2 = get.number(evt.card);
-					if (num1 === "unsure" || (typeof num1 == "number" && typeof num2 == "number" && num1 % num2 == 0)) return Infinity;
+					let num2 = get.number(evt.card);
+					if (typeof num2 == "number" && num1 % num2 == 0) return Infinity;
 				}
 			},
 			aiOrder: function (player, card, num) {
 				if (typeof card == "object") {
-					var evt = lib.skill.dcjianying.getLastUsed(player);
+					let num1 = get.number(card);
+					if (num1 != "unsure" && typeof num1 != "number") return;
+					if (!card.cards) return;
+					for (var i of card.cards) {
+						if (i.hasGaintag("xingtu1")) return num + 5;
+					}
+					let evt = lib.skill.dcjianying.getLastUsed(player);
 					if (!evt || !evt.card) return;
-					var num1 = get.number(card),
-						num2 = (num2 = get.number(evt.card));
-					if (num1 === "unsure" || (typeof num1 == "number" && typeof num2 == "number" && num2 % num1 == 0)) return num + 5;
+					let num2 = get.number(evt.card);
+					if (typeof num2 == "number" && num1 % num2 == 0) return num + 5;
 				}
 			},
 		},
