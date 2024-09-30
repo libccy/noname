@@ -677,7 +677,7 @@ const skills = {
 						for (const t of types) await player.disableEquip(t);
 						const num = Math.min(target.hasDisabledSlot() + target.isDamaged() + 1, types.length),
 							selected = [];
-						while(selected.length < num) {
+						while (selected.length < num) {
 							const result = await target
 								.chooseButton(
 									[
@@ -695,7 +695,7 @@ const skills = {
 								.set("forceAuto", true)
 								.set("filterButton", button => {
 									const player = get.event().player;
-									if(get.event("selected").includes(button.link)) return false;
+									if (get.event("selected").includes(button.link)) return false;
 									switch (button.link) {
 										case "equip":
 											return player.hasDisabledSlot();
@@ -5211,7 +5211,7 @@ const skills = {
 				var info = lib.skill.olgangshu.getInfo(player);
 				info[result.index] = Math.min(5, info[result.index] + 1);
 				game.log(player, "的", result.control.slice(0, result.control.indexOf("(")), "#y+1");
-				lib.skill.olgangshu.init(player);
+				player.markSkill("olgangshu_buff");
 			}
 		},
 		ai: {
@@ -5221,10 +5221,7 @@ const skills = {
 			buff: {
 				trigger: { player: "phaseDrawBegin2" },
 				charlotte: true,
-				onremove(player, skill) {
-					delete player.storage[skill];
-					lib.skill.olgangshu.init(player);
-				},
+				onremove: true,
 				forced: true,
 				filter: function (event, player) {
 					var info = lib.skill.olgangshu.getInfo(player);
@@ -5235,7 +5232,7 @@ const skills = {
 					var info = lib.skill.olgangshu.getInfo(player);
 					trigger.num += info[1];
 					info[1] = 0;
-					lib.skill.olgangshu.init(player);
+					player.markSkill("olgangshu_buff");
 				},
 				mod: {
 					attackRange: function (player, range) {
@@ -5248,6 +5245,7 @@ const skills = {
 						if (info) return num + info[2];
 					},
 				},
+				mark: true,
 				intro: {
 					markcount: function (storage, player) {
 						var info = lib.skill.olgangshu.getInfo(player);
@@ -11800,8 +11798,8 @@ const skills = {
 		audio: 2,
 		init(player, name) {
 			let list = [1, 2, 3, 4];
-			if(!player.storage[name]) player.storage[name] = list;
-			player.addTip("shanduan", "善断 " +  player.storage[name].slice().join(" "));
+			if (!player.storage[name]) player.storage[name] = list;
+			player.addTip("shanduan", "善断 " + player.storage[name].slice().join(" "));
 		},
 		onremove(player, name) {
 			player.removeTip(name);
@@ -18996,20 +18994,11 @@ const skills = {
 		locked: false,
 		preHidden: true,
 		filter: function (event, player) {
-			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
-			player.addTip("gzjili", "蒺藜 " + all.toString(), true);
-			return all == player.getAttackRange();
+			return player.getHistory("useCard").length + player.getHistory("respond").length == player.getAttackRange();
 		},
 		audio: 2,
 		content: function () {
 			player.draw(player.getHistory("useCard").length + player.getHistory("respond").length);
-		},
-		init(player) {
-			let all = player.getHistory("useCard").length + player.getHistory("respond").length;
-			if (all) player.addTip("gzjili", "蒺藜 " + all.toString(), true);
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
 		},
 		ai: {
 			threaten: 1.8,
@@ -19059,14 +19048,6 @@ const skills = {
 					} else if (get.tag(card, "respondSha") > 0) {
 						if (current < 0 && used == target.getAttackRange() - 1 && target.mayHaveSha(player)) return [1, (used + 1) / 2];
 					}
-				},
-			},
-		},
-		subSkill: {
-			count: {
-				charlotte: true,
-				onremove(player, skill) {
-					player.removeTip(skill);
 				},
 			},
 		},

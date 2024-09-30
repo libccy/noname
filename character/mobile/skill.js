@@ -7575,8 +7575,8 @@ const skills = {
 			},
 			result: { player: 7 },
 		},
-		group: ["xinjianying_draw"],
-		init(player) {
+		group: ["xinjianying_draw", "jianying_mark"],
+		init: function (player) {
 			if (player.isPhaseUsing()) {
 				var evt = _status.event.getParent("phaseUse");
 				var history = player.getHistory("useCard", function (evt2) {
@@ -7584,13 +7584,25 @@ const skills = {
 				});
 				if (history.length) {
 					var trigger = history[history.length - 1];
-					if (get.suit(trigger.card) == "none" || typeof get.number(trigger.card) != "number") return;
-					player.addTip("jianying", "渐营 " + lib.skill.jianying.getTranslation(trigger.card), "phaseUseAfter");
+					player.storage.jianying_mark = trigger.card;
+					player.markSkill("jianying_mark");
+					game.broadcastAll(
+						function (player, suit) {
+							if (player.marks.jianying_mark) player.marks.jianying_mark.firstChild.innerHTML = get.translation(suit);
+						},
+						player,
+						get.suit(trigger.card, player)
+					);
+					player.when("phaseUseAfter").then(() => {
+						player.unmarkSkill("jianying_mark");
+						delete player.storage.jianying_mark;
+					});
 				}
 			}
 		},
-		onremove(player) {
-			player.removeTip("jianying");
+		onremove: function (player) {
+			player.unmarkSkill("jianying_mark");
+			delete player.storage.jianying_mark;
 		},
 		subSkill: {
 			draw: { inherit: "jianying", audio: "xinjianying" },
