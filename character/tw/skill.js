@@ -10994,7 +10994,12 @@ const skills = {
 				audio: "yinlang",
 				trigger: { global: "phaseUseBegin" },
 				filter: function (event, player) {
-					return event.player.group == player.storage.yaohu && event.player.isIn() && player.getExpansions("jutu").length > 0;
+					return (
+						player !== event.player &&
+						event.player.group === player.storage.yaohu &&
+						event.player.isIn() &&
+						player.getExpansions("jutu").length > 0
+					);
 				},
 				forced: true,
 				locked: false,

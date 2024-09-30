@@ -3945,9 +3945,15 @@ const skills = {
 				charlotte: true,
 				onremove: true,
 				intro: { content: "出牌阶段第一张【杀】只能指定$为目标，且其不可响应你回合内使用的【杀】" },
-				trigger: { player: "useCard1" },
+				trigger: { player: "useCardToPlayered" },
 				filter: function (event, player) {
-					return player == _status.currentPhase && event.card.name == "sha";
+					return (
+						player === _status.currentPhase &&
+						event.card.name == "sha" &&
+						player.getStorage("luanqun_directHit").some(tar => {
+							return event.targets.includes(tar);
+						})
+					);
 				},
 				forced: true,
 				logTarget(event, player) {
@@ -3955,6 +3961,12 @@ const skills = {
 				},
 				content: function () {
 					trigger.directHit.addArray(player.getStorage("luanqun_directHit"));
+				},
+				ai: {
+					directHit_ai: true,
+					skillTagFilter(player, tag, arg) {
+						if (tag === "directHit_ai") return player.getStorage("luanqun_directHit").includes(arg.target);
+					},
 				},
 			},
 		},
