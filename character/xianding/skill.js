@@ -249,10 +249,10 @@ const skills = {
 						if (!owner) return false;
 						let att = get.attitude(player, owner);
 						if (get.position(card) == "j" && (card.viewAs || card.name) == "jsrg_xumou") att *= -1;
-						if (get.position(card) == "e" && get.equipValue(card, owner) > 0) att*= -1;
+						if (get.position(card) == "e" && get.equipValue(card, owner) > 0) att *= -1;
 						return att > 0;
 					});
-					if(valueCards.length * 2 >= cards.length) return "场上";
+					if (valueCards.length * 2 >= cards.length) return "场上";
 					return "牌堆";
 				})
 				.set("prompt", get.prompt2("dcchaozhen"))
@@ -313,7 +313,7 @@ const skills = {
 		},
 		check(event, player) {
 			if (player.countCards("h") < 2 || !player.isPhaseUsing()) return true;
-			if (player.countCards("h", card => player.hasValueTarget(card) && !player.countCards("h", cardx =>{
+			if (player.countCards("h", card => player.hasValueTarget(card) && !player.countCards("h", cardx => {
 				return get.number(cardx, player) < get.number(card, player);
 			}) && !player.getStorage("dclianjie_used").includes(get.number(card, player)))) return false;
 			return true;
@@ -15911,13 +15911,12 @@ const skills = {
 				}).setContent("gaincardMultiple");
 			}
 		},
-		init(player) {
-			var list = lib.skill.yuqi.getInfo(player);
-			player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
-		},
-		onremove(player, name) {
-			player.removeTip(name);
-			delete player.storage[name];
+		mark: true,
+		intro: {
+			content: function (storage, player) {
+				var info = lib.skill.yuqi.getInfo(player);
+				return '<div class="text center"><span class=thundertext>蓝色：' + info[0] + "</span>　<span class=firetext>红色：" + info[1] + "</span><br><span class=greentext>绿色：" + info[2] + "</span>　<span class=yellowtext>黄色：" + info[3] + "</span></div>";
+			},
 		},
 		ai: {
 			threaten: 8.8,
@@ -15964,7 +15963,7 @@ const skills = {
 				var list = lib.skill.yuqi.getInfo(player);
 				list[result.index] = Math.min(5, list[result.index] + 2);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
-				player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
+				player.markSkill("yuqi");
 				if (event.goon) player.recover();
 			}
 		},
@@ -16010,7 +16009,7 @@ const skills = {
 				var list = lib.skill.yuqi.getInfo(player);
 				list[result.index] = Math.min(5, list[result.index] + 1);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
-				player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
+				player.markSkill("yuqi");
 				if (player.isDamaged()) event.finish();
 			} else event.finish();
 			"step 2";
@@ -16044,7 +16043,7 @@ const skills = {
 				var list = lib.skill.yuqi.getInfo(player);
 				list[result.index] = Math.min(5, list[result.index] + 1);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
-				player.addTip("yuqi", "隅泣 " + list.slice().join(" "));
+				player.markSkill("yuqi");
 			}
 		},
 		ai: {
@@ -16151,7 +16150,7 @@ const skills = {
 			const list = ["选项一：摸两张牌", "选项二：对一名其他角色造成1点伤害，且本回合对其使用【杀】无距离和次数限制", "选项三：本回合手牌上限视为无限", "选项四：获得一名其他角色区域内的一张牌", "选项五：令一名其他角色将手牌数摸至体力上限（至多摸至五张）"],
 				num = Math.min(5, player.getDamagedHp() + 1),
 				selected = [];
-			while(selected.length < num) {
+			while (selected.length < num) {
 				const result = await player
 					.chooseButton([
 						"玉陨：是否选择一项执行？",
@@ -16234,7 +16233,7 @@ const skills = {
 										return get.damageEffect(target, player, player);
 									})
 									.forResult();
-								if(result2.bool) {
+								if (result2.bool) {
 									const target = result2.targets[0];
 									player.line(target, "green");
 									await target.damage();
@@ -16268,7 +16267,7 @@ const skills = {
 						}
 						case 4: {
 							if (game.hasPlayer(function (current) {
-									return current != player && current.countCards("h") < Math.min(5, current.maxHp);
+								return current != player && current.countCards("h") < Math.min(5, current.maxHp);
 							})) {
 								const result2 = await player
 									.chooseTarget(true, "令一名其他角色将手牌数摸至体力上限", function (card, player, current) {

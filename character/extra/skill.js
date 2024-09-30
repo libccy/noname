@@ -475,7 +475,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
-					target.addTempSkill("new_dclieqiong_abdomen", {player: "phaseEnd"});
+					target.addTempSkill("new_dclieqiong_abdomen", { player: "phaseEnd" });
 				}
 			},
 		},
@@ -542,6 +542,12 @@ const skills = {
 				event.control_ok.classList.add('disabled');
 				//创建对话框
 				const dialog = ui.create.dialog("forcebutton", "hidden");
+				dialog.listen(() => {
+					let allpos = dialog.querySelectorAll(".position");
+					allpos.forEach(pos => pos.classList.remove('selected_cp'));
+					event.selectedPos = null;
+					event.control_ok.classList.add('disabled');
+				});
 				event.dialog = dialog;
 				dialog.classList.add('dclieqiong', "fixed", 'fullheight');
 				dialog.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
@@ -550,7 +556,8 @@ const skills = {
 				//添加部位
 				for (let pos of list) {
 					let position = lib.skill.new_dclieqiong.positions[pos];
-					let div = ui.create.div('.position', dialog, () => {
+					let div = ui.create.div('.position', dialog, (e) => {
+						e.stopPropagation();
 						let allPosDiv = Array.from(dialog.querySelectorAll('.position'));
 						allPosDiv.forEach(p => p.classList.remove('selected_cp'));
 						div.classList.add('selected_cp');
@@ -563,6 +570,21 @@ const skills = {
 					});
 					let sex = target.hasSex("male") ? "male" : "female";
 					div.css(position['css_' + sex] || {});
+
+					//-------------------尝试使用nodeintro-------
+					div.classList.add("nodeintro");
+					div.nodeTitle = position.name;
+					div.nodeContent = position.info;
+					if (!lib.config.touchscreen) {
+						if (lib.config.hover_all) {
+							lib.setHover(div, ui.click.hoverplayer);
+						}
+						if (lib.config.right_info) {
+							div.oncontextmenu = ui.click.rightplayer;
+						}
+					}
+					//----------------------------------------------
+
 					div.style.setProperty('--info', `"【${position.name}】:${position.info}"`);
 				}
 				dialog.open();
@@ -3389,49 +3411,36 @@ const skills = {
 		prompt2: () => lib.translate.shelie_info,
 		group: "twshelie_jingce",
 		//什么精策技能啊喂！
-		init(player) {
-			if (player.hasSkill("twshelie_round") || player !== _status.currentPhase) return;
-			var list = [];
-			player.getHistory("useCard", function (evt) {
-				if (lib.suit.includes(get.suit(evt.card)) && !list.includes(get.suit(evt.card))) list.push(get.suit(evt.card));
-			});
-			if (list.length) {
-				list.sort(function (a, b) {
-					return lib.suit.indexOf(b) - lib.suit.indexOf(a);
-				});
-				player.addTip("twshelie", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""), true);
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
-		},
 		subSkill: {
 			round: { charlotte: true },
 			count: {
 				charlotte: true,
-				onremove(player, skill) {
-					player.removeTip(skill);
+				onremove: true,
+				intro: {
+					markcount(storage) {
+						return storage.length;
+					},
+					content: "本回合已使用$花色的牌",
 				},
 			},
 			jingce: {
 				audio: "shelie",
 				trigger: { player: ["phaseJieshuBegin", "useCard1"] },
 				filter(event, player) {
-					if (player.hasSkill("twshelie_round") || player !== _status.currentPhase) return false;
+					if (player.hasSkill("twshelie_round") || player != _status.currentPhase) return false;
 					var list = [];
 					player.getHistory("useCard", function (evt) {
 						if (lib.suit.includes(get.suit(evt.card)) && !list.includes(get.suit(evt.card))) list.push(get.suit(evt.card));
 					});
-					if (event.name == "useCard") {
-						if (list.length) {
-							list.sort(function (a, b) {
-								return lib.suit.indexOf(b) - lib.suit.indexOf(a);
-							});
-							player.addTip("twshelie", "涉猎 " + list.reduce((str, suit) => str + get.translation(suit), ""), true);
-						}
-						return false;
+					if (list.length) {
+						player.addTempSkill("twshelie_count");
+						player.storage.twshelie_count = list.sort(function (a, b) {
+							return lib.suit.indexOf(b) - lib.suit.indexOf(a);
+						});
+						player.markSkill("twshelie_count");
+						player.syncStorage("twshelie_count");
 					}
-					return list.length >= 4;
+					return event.name != "useCard" && list.length >= 4;
 				},
 				forced: true,
 				locked: false,
