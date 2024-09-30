@@ -3878,19 +3878,17 @@ const skills = {
 		group: "sbliuli_heart",
 		subSkill: {
 			heart: {
-				trigger: { player: "logSkill" },
+				trigger: { player: "discardAfter" },
 				filter: function (event, player) {
-					if (event.skill != "sbliuli") return false;
+					const evt = event.getParent("sbliuli", true);
+					if (!evt || !evt.cards) return false;
 					if (player.hasSkill("sbliuli_used")) return false;
-					var evt = event.log_event;
-					return player.hasHistory("lose", evtx => {
-						return evtx.getParent(2) == evt && get.suit(evtx.cards[0]) == "heart";
-					});
+					return get.suit(evt.cards[0]) == "heart";
 				},
 				direct: true,
 				content: function () {
 					"step 0";
-					var sourcex = trigger.log_event.getTrigger().player;
+					var sourcex = trigger.getParent("sbliuli", true).getTrigger().player;
 					player
 						.chooseTarget("流离：是否令一名不为" + get.translation(sourcex) + "的其他角色获得“流离”标记？", (card, player, target) => {
 							return target != player && target != _status.event.sourcex;
@@ -3918,9 +3916,7 @@ const skills = {
 				marktext: "流",
 				intro: { content: "回合开始时，执行一个额外的出牌阶段" },
 				content: function () {
-					var next = player.phaseUse();
-					event.next.remove(next);
-					trigger.next.push(next);
+					trigger.phaseList.splice(trigger.num, 0, `phaseUse|sbliuli`);
 					player.removeSkill("sbliuli_dangxian");
 				},
 			},

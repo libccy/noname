@@ -29,7 +29,8 @@ const characters = {
 		hp: 3,
 		skills: ["xingtu", "scls_juezhi"],
 		dieAudios: ["peixiu"],
-		trashBin: ["character:peixiu"]
+		trashBin: ["character:peixiu"],
+		groupBorder: "jin",
 	},
 	scl_caoying: {
 		sex: "female",
