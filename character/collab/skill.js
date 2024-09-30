@@ -67,6 +67,21 @@ const skills = {
 			const cards = player.getExpansions(skill);
 			if (cards.length) player.loseToDiscardpile(cards);
 		},
+		group: "oldingxi_biyue",
+		subSkill: {
+			biyue: {
+				audio: "oldingxi",
+				trigger: { player: "phaseJieshuBegin" },
+				forced: true,
+				locked: false,
+				filter(event, player) {
+					return player.countExpansions("oldingxi") > 0;
+				},
+				async content(event, trigger, player) {
+					await player.draw(player.countExpansions("oldingxi"));
+				},
+			},
+		},
 	},
 	olnengchen: {
 		audio: 2,
@@ -85,24 +100,26 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseUseBegin" },
 		filter(event, player) {
-			return player.hasExpansions("oldingxi");
+			return player.countExpansions("oldingxi") > (game.players.length + game.dead.length);
 		},
 		forced: true,
 		async content(event, trigger, player) {
-			let boom = false,
-				num = player.getExpansions("oldingxi").length;
+			let num = player.getExpansions("oldingxi").length;
 			while (num > 0) {
 				num--;
 				const next = player.executeDelayCardEffect("shandian");
 				await next;
-				if (!boom && player.hasHistory("damage", evt => evt.getParent(2) == next)) boom = true;
-			}
-			if (boom && player.hasExpansions("oldingxi")) {
-				const cards = player.getExpansions("oldingxi");
-				await player.gain(cards.randomGet(), player, "give");
+				if (player.hasHistory("damage", evt => evt.getParent(2) == next)) {
+					const cards = player.getExpansions("oldingxi");
+					if(cards.length) await player.gain(cards, player, "give");
+					break;
+				}
 			}
 		},
-		ai: { combo: "oldingxi" },
+		ai: {
+			combo: "oldingxi",
+			neg: true,
+		},
 	},
 	//刘协曹节
 	//我们意念合一×2
