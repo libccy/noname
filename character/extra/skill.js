@@ -3451,15 +3451,12 @@ const skills = {
 					else player.chooseControl("摸牌阶段", "出牌阶段").set("prompt", "涉猎：请选择要执行的额外阶段");
 					"step 1";
 					player.storage.twshelie = 1 - result.index;
+					const evt = trigger.getParent("phase", true, true);
 					if (result.index == 0) {
-						var next = player.phaseDraw();
-						event.next.remove(next);
-						trigger.getParent().next.push(next);
+						if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|twshelie");
 					}
 					if (result.index == 1) {
-						var next = player.phaseUse();
-						event.next.remove(next);
-						trigger.getParent().next.push(next);
+						if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseUse|twshelie");
 					}
 				},
 			},

@@ -13660,9 +13660,8 @@ const skills = {
 		forced: true,
 		content: function () {
 			if (!player.hasEquipableSlot(5) || player.getEquip("dagongche")) {
-				var next = player.phaseUse();
-				event.next.remove(next);
-				trigger.getParent().next.push(next);
+				const evt = trigger.getParent("phase", true, true);
+				if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseUse|dcwanglu");
 			} else {
 				var card = game.createCard("dagongche", "spade", 9);
 				player.$gain2(card);

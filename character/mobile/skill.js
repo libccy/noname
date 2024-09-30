@@ -12828,9 +12828,7 @@ const skills = {
 			if (card) player.gain(card, "gain2");
 			"step 1";
 			game.updateRoundNumber();
-			var next = player.phaseUse();
-			event.next.remove(next);
-			trigger.next.push(next);
+			trigger.phaseList.splice(trigger.num, 0, `phaseUse|${event.name}`);
 		},
 	},
 	xuewei: {

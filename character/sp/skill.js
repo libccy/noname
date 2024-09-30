@@ -7712,9 +7712,8 @@ const skills = {
 				forced: true,
 				popup: false,
 				content: function () {
-					var next = trigger.player.phaseDraw();
-					event.next.remove(next);
-					trigger.getParent("phase").next.push(next);
+					const evt = trigger.getParent("phase", true, true);
+					if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|olhongji");
 					player.removeSkill("olhongji_draw");
 				},
 			},
@@ -7724,9 +7723,8 @@ const skills = {
 				forced: true,
 				popup: false,
 				content: function () {
-					var next = trigger.player.phaseUse();
-					event.next.remove(next);
-					trigger.getParent("phase").next.push(next);
+					const evt = trigger.getParent("phase", true, true);
+					if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseUse|olhongji");
 					player.removeSkill("olhongji_use");
 				},
 			},
