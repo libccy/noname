@@ -542,6 +542,12 @@ const skills = {
 				event.control_ok.classList.add('disabled');
 				//创建对话框
 				const dialog = ui.create.dialog("forcebutton", "hidden");
+				dialog.listen(() => {
+					let allpos = dialog.querySelectorAll(".position");
+					allpos.forEach(pos => pos.classList.remove('selected_cp'));
+					event.selectedPos = null;
+					event.control_ok.classList.add('disabled');
+				});
 				event.dialog = dialog;
 				dialog.classList.add('dclieqiong', "fixed", 'fullheight');
 				dialog.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
@@ -550,7 +556,8 @@ const skills = {
 				//添加部位
 				for (let pos of list) {
 					let position = lib.skill.new_dclieqiong.positions[pos];
-					let div = ui.create.div('.position', dialog, () => {
+					let div = ui.create.div('.position', dialog, (e) => {
+						e.stopPropagation();
 						let allPosDiv = Array.from(dialog.querySelectorAll('.position'));
 						allPosDiv.forEach(p => p.classList.remove('selected_cp'));
 						div.classList.add('selected_cp');
@@ -563,6 +570,21 @@ const skills = {
 					});
 					let sex = target.hasSex("male") ? "male" : "female";
 					div.css(position['css_' + sex] || {});
+
+					//-------------------尝试使用nodeintro-------
+					div.classList.add("nodeintro");
+					div.nodeTitle = position.name;
+					div.nodeContent = position.info;
+					if (!lib.config.touchscreen) {
+						if (lib.config.hover_all) {
+							lib.setHover(div, ui.click.hoverplayer);
+						}
+						if (lib.config.right_info) {
+							div.oncontextmenu = ui.click.rightplayer;
+						}
+					}
+					//----------------------------------------------
+
 					div.style.setProperty('--info', `"【${position.name}】:${position.info}"`);
 				}
 				dialog.open();
