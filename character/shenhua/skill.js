@@ -2260,32 +2260,28 @@ const skills = {
 				return 20 * val;
 			},
 		},
-		trigger: { player: ["useCardAfter", "useCardToTargeted", "useCard1"] },
+		trigger: { player: ["useCardAfter", "useCardToTargeted"] },
 		prompt2(event, player) {
 			const cards = event.cards.filterInD("oe");
 			return "你可以将" + get.translation(cards) + (cards.length > 1 ? "以任意顺序" : "") + "置于牌堆顶，然后摸一张牌";
 		},
-		filter(event, player, name) {
-			let evt = event.name == "useCard" ? event : event.getParent();
-			let type = get.type2(evt.card, false);
-			if (
-				player.hasHistory(
-					"useCard",
-					evtx => {
-						return evtx != evt && get.type2(evtx.card, false) == type;
-					},
-					evt
-				)
-			)
-				return false;
-			if (name === "useCard1") {
-				lib.skill.nzry_shicai.init(player);
-				return false;
-			}
-			if (!event.cards.someInD("oe")) return false;
+		filter(event, player) {
+			if (!event.cards.someInD()) return false;
+			let evt = event,
+				type = get.type2(evt.card, false);
 			if (event.name == "useCardToTargeted") {
-				return type == "equip" && player == event.target;
-			} else return type !== "equip";
+				if (type != "equip" || player != event.target) return false;
+				evt = evt.getParent();
+			} else {
+				if (type == "equip") return false;
+			}
+			return !player.hasHistory(
+				"useCard",
+				evtx => {
+					return evtx != evt && get.type2(evtx.card, false) == type;
+				},
+				evt
+			);
 		},
 		check(event, player) {
 			if (get.type(event.card) == "equip") {
@@ -2323,28 +2319,7 @@ const skills = {
 			game.log(player, "将", cards, "置于了牌堆顶");
 			await player.draw();
 		},
-		init(player) {
-			const types = player
-				.getHistory("useCard")
-				.slice()
-				.map(evt => get.translation(get.type2(evt.card, false))[0] || "")
-				.unique();
-			if (types.length) {
-				player.addTip("nzry_shicai", "恃才 " + types.slice().join(" "), true);
-			}
-		},
-		onremove(player, skill) {
-			player.removeTip(skill);
-		},
-		subSkill: {
-			2: {
-				audio: 2,
-				charlotte: true,
-				onremove(player, skill) {
-					player.removeTip(skill);
-				},
-			},
-		},
+		subSkill: { 2: { audio: 2 } },
 		ai: {
 			reverseOrder: true,
 			skillTagFilter(player) {
@@ -2400,7 +2375,7 @@ const skills = {
 		},
 		group: ["nzry_mingren_1", "nzry_mingren_2"],
 		ai: {
-			notemp: true,
+			notemp: true
 		},
 		subSkill: {
 			1: {
@@ -2624,13 +2599,10 @@ const skills = {
 					player.changeZhuanhuanji("nzry_shenshi");
 					await player.give(event.cards, target);
 					await target.damage("nocard");
-					if (
-						!game.getGlobalHistory("everything", evt => {
-							if (evt.name != "die" || evt.player != target) return false;
-							return evt.reason?.getParent() == event;
-						}).length
-					)
-						return;
+					if (!game.getGlobalHistory("everything", evt => {
+						if (evt.name != "die" || evt.player != target) return false;
+						return evt.reason?.getParent() == event;
+					}).length) return;
 					const { result } = await player
 						.chooseTarget("令一名角色将手牌摸至四张", function (card, player, target) {
 							return target.countCards("h") < 4;
@@ -3713,7 +3685,7 @@ const skills = {
 			},
 			nodiscard: true,
 			nolose: true,
-			notemp: true,
+			notemp: true
 		},
 	},
 	zaoxian: {
@@ -6281,7 +6253,7 @@ const skills = {
 			}
 		},
 		ai: {
-			combo: "moon_jushou",
+			combo: "moon_jushou"
 		},
 	},
 	releiji: {
