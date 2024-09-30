@@ -475,7 +475,7 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
-					target.addTempSkill("new_dclieqiong_abdomen", {player: "phaseEnd"});
+					target.addTempSkill("new_dclieqiong_abdomen", { player: "phaseEnd" });
 				}
 			},
 		},
@@ -542,6 +542,12 @@ const skills = {
 				event.control_ok.classList.add('disabled');
 				//创建对话框
 				const dialog = ui.create.dialog("forcebutton", "hidden");
+				dialog.listen(() => {
+					let allpos = dialog.querySelectorAll(".position");
+					allpos.forEach(pos => pos.classList.remove('selected_cp'));
+					event.selectedPos = null;
+					event.control_ok.classList.add('disabled');
+				});
 				event.dialog = dialog;
 				dialog.classList.add('dclieqiong', "fixed", 'fullheight');
 				dialog.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
@@ -550,7 +556,8 @@ const skills = {
 				//添加部位
 				for (let pos of list) {
 					let position = lib.skill.new_dclieqiong.positions[pos];
-					let div = ui.create.div('.position', dialog, () => {
+					let div = ui.create.div('.position', dialog, (e) => {
+						e.stopPropagation();
 						let allPosDiv = Array.from(dialog.querySelectorAll('.position'));
 						allPosDiv.forEach(p => p.classList.remove('selected_cp'));
 						div.classList.add('selected_cp');
