@@ -3598,61 +3598,67 @@ const skills = {
 		},
 		subSkill: {
 			xiongluan: {
-				trigger: { player: "phaseEnd" },
+				trigger: { player: ["phaseEnd", "useCard"] },
 				charlotte: true,
 				forced: true,
 				popup: false,
-				onremove: function (player, skill) {
+				onremove(player, skill) {
 					player.removeGaintag("dclvecheng_xiongluan");
 					delete player.storage[skill];
 				},
-				filter: function (event, player) {
+				filter(event, player) {
+					if (event.name == "useCard") {
+						if (event.addCount === false) return false;
+						return player.hasHistory("lose", evt => {
+							if (evt.getParent() != event) return false;
+							for (var i in evt.gaintag_map) {
+								if (evt.gaintag_map[i].includes("dclvecheng_xiongluan")) return true;
+							}
+							return false;
+						});
+					}
 					return player.getStorage("dclvecheng_xiongluan").some(i => i.isIn());
 				},
-				content: function () {
-					"step 0";
-					event.targets = player.getStorage("dclvecheng_xiongluan").slice();
-					event.targets.sortBySeat();
-					"step 1";
-					if (!event.targets.length) {
-						event.finish();
+				async content(event, trigger, player) {
+					if (trigger.name == "useCard") {
+						trigger.addCount = false;
+						trigger.player.getStat().card.sha--;
 						return;
 					}
-					var target = event.targets.shift();
-					event.target = target;
-					target.showHandcards();
-					var cards = target.getCards("h", "sha");
-					if (!cards.length) event.redo();
-					else event.forced = false;
-					"step 2";
-					var forced = event.forced;
-					var prompt2 = forced ? "掠城：选择对" + get.translation(player) + "使用的【杀】" : "掠城：是否依次对" + get.translation(player) + "使用所有的【杀】？";
-					target
-						.chooseToUse(
-							forced,
-							function (card, player, event) {
-								if (get.itemtype(card) != "card" || get.name(card) != "sha") return false;
-								return lib.filter.filterCard.apply(this, arguments);
-							},
-							prompt2
-						)
-						.set("targetRequired", true)
-						.set("complexSelect", true)
-						.set("filterTarget", function (card, player, target) {
-							if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
-							return lib.filter.targetEnabled.apply(this, arguments);
-						})
-						.set("sourcex", player);
-					"step 3";
-					if (result.bool) {
-						if (target.countCards("h", "sha")) {
-							event.forced = true;
-							event.goto(2);
-							return;
+					const targets = player.getStorage("dclvecheng_xiongluan").slice().sortBySeat();
+					if (!targets.length) return;
+					while(targets.length) {
+						const target = targets.shift();
+						await target.showHandcards();
+						let cards = target.getCards("h", "sha");
+						if (!cards.length) continue;
+						let forced = false;
+						while(cards.length) {
+							const prompt2 = forced ? `掠城：选择对${get.translation(player)}使用的【杀】` : `掠城：是否依次对${get.translation(player)}使用所有的【杀】？`;
+							const result = await target
+								.chooseToUse(
+									forced,
+									function (card, player, event) {
+										if (get.itemtype(card) != "card" || get.name(card) != "sha") return false;
+										return lib.filter.filterCard.apply(this, arguments);
+									},
+									prompt2
+								)
+								.set("targetRequired", true)
+								.set("complexSelect", true)
+								.set("filterTarget", function (card, player, target) {
+									if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
+									return lib.filter.targetEnabled.apply(this, arguments);
+								})
+								.set("sourcex", player)
+								.forResult();
+							if (result.bool) {
+								cards = target.getCards("h", "sha");
+								forced = true;
+							}
+							else break;
 						}
 					}
-					event.forced = false;
-					event.goto(1);
 				},
 				intro: {
 					content: "对$使用“掠城”【杀】无任何次数限制",

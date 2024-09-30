@@ -1856,6 +1856,7 @@ const skills = {
 			player.addTempSkill("dcsbwuwei_effect");
 			event.result.cards = player.getCards("h", { color: color });
 			event.result.card.cards = player.getCards("h", { color: color });
+			event.getParent().addCount = false;
 		},
 		ai: {
 			order(item, player) {
