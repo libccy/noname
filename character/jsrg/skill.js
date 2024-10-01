@@ -1717,12 +1717,12 @@ const skills = {
 				});
 			if (get.attitude(get.zhu(player), player) > 0) {
 				//听话的主公应该忠臣给啥你亮啥
-				next.ai = function (card) {
+				next.set("ai", card => {
 					const target = get.zhu(player),
 						history = target.getHistory("gain", evt => evt.getParent("jsrgwentian", true)?.player == player);
 					if (history.length && get.color(card) == get.color(history[0].cards[0])) return 2 + Math.random();
 					return Math.random();
-				};
+				});
 			}
 			await next;
 		},
@@ -2981,50 +2981,50 @@ const skills = {
 				},
 				async content(event, trigger, player) {
 					player.chooseToDebate(player.getStorage("jsrgyaoyan_hold").filter(i => i.isIn())).set("callback", async event => {
-						const { bool, opinion, targets } = event.debateResult;
-						if (bool && opinion && ["red", "black"].includes(opinion)) {
-							if (opinion == "red") {
-								const notDebated = game.filterPlayer().removeArray(targets);
-								if (notDebated.length) {
-									const { result } = await player
-										.chooseTarget("获得任意名未议事的角色的各一张手牌", [1, Infinity], true, (card, player, target) => {
-											return get.event("targets").includes(target) && target.countGainableCards(player, "h");
-										})
-										.set("targets", notDebated)
-										.set("ai", target => {
-											const player = get.player();
-											const att = get.attitude(player, target);
-											return -att;
-										});
-									if (result.bool) {
-										const targets = result.targets;
-										targets.sortBySeat();
-										player.line(targets, "green");
-										for (const current of targets) {
-											await player.gainPlayerCard(current, "h", true);
+							const { bool, opinion, targets } = event.debateResult;
+							if (bool && opinion && ["red", "black"].includes(opinion)) {
+								if (opinion == "red") {
+									const notDebated = game.filterPlayer().removeArray(targets);
+									if (notDebated.length) {
+										const { result } = await player
+											.chooseTarget("获得任意名未议事的角色的各一张手牌", [1, Infinity], true, (card, player, target) => {
+												return get.event("targets").includes(target) && target.countGainableCards(player, "h");
+											})
+											.set("targets", notDebated)
+											.set("ai", target => {
+												const player = get.player();
+												const att = get.attitude(player, target);
+												return -att;
+											});
+										if (result.bool) {
+											const targets = result.targets;
+											targets.sortBySeat();
+											player.line(targets, "green");
+											for (const current of targets) {
+												await player.gainPlayerCard(current, "h", true);
+											}
 										}
 									}
-								}
-							} else {
-								const {
-									result: { bool, targets: targets2 },
-								} = await player
-									.chooseTarget("是否对一名议事的角色造成2点伤害？", (card, player, target) => {
-										return get.event("targets").includes(target);
-									})
-									.set("targets", targets)
-									.set("ai", target => {
-										const player = get.player();
-										const eff = get.damageEffect(target, player, player);
-										return eff;
-									});
-								if (bool) {
-									player.line(targets2[0]);
-									targets2[0].damage(2);
+								} else {
+									const {
+										result: { bool, targets: targets2 },
+									} = await player
+										.chooseTarget("是否对一名议事的角色造成2点伤害？", (card, player, target) => {
+											return get.event("targets").includes(target);
+										})
+										.set("targets", targets)
+										.set("ai", target => {
+											const player = get.player();
+											const eff = get.damageEffect(target, player, player);
+											return eff;
+										});
+									if (bool) {
+										player.line(targets2[0]);
+										targets2[0].damage(2);
+									}
 								}
 							}
-						}
-					});
+						});
 				},
 			},
 		},
