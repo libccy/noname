@@ -571,20 +571,7 @@ const skills = {
 					let sex = target.hasSex("male") ? "male" : "female";
 					div.css(position['css_' + sex] || {});
 
-					//-------------------尝试使用nodeintro-------
-					div.classList.add("nodeintro");
-					div.nodeTitle = position.name;
-					div.nodeContent = position.info;
-					if (!lib.config.touchscreen) {
-						if (lib.config.hover_all) {
-							lib.setHover(div, ui.click.hoverplayer);
-						}
-						if (lib.config.right_info) {
-							div.oncontextmenu = ui.click.rightplayer;
-						}
-					}
-					//----------------------------------------------
-
+					div.setNodeIntro(position.name, position.info);
 					div.style.setProperty('--info', `"【${position.name}】:${position.info}"`);
 				}
 				dialog.open();

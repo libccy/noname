@@ -380,7 +380,7 @@ export class Player extends HTMLDivElement {
 	 * @param {string} message 设置提示标记的内容
 	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 是否是临时的tip。默认为false,表示一直存在；若为true,则回合结束自动失去。也可以填一个具体的自定义时机。
 	 * @param { object } [css] 自定义的样式
-	 * @returns { HTMLDivElement }
+	 * @returns { void }
 	 * @author Curpond
 	 */
 	addTip(index, message, isTemp = false, css = {}) {
@@ -427,7 +427,7 @@ export class Player extends HTMLDivElement {
 				})
 				.finish();
 		}
-		return player.tips.get(index);
+
 	}
 	/**
 	 * 清除标记，不传参数可以清空所有标记
