@@ -8187,6 +8187,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
+			player.addTip('xingtu', `行图 ${get.translation(get.number(event.card, player))}`);
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
 			if (!evt || !evt.card) return false;
 			var num1 = get.number(event.card),
@@ -8231,6 +8232,7 @@ const skills = {
 			player.removeSkill("xingtu_mark");
 			player.removeGaintag("xingtu1");
 			player.removeGaintag("xingtu2");
+			player.removeTip('xingtu');
 			delete player.storage.xingtu_mark;
 		},
 		subSkill: {
