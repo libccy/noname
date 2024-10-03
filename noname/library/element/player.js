@@ -377,7 +377,7 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 设置提示文字，有则更改，无则加之。
 	 * @param {string} index 给标记起一个名字，名字任意
-	 * @param {string} message 设置提示标记的内容
+	 * @param {string} message 设置提示标记的内容,标记中的\n代表换行符
 	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 是否是临时的tip。默认为false,表示一直存在；若为true,则回合结束自动失去。也可以填一个具体的自定义时机。
 	 * @param { object } [css] 自定义的样式
 	 * @returns { void }
@@ -390,7 +390,7 @@ export class Player extends HTMLDivElement {
 				player.node.tipContainer ??= ui.create.div(".tipContainer", player);
 				player.tips ??= new Map();
 				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
-				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>').replace(/\n/g, '<br>');
 				player.tips.get(index).css(css);
 
 				let double = player.classList.contains('fullskin2') && lib.config.layout !== 'long2';
