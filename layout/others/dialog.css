@@ -288,3 +288,7 @@
     padding: 2px;
     font-size: 1.1em;
 } */
+
+.marks{
+    transform: translateX(-8px);
+}

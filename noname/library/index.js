@@ -11744,9 +11744,11 @@ export class Library {
 		fengyin: {
 			init: function (player, skill) {
 				player.addSkillBlocker(skill);
+				player.addTip(skill, '非锁定技失效');
 			},
 			onremove: function (player, skill) {
 				player.removeSkillBlocker(skill);
+				player.removeTip(skill);
 			},
 			charlotte: true,
 			skillBlocker: function (skill, player) {

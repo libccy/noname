@@ -12637,9 +12637,10 @@ const skills = {
 		trigger: { player: "useCard" },
 		frequent: true,
 		filter: function (event, player) {
+			if (!player.isPhaseUsing()) return false;
+			player.addTip("jianying", '渐营 ' + get.translation(get.suit(event.card, player)) + get.translation(get.strNumber(get.number(event.card, player))), true);
 			var evt = player.getLastUsed(1);
 			if (!evt || !evt.card) return false;
-			if (!player.isPhaseUsing()) return false;
 			var evt2 = evt.getParent("phaseUse");
 			if (!evt2 || evt2.name != "phaseUse" || evt2 !== event.getParent("phaseUse")) return false;
 			return (get.suit(evt.card) != "none" && get.suit(evt.card) == get.suit(event.card)) || (typeof get.number(evt.card, false) == "number" && get.number(evt.card, false) == get.number(event.card));

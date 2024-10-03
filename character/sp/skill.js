@@ -18968,8 +18968,13 @@ const skills = {
 		frequent: true,
 		locked: false,
 		preHidden: true,
+		onremove(player) {
+			player.removeTip('gzjili');
+		},
 		filter: function (event, player) {
-			return player.getHistory("useCard").length + player.getHistory("respond").length == player.getAttackRange();
+			let count = player.getHistory("useCard").length + player.getHistory("respond").length;
+			player.addTip('gzjili', '蒺藜 ' + count, true);
+			return count == player.getAttackRange();
 		},
 		audio: 2,
 		content: function () {
