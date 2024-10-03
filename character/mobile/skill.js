@@ -1916,6 +1916,17 @@ const skills = {
 					resolve(event._result);
 					game.resume();
 				});
+				event.switchToAuto = function () {
+					_status.imchoosing = false;
+					event.dialog?.close();
+					event.control_ok?.close();
+					event.control_cancel?.close();
+					event._result = {
+						bool: false
+					};
+					resolve(event._result);
+					game.resume();
+				};
 				dialog.addNewRow('请选择一种花色的牌弃置');
 				let keys = Object.keys(suitCards);
 				//添加框
@@ -2002,15 +2013,13 @@ const skills = {
 			let next;
 			if (event.isMine()) {
 				next = chooseOneSuitCard(player, player);
-			} else if (player.isOnline) {
+			} else if (player.isOnline()) {
 				let { promise, resolve } = Promise.withResolvers();
 				player.send(chooseOneSuitCard, player, player);
-				let suitCards = Object.groupBy(player.getCards('h'), c => get.suit(c, player));
 				player.wait(result => {
 					if (result == 'ai') {
 						resolve({
-							bool: true,
-							cards: suitCards.randomGet()
+							bool: false
 						});
 					} else {
 						resolve(result);
@@ -2019,8 +2028,7 @@ const skills = {
 				next = promise;
 			} else {
 				next = Promise.resolve({
-					bool: true,
-					cards: suitCards.randomGet()
+					bool: false,
 				});
 			}
 
@@ -2049,13 +2057,11 @@ const skills = {
 
 			} else if (player.isOnline()) {
 				let { promise, resolve } = Promise.withResolvers();
-				let suitCards = Object.groupBy(target.getCards('h'), c => get.suit(c, target));
 				player.send(chooseOneSuitCard, player, target);
 				player.wait(result => {
 					if (result == 'ai') {
 						resolve({
-							bool: true,
-							cards: suitCards.randomGet()
+							bool: false
 						});
 					} else {
 						resolve(result);
@@ -2063,9 +2069,8 @@ const skills = {
 				});
 				next2 = promise;
 			} else {
-				next2 = Promise.resolve({
-					bool: true,
-					cards: suitCards.randomGet()
+				next = Promise.resolve({
+					bool: false,
 				});
 			}
 			let result3 = await next2;
