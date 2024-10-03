@@ -110,7 +110,7 @@ const skills = {
 						if (choice == "弃置武器牌") await player.discard(event.cards);
 						else await player.removeSkills(choice);
 						const target = event.target;
-						await target.chooseToDiscard(2, true, "h");
+						await target.chooseToDiscard(2, true, "he");
 					},
 					ai1(card) {
 						return 10 - get.value(card);

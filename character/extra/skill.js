@@ -368,15 +368,15 @@ const skills = {
 		derivation: ["dclieqiong_place1", "dclieqiong_place4", "dclieqiong_place5", "dclieqiong_place6", "dclieqiong_place7"],
 		positions: {
 			head: {
-				name: '天冲',
-				info: '令其失去所有体力，若其因此死亡，你增加一点体力上限',
+				name: "天冲",
+				info: "令其失去所有体力，若其因此死亡，你增加一点体力上限",
 				css_male: {
-					left: '50%',
-					top: '14%'
+					left: "50%",
+					top: "14%",
 				},
 				css_female: {
-					left: '45%',
-					top: '10%'
+					left: "45%",
+					top: "10%",
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
@@ -391,36 +391,36 @@ const skills = {
 							await player.gainMaxHp();
 						}
 					}
-				}
+				},
 			},
 			hand: {
-				name: '力烽',
-				info: '令其随机弃置一半手牌（向上取整）',
+				name: "力烽",
+				info: "令其随机弃置一半手牌（向上取整）",
 				css_male: {
-					left: '28%',
-					top: '40%'
+					left: "28%",
+					top: "40%",
 				},
 				css_female: {
-					left: '72%',
-					top: '40%'
+					left: "72%",
+					top: "40%",
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
 					const cardx = target.getDiscardableCards(target, "h");
 					const num = Math.ceil(cardx.length / 2);
 					if (cardx.length) await target.discard(cardx.randomGets(num));
-				}
+				},
 			},
 			leg: {
-				name: '地机',
-				info: '令其下一次受到的伤害+1直到其下个回合结束',
+				name: "地机",
+				info: "令其下一次受到的伤害+1直到其下个回合结束",
 				css_male: {
-					left: '35%',
-					top: '80%'
+					left: "35%",
+					top: "80%",
 				},
 				css_female: {
-					left: '67%',
-					top: '80%'
+					left: "67%",
+					top: "80%",
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
@@ -433,18 +433,18 @@ const skills = {
 							player.removeTip("new_dclieqiong_leg");
 							if (trigger.name == "damage") trigger.num++;
 						});
-				}
+				},
 			},
 			chest: {
-				name: '中枢',
-				info: '令其使用的下一张牌无效直到其回合结束',
+				name: "中枢",
+				info: "令其使用的下一张牌无效直到其回合结束",
 				css_male: {
-					left: '50%',
-					top: '30%'
+					left: "50%",
+					top: "30%",
 				},
 				css_female: {
-					left: '40%',
-					top: '25%'
+					left: "40%",
+					top: "25%",
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
@@ -460,23 +460,23 @@ const skills = {
 								trigger.all_excluded = true;
 							}
 						});
-				}
+				},
 			},
 			abdomen: {
-				name: '气海',
-				info: '令其不能使用或打出♥️牌直到其回合结束',
+				name: "气海",
+				info: "令其不能使用或打出♥️牌直到其回合结束",
 				css_male: {
-					left: '50%',
-					top: '42%'
+					left: "50%",
+					top: "42%",
 				},
 				css_female: {
-					left: '40%',
-					top: '35%'
+					left: "40%",
+					top: "35%",
 				},
 				async content(event, trigger, player) {
 					const { target, position } = event;
 					target.addTempSkill("new_dclieqiong_abdomen", { player: "phaseEnd" });
-				}
+				},
 			},
 		},
 		async cost(event, trigger, player) {
@@ -484,10 +484,12 @@ const skills = {
 			await Promise.all(event.next);
 			event.videoId = lib.status.videoId++;
 			let list = Object.keys(lib.skill[event.skill].positions);
-			if (!player.hasHistory('useSkill', evt => {
-				return evt.skill == event.name.slice(0, -5) && evt?.targets.includes(target);
-			})) {
-				list.remove('head');
+			if (
+				!player.hasHistory("useSkill", evt => {
+					return evt.skill == event.name.slice(0, -5) && evt?.targets.includes(target);
+				})
+			) {
+				list.remove("head");
 			}
 			if (!list?.length) {
 				event.result = { bool: false };
@@ -518,15 +520,6 @@ const skills = {
 					if (event.control_cancel) event.control_cancel.close();
 					if (event.control_ok) event.control_ok.close();
 				};
-				event.control_cancel = ui.create.control("cancel2", function (link) {
-					event.dialog.close();
-					event.control_cancel.close();
-					if (event.control_ok) event.control_ok.close();
-					game.resume();
-					_status.imchoosing = false;
-					event._result = { bool: false };
-					resolve(event._result);
-				});
 				event.control_ok = ui.create.control("ok", function (link) {
 					event.dialog.close();
 					event.control_cancel.close();
@@ -539,40 +532,49 @@ const skills = {
 					};
 					resolve(event._result);
 				});
-				event.control_ok.classList.add('disabled');
+				event.control_cancel = ui.create.control("cancel2", function (link) {
+					event.dialog.close();
+					event.control_cancel.close();
+					if (event.control_ok) event.control_ok.close();
+					game.resume();
+					_status.imchoosing = false;
+					event._result = { bool: false };
+					resolve(event._result);
+				});
+				event.control_ok.classList.add("disabled");
 				//创建对话框
 				const dialog = ui.create.dialog("forcebutton", "hidden");
 				dialog.listen(() => {
 					let allpos = dialog.querySelectorAll(".position");
-					allpos.forEach(pos => pos.classList.remove('selected_cp'));
+					allpos.forEach(pos => pos.classList.remove("selected_cp"));
 					event.selectedPos = null;
-					event.control_ok.classList.add('disabled');
+					event.control_ok.classList.add("disabled");
 				});
 				event.dialog = dialog;
-				dialog.classList.add('dclieqiong', "fixed", 'fullheight');
+				dialog.classList.add("dclieqiong", "fixed", "fullheight");
 				dialog.style.backgroundImage = "url(" + lib.assetURL + "image/card/yiwu_" + (target.hasSex("male") ? "male" : "female") + ".png)";
 				const title = ui.create.div(".title", dialog);
 				title.innerHTML = `裂穹：是否击伤${get.translation(target)}的一个部位？`;
 				//添加部位
 				for (let pos of list) {
 					let position = lib.skill.new_dclieqiong.positions[pos];
-					let div = ui.create.div('.position', dialog, (e) => {
+					let div = ui.create.div(".position", dialog, e => {
 						e.stopPropagation();
-						let allPosDiv = Array.from(dialog.querySelectorAll('.position'));
-						allPosDiv.forEach(p => p.classList.remove('selected_cp'));
-						div.classList.add('selected_cp');
+						let allPosDiv = Array.from(dialog.querySelectorAll(".position"));
+						allPosDiv.forEach(p => p.classList.remove("selected_cp"));
+						div.classList.add("selected_cp");
 						event.selectedPos = pos;
-						if (allPosDiv.some(p => p.classList.contains('selected_cp')) && event.selectedPos) {
-							event.control_ok.classList.remove('disabled');
+						if (allPosDiv.some(p => p.classList.contains("selected_cp")) && event.selectedPos) {
+							event.control_ok.classList.remove("disabled");
 						} else {
-							event.control_ok.classList.add('disabled');
+							event.control_ok.classList.add("disabled");
 						}
 					});
 					let sex = target.hasSex("male") ? "male" : "female";
-					div.css(position['css_' + sex] || {});
+					div.css(position["css_" + sex] || {});
 
 					div.setNodeIntro(position.name, position.info);
-					div.style.setProperty('--info', `"【${position.name}】:${position.info}"`);
+					div.style.setProperty("--info", `"【${position.name}】:${position.info}"`);
 				}
 				dialog.open();
 				game.pause();
@@ -606,17 +608,16 @@ const skills = {
 					position: result.position,
 					target: target,
 				},
-
 			};
 		},
 		async content(event, trigger, player) {
 			const { target, position } = event.cost_data;
 			const positionObj = lib.skill[event.name].positions[position];
-			let next = game.createEvent(event.name + 'effect', false);
+			let next = game.createEvent(event.name + "effect", false);
 			next.setContent(positionObj.content);
-			next.set('target', target);
-			next.set('player', player);
-			next.set('position', positionObj);
+			next.set("target", target);
+			next.set("player", player);
+			next.set("position", positionObj);
 			await next;
 		},
 		subSkill: {
@@ -655,7 +656,7 @@ const skills = {
 		},
 		async cost(event, trigger, player) {
 			const hps = [player.getHp(), player.getDamagedHp()];
-			let list = [(hps[0] > 0 ? "摸" + get.cnNumber(hps[0]) + "张牌，" : "") + "此阶段使用的下一张【杀】无距离限制且不能被响应。", (hps[1] > 0 ? "摸" + get.cnNumber(hps[1]) + "张牌" : "") + "此阶段下一次造成伤害后，回复等量体力。"];
+			let list = [(hps[0] > 0 ? "摸" + get.cnNumber(hps[0]) + "张牌，" : "") + "此阶段使用的下一张【杀】无距离限制且不能被响应。", (hps[1] > 0 ? "摸" + get.cnNumber(hps[1]) + "张牌，" : "") + "此阶段下一次造成伤害后，回复等量体力。"];
 			let result = await player
 				.chooseControlList(list)
 				.set("ai", function () {

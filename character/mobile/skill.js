@@ -2316,10 +2316,12 @@ const skills = {
 		subSkill: {
 			backup: {},
 			baiban: {
-				init: function (player, skill) {
+				init(player, skill) {
+					player.addSkillBlocker(skill);
 					player.addTip(skill, '放逐 技能失效');
 				},
 				onremove(player, skill) {
+					player.removeSkillBlocker(skill);
 					player.removeTip(skill);
 				},
 				inherit: "baiban",
