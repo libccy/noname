@@ -1880,7 +1880,7 @@ const skills = {
 			 * @param {Player} player 
 			 * @param {Player} target 
 			 */
-			function chooseOneSuitCard(player, target) {
+			function chooseOneSuitCard(player, target, force = false) {
 
 				const { promise, resolve } = Promise.withResolvers();
 				const event = _status.event;
@@ -1905,17 +1905,21 @@ const skills = {
 					game.resume();
 				});
 				event.control_ok.classList.add('disabled');
-				event.control_cancel = ui.create.control('cancel', (link) => {
-					_status.imchoosing = false;
-					event.dialog.close();
-					event.control_ok?.close();
-					event.control_cancel?.close();
-					event._result = {
-						bool: false,
-					};
-					resolve(event._result);
-					game.resume();
-				});
+				//如果是非强制的，才创建取消按钮
+				if (!force) {
+					event.control_cancel = ui.create.control('cancel', (link) => {
+						_status.imchoosing = false;
+						event.dialog.close();
+						event.control_ok?.close();
+						event.control_cancel?.close();
+						event._result = {
+							bool: false,
+						};
+						resolve(event._result);
+						game.resume();
+					});
+				}
+
 				event.switchToAuto = function () {
 					_status.imchoosing = false;
 					event.dialog?.close();
@@ -1927,8 +1931,11 @@ const skills = {
 					resolve(event._result);
 					game.resume();
 				};
-				dialog.addNewRow('请选择一种花色的牌弃置');
-				let keys = Object.keys(suitCards);
+				dialog.addNewRow(`请选择【${get.translation(target)}】一种花色的牌弃置`);
+				let keys = Object.keys(suitCards).sort((a, b) => {
+					let arr = ['spade', 'heart', 'club', 'diamond', 'none'];
+					return arr.indexOf(a) - arr.indexOf(b);
+				});
 				//添加框
 				while (keys.length) {
 					let key1 = keys.shift();
@@ -1948,30 +1955,34 @@ const skills = {
 					//给框加封条，显示xxx牌多少张
 					function createCustom(suit, count) {
 						return function (itemContainer) {
+							function formatStr(str) {
+								return str.replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+							}
+
 							let div = ui.create.div(itemContainer);
 							if (count) {
-								div.innerHTML = `${get.translation(suit)}牌${count}张`;
+								div.innerHTML = formatStr(`${get.translation(suit)}牌${count}张`);
 
 							} else {
-								div.innerHTML = `没有${get.translation(suit)}牌`;
+								div.innerHTML = formatStr(`没有${get.translation(suit)}牌`);
 							}
 							div.css({
 								position: 'absolute',
 								width: '100%',
 								bottom: '1%',
 								height: '35%',
-								background: '#4b4040bf',
+								background: '#352929bf',
 								display: 'flex',
 								justifyContent: 'center',
 								alignItems: 'center',
 								fontSize: '1.2em',
+								zIndex: '2',
 							});
 						};
 					}
 					//框的样式，不要太宽，高度最小也要100px，防止空框没有高度
 					/**@type {Row_Item_Option['itemContainerCss']} */
 					let itemContainerCss = {
-						maxWidth: '400px',
 						border: 'solid #c6b3b3 2px',
 						minHeight: '100px',
 
@@ -2053,11 +2064,11 @@ const skills = {
 
 			let next2;
 			if (event.isMine()) {
-				next2 = chooseOneSuitCard(player, target);
+				next2 = chooseOneSuitCard(player, target, true);
 
 			} else if (player.isOnline()) {
 				let { promise, resolve } = Promise.withResolvers();
-				player.send(chooseOneSuitCard, player, target);
+				player.send(chooseOneSuitCard, player, target, true);
 				player.wait(result => {
 					if (result == 'ai') {
 						resolve({
