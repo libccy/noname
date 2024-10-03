@@ -532,6 +532,7 @@ const skills = {
 					};
 					resolve(event._result);
 				});
+				event.control_ok.classList.add("disabled");
 				event.control_cancel = ui.create.control("cancel2", function (link) {
 					event.dialog.close();
 					event.control_cancel.close();
@@ -541,7 +542,6 @@ const skills = {
 					event._result = { bool: false };
 					resolve(event._result);
 				});
-				event.control_ok.classList.add("disabled");
 				//创建对话框
 				const dialog = ui.create.dialog("forcebutton", "hidden");
 				dialog.listen(() => {
