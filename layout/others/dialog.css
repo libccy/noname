@@ -257,7 +257,7 @@
 .player .tipContainer>.tip {
     position: relative;
     box-sizing: border-box;
-    width: 100%;
+    width: 93%;
     background: var(--bg);
     border-radius: 5px;
     padding: 3px 3px;
@@ -269,6 +269,7 @@
     align-items: center;
     color: #e0dddd;
     text-shadow: none;
+    left:6%
 }
 
 /* 方案二 */
@@ -288,7 +289,3 @@
     padding: 2px;
     font-size: 1.1em;
 } */
-
-.marks{
-    transform: translateX(-8px);
-}
