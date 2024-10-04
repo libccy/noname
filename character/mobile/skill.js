@@ -1608,10 +1608,14 @@ const skills = {
 		},
 		filter(event, player) {
 			let skills = [];
-			if (player.additionalSkills && player.additionalSkills.mbqianlong) skills.addArray(player.additionalSkills.mbqianlong);
-			return player.countMark("mbqianlong") >= 25 * skills.length;
+			let current = player.additionalSkills?.mbqianlong?.length ?? 0;
+			let target = player.countMark("mbqianlong") == lib.skill.mbqianlong.maxMarkCount
+				? lib.skill.mbqianlong.derivation.length
+				: Math.floor(player.countMark("mbqianlong") / 25);
+			return target > current;
 		},
 		forced: true,
+		popup: false,
 		locked: false,
 		beginMarkCount: 20,
 		maxMarkCount: 99,
