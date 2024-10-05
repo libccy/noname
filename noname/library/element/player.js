@@ -1,16 +1,3 @@
-/**
- * @typedef { {
- * useCard: GameEventPromise[],
- * respond: GameEventPromise[],
- * skipped: GameEventPromise[],
- * lose: GameEventPromise[],
- * gain: GameEventPromise[],
- * 	sourceDamage: GameEventPromise[],
- * 	damage: GameEventPromise[],
- * 	custom: GameEventPromise[],
- * 	useSkill: GameEventPromise[],
- * }} ActionHistory
- */
 
 import { ai } from "../../ai/index.js";
 import { get } from "../../get/index.js";
@@ -240,10 +227,11 @@ export class Player extends HTMLDivElement {
 	 */
 	judging;
 	/**
-	 * @type { { card:{}, skill: {} }[] }
+	 * @type {Stat[]}
 	 */
 	stat;
 	/**
+	 * 玩家的行动历史，每个回合对应一个历史。
 	 * @type { ActionHistory[] }
 	 */
 	actionHistory;
@@ -377,7 +365,7 @@ export class Player extends HTMLDivElement {
 	/**
 	 * 设置提示文字，有则更改，无则加之。
 	 * @param {string} index 给标记起一个名字，名字任意
-	 * @param {string} message 设置提示标记的内容
+	 * @param {string} message 设置提示标记的内容,标记中的\n代表换行符
 	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 是否是临时的tip。默认为false,表示一直存在；若为true,则回合结束自动失去。也可以填一个具体的自定义时机。
 	 * @param { object } [css] 自定义的样式
 	 * @returns { void }
@@ -390,7 +378,7 @@ export class Player extends HTMLDivElement {
 				player.node.tipContainer ??= ui.create.div(".tipContainer", player);
 				player.tips ??= new Map();
 				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
-				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>');
+				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>').replace(/\n/g, '<br>');
 				player.tips.get(index).css(css);
 
 				let double = player.classList.contains('fullskin2') && lib.config.layout !== 'long2';
@@ -8839,19 +8827,13 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * 快速获取一名角色当前轮次/前X轮次的历史
-	 *
-	 * 第一个参数填写获取的动作
-	 *
-	 * 第二个参数填写获取历史的筛选条件
-	 *
-	 * 第三个参数填写数字（不填默认为0），获取上X轮的历史（X为0则为本轮历史），第四个参数若为true，则获取从上X轮开始至现在
-	 *
-	 * 第四个参数若为true，则获取从上X轮开始至现在所有符合条件的历史
-	 *
-	 * 第五个参数填写event，获取此event之前所有符合条件的历史
-	 *
-	 * @param { string | function | number | boolean | object } map
+	 * 快速获取一名角色当前轮次/倒数第X轮次的历史
+	 *	@template {Exclude< keyof ActionHistory, 'isRound'|'isMe'>} T
+	 * @param {T} key 
+	 * @param {(event:GameEventPromise)=>boolean} filter 筛选条件
+	 * @param {number} [num] 获取倒数第num轮的历史，默认为0，表示当前轮
+	 * @param {boolean} [keep] 若为true,则获取倒数第num轮到现在的所有历史
+	 * @param {GameEventPromise} last 代表最后一个事件，获取该事件之前的历史
 	 */
 	getRoundHistory(key, filter, num, keep, last) {
 		if (!num) num = 0;
@@ -8878,15 +8860,22 @@ export class Player extends HTMLDivElement {
 		return evts;
 	}
 	/**
+	 * 不填参数，直接获得最后一个回合的改玩家的整个历史对象。
 	 * @overload
 	 * @returns { ActionHistory }
 	 */
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 
+	 * @overload
+	 * @param { 'isRound'|'isMe' } key
+	 * @returns { boolean}
+	 */
+	/**
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: GameEventPromise) => boolean } [filter]
-	 * @param { GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } [filter] 过滤条件
+	 * @param { GameEventPromise } [last] 若有改参数，则该参数事件之后的将被排除掉
 	 * @returns { ActionHistory[T] }
 	 */
 	getHistory(key, filter, last) {
@@ -8905,10 +8894,11 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 遍历历史
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
-	 * @param { (event: GameEventPromise) => boolean } filter
-	 * @param { GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => void } filter 遍历过程需要执行的函数
+	 * @param { GameEventPromise } [last] 
 	 */
 	checkHistory(key, filter, last) {
 		if (!key || !filter) return;
@@ -8926,7 +8916,7 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } [filter]
 	 * @param { GameEventPromise } [last]
@@ -8945,12 +8935,17 @@ export class Player extends HTMLDivElement {
 		return history.some(filter);
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 不填参数，直接获得最后一个回合的改玩家的整个历史对象。
 	 * @overload
-	 * @param { T } [key]
-	 * @param { (event: GameEventPromise) => boolean } [filter]
-	 * @param { GameEventPromise } [last]
-	 * @returns { null | ActionHistory[T] | boolean }
+	 * @returns { ActionHistory }
+	 */
+	/**
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
+	 * @overload
+	 * @param { T } key
+	 * @param { (event: GameEventPromise) => boolean } [filter] 过滤条件
+	 * @param { GameEventPromise } [last] 若有改参数，则该参数事件之后的将被排除掉
+	 * @returns { ActionHistory[T] }
 	 */
 	getLastHistory(key, filter, last) {
 		let history = false;
@@ -8975,9 +8970,10 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 遍历整局游戏该玩家的历史
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
-	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { (event: GameEventPromise) => void } filter
 	 * @param { GameEventPromise } [last]
 	 */
 	checkAllHistory(key, filter, last) {
@@ -8996,8 +8992,15 @@ export class Player extends HTMLDivElement {
 		});
 	}
 	/**
-	 * @template { keyof ActionHistory } T
-	 * @param { T } [key]
+	 * 获得整局游戏该玩家的行动历史
+	 * @overload
+	 * @returns { ActionHistory[] }
+	 */
+	/**
+	 * 获得整局游戏该玩家的某个指定行为的历史
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
+	 * @overload
+	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } [filter]
 	 * @param { GameEventPromise } [last]
 	 * @returns { ActionHistory[T] }
@@ -9024,7 +9027,7 @@ export class Player extends HTMLDivElement {
 		return history;
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } filter
 	 * @param { GameEventPromise } [last]
@@ -9054,10 +9057,31 @@ export class Player extends HTMLDivElement {
 		if (history.length <= num) return null;
 		return history[history.length - num - 1];
 	}
+	/**
+	 * @overload
+	 * @returns {Stat}
+	 */
+	/**
+	 * @template {keyof Stat} T
+	 * @overload
+	 * @param {T} key 
+	 * @returns {Stat[T]}
+	 */
 	getStat(key) {
 		if (!key) return this.stat[this.stat.length - 1];
 		return this.stat[this.stat.length - 1][key];
 	}
+	/**
+	 * 用法同getStat，区别是获得自己的回合的统计
+	 * @overload
+	 * @returns {Stat}
+	 */
+	/**
+	 * @template {keyof Stat} T
+	 * @overload
+	 * @param {T} key 
+	 * @returns {Stat[T]}
+	 */
 	getLastStat(key) {
 		var stat = false;
 		for (var i = this.stat.length - 1; i >= 0; i--) {

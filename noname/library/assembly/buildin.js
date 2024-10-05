@@ -149,9 +149,13 @@ export const checkOverflow = {
 		//计算压缩折叠的量
 		const gap = 3;
 		// @ts-ignore
-		const L = (itemContainer.originWidth - 2 * gap) / game.documentZoom;
+		function isEqual(a, b) {
+			return Math.abs(a - b) < 3;
+		}
+		let equal = isEqual(itemContainer.originWidth, itemContainer.getBoundingClientRect().width);
+		const L = (itemContainer.originWidth - 2 * gap) * (equal ? 0.8 : 1);
 		// @ts-ignore
-		const W = addedItems[0].getBoundingClientRect().width / game.documentZoom;
+		const W = 90;//这里需要填卡的实际宽度，扩展中需要自行调整。
 		// @ts-ignore
 		let n = addedItems.length;
 		const r = 16; //为偏移留出的空间，如果r为0，可能会把前面的卡牌全遮住
@@ -160,7 +164,7 @@ export const checkOverflow = {
 			itemContainer.classList.remove('zoom');
 		} else {
 			// @ts-ignore
-			const ml = Math.min((n * W - L + gap) / (n - 1), W - r / game.documentZoom);
+			const ml = Math.min((n * W - L + gap) / (n - 1), W - r);
 			itemContainer.style.setProperty("--ml", "-" + ml + "px");
 			itemContainer.classList.add('zoom');
 		}

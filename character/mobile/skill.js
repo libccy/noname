@@ -1608,10 +1608,14 @@ const skills = {
 		},
 		filter(event, player) {
 			let skills = [];
-			if (player.additionalSkills && player.additionalSkills.mbqianlong) skills.addArray(player.additionalSkills.mbqianlong);
-			return player.countMark("mbqianlong") >= 25 * skills.length;
+			let current = player.additionalSkills?.mbqianlong?.length ?? 0;
+			let target = player.countMark("mbqianlong") == lib.skill.mbqianlong.maxMarkCount
+				? lib.skill.mbqianlong.derivation.length
+				: Math.floor(player.countMark("mbqianlong") / 25);
+			return target > current;
 		},
 		forced: true,
+		popup: false,
 		locked: false,
 		beginMarkCount: 20,
 		maxMarkCount: 99,
@@ -1706,7 +1710,7 @@ const skills = {
 			combo: "mbqianlong",
 		},
 	},
-	mbcmqingzheng: {
+	old_mbcmqingzheng: {
 		audio: 2,
 		persevereSkill: true,
 		trigger: { player: "phaseUseBegin" },
@@ -1865,6 +1869,224 @@ const skills = {
 			"step 4";
 			if (event.cards2.length < cards.length) target.damage();
 		},
+	},
+	mbcmqingzheng: {
+		audio: 2,
+		persevereSkill: true,
+		trigger: { player: "phaseUseBegin" },
+		filter(event, player) {
+			return player.countCards("h") > 0;
+		},
+		direct: true,
+		async content(event, trigger, player) {
+			/**
+			 * player选择target的一种花色的牌
+			 * @param {Player} player 
+			 * @param {Player} target 
+			 */
+			function chooseOneSuitCard(player, target) {
+
+				const { promise, resolve } = Promise.withResolvers();
+				const event = _status.event;
+				//对手牌按花色分类
+				let suitCards = Object.groupBy(target.getCards('h'), c => get.suit(c, target));
+				suitCards.heart ??= [];
+				suitCards.diamond ??= [];
+				suitCards.spade ??= [];
+				suitCards.club ??= [];
+
+				let dialog = event.dialog = ui.create.dialog();
+				event.control_ok = ui.create.control('ok', (link) => {
+					_status.imchoosing = false;
+					event.dialog.close();
+					event.control_ok?.close();
+					event.control_cancel?.close();
+					event._result = {
+						bool: true,
+						cards: event.selectedCards
+					};
+					resolve(event._result);
+					game.resume();
+				});
+				event.control_ok.classList.add('disabled');
+				event.control_cancel = ui.create.control('cancel', (link) => {
+					_status.imchoosing = false;
+					event.dialog.close();
+					event.control_ok?.close();
+					event.control_cancel?.close();
+					event._result = {
+						bool: false,
+					};
+					resolve(event._result);
+					game.resume();
+				});
+				event.switchToAuto = function () {
+					_status.imchoosing = false;
+					event.dialog?.close();
+					event.control_ok?.close();
+					event.control_cancel?.close();
+					event._result = {
+						bool: false
+					};
+					resolve(event._result);
+					game.resume();
+				};
+				dialog.addNewRow('请选择一种花色的牌弃置');
+				let keys = Object.keys(suitCards);
+				//添加框
+				while (keys.length) {
+					let key1 = keys.shift();
+					let cards1 = suitCards[key1];
+					let key2 = keys.shift();
+					let cards2 = suitCards[key2];
+
+					//点击容器的回调
+					/**@type {Row_Item_Option['clickItemContainer']} */
+					const clickItemContainer = function (container, item, allContainer) {
+						if (!item?.length) return;
+						allContainer.forEach(c => c.classList.remove('selected'));
+						container.classList.add('selected');
+						event.selectedCards = item;
+						if (event.selectedCards) event.control_ok.classList.remove('disabled');
+					};
+					//给框加封条，显示xxx牌多少张
+					function createCustom(suit, count) {
+						return function (itemContainer) {
+							let div = ui.create.div(itemContainer);
+							if (count) {
+								div.innerHTML = `${get.translation(suit)}牌${count}张`;
+
+							} else {
+								div.innerHTML = `没有${get.translation(suit)}牌`;
+							}
+							div.css({
+								position: 'absolute',
+								width: '100%',
+								bottom: '1%',
+								height: '35%',
+								background: '#4b4040bf',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								fontSize: '1.2em',
+							});
+						};
+					}
+					//框的样式，不要太宽，高度最小也要100px，防止空框没有高度
+					/**@type {Row_Item_Option['itemContainerCss']} */
+					let itemContainerCss = {
+						maxWidth: '400px',
+						border: 'solid #c6b3b3 2px',
+						minHeight: '100px',
+
+					};
+					if (key2) {
+						dialog.addNewRow(
+							{
+								item: cards1,
+								ItemNoclick: true,//卡牌不需要被点击
+								clickItemContainer,
+								custom: createCustom(key1, cards1.length),//添加封条
+								itemContainerCss
+							},
+							{
+								item: cards2,
+								ItemNoclick: true,//卡牌不需要被点击
+								clickItemContainer,
+								custom: createCustom(key2, cards2.length),
+								itemContainerCss,
+							}
+						);
+					} else {
+						dialog.addNewRow(
+							{
+								item: cards1,
+								ItemNoclick: true,//卡牌不需要被点击
+								clickItemContainer,
+								custom: createCustom(key1, cards1.length),
+								itemContainerCss,
+							}
+						);
+					}
+				}
+				game.pause();
+				dialog.open();
+				_status.imchoosing = true;
+				return promise;
+			}
+			let next;
+			if (event.isMine()) {
+				next = chooseOneSuitCard(player, player);
+			} else if (player.isOnline()) {
+				let { promise, resolve } = Promise.withResolvers();
+				player.send(chooseOneSuitCard, player, player);
+				player.wait(result => {
+					if (result == 'ai') {
+						resolve({
+							bool: false
+						});
+					} else {
+						resolve(result);
+					}
+				});
+				next = promise;
+			} else {
+				next = Promise.resolve({
+					bool: false,
+				});
+			}
+
+			let result1 = await next;
+
+			if (!result1.bool) return;
+			let cards1 = event.cards1 = result1.cards;
+			let result2 = await player
+				.chooseTarget("清正：观看一名其他角色的手牌并弃置其中一种花色的所有牌",
+					(card, player, target) => {
+						return target != player && target.countCards("h");
+					})
+				.set("ai", target => {
+					var player = _status.event.player,
+						att = get.attitude(player, target);
+					if (att >= 0) return 0;
+					return 1 - att / 2 + Math.sqrt(target.countCards("h"));
+				}).forResult();
+			if (!result2.bool) return;
+			await player.discard(cards1);
+			let target = event.target = result2.targets[0];
+
+			let next2;
+			if (event.isMine()) {
+				next2 = chooseOneSuitCard(player, target);
+
+			} else if (player.isOnline()) {
+				let { promise, resolve } = Promise.withResolvers();
+				player.send(chooseOneSuitCard, player, target);
+				player.wait(result => {
+					if (result == 'ai') {
+						resolve({
+							bool: false
+						});
+					} else {
+						resolve(result);
+					}
+				});
+				next2 = promise;
+			} else {
+				next = Promise.resolve({
+					bool: false,
+				});
+			}
+			let result3 = await next2;
+			let cards2 = event.cards2 = result3.cards;
+			await target.discard(cards2, 'notBySelf');
+			if (cards1.length > cards2.length) {
+				target.damage(player);
+			}
+
+		}
+
+
 	},
 	mbcmjiushi: {
 		audio: 2,
@@ -2103,10 +2325,12 @@ const skills = {
 		subSkill: {
 			backup: {},
 			baiban: {
-				init: function (player, skill) {
+				init(player, skill) {
+					player.addSkillBlocker(skill);
 					player.addTip(skill, '放逐 技能失效');
 				},
 				onremove(player, skill) {
+					player.removeSkillBlocker(skill);
 					player.removeTip(skill);
 				},
 				inherit: "baiban",
@@ -7974,6 +8198,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "useCard" },
 		filter: function (event, player) {
+			player.addTip('xingtu', `行图 ${get.translation(get.number(event.card, player))}`);
 			var evt = lib.skill.dcjianying.getLastUsed(player, event);
 			if (!evt || !evt.card) return false;
 			var num1 = get.number(event.card),
@@ -8018,6 +8243,7 @@ const skills = {
 			player.removeSkill("xingtu_mark");
 			player.removeGaintag("xingtu1");
 			player.removeGaintag("xingtu2");
+			player.removeTip('xingtu');
 			delete player.storage.xingtu_mark;
 		},
 		subSkill: {
