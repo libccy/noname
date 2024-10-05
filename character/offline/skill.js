@@ -526,9 +526,14 @@ const skills = {
 			}
 		},
 		onremove: true,
+		intro: {
+			content(storage, player) {
+				return "本回合还可使用" + get.cnNumber(5 - storage) + "张牌";
+			}
+		},
 		mod: {
-			targetInRange() {
-				return true;
+			targetInRange(card, player) {
+				if (player.isPhaseUsing()) return true;
 			},
 			aiOrder(player, card, num) {
 				let name = get.name(card);
@@ -540,7 +545,7 @@ const skills = {
 				if (player.countMark("scls_kuangcai") >= 5) return false;
 			},
 			cardUsable(card, player) {
-				if (player.countMark("scls_kuangcai") >= 5) return false;
+				if (!player.isPhaseUsing() || player.countMark("scls_kuangcai") >= 5) return false;
 				if (get.info(card) && get.info(card).forceUsable) return;
 				return Infinity;
 			},
@@ -552,7 +557,9 @@ const skills = {
 			player: "useCard1",
 		},
 		locked: false,
-		prompt2: "摸一张牌，本回合至多使用五张牌",
+		prompt2(event, player) {
+			return "摸一张牌" + (player.hasMark("scls_kuangcai") ? "" : "，本回合至多使用五张牌");
+		},
 		frequent(event, player) {
 			return player.hasMark("scls_kuangcai");
 		},
@@ -567,7 +574,7 @@ const skills = {
 		subSkill: {
 			clear: {
 				trigger: {
-					player: "phaseUseAfter"
+					player: "phaseAfter"
 				},
 				silent: true,
 				async content(event, trigger, player) {
