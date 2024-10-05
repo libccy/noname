@@ -563,18 +563,30 @@ const skills = {
 		prompt2(event, player) {
 			return "摸一张牌" + (player.hasMark("scls_kuangcai") ? "" : "，本回合至多使用五张牌");
 		},
-		frequent(event, player) {
-			return player.hasMark("scls_kuangcai");
-		},
+		frequent: true,
 		async content(event, trigger, player) {
-			player.addMark("scls_kuangcai", 1, false);
+			player.markSkill("scls_kuangcai");
 			await player.draw();
 		},
 		ai: {
 			threaten: 4.5
 		},
-		group: "scls_kuangcai_clear",
+		group: ["scls_kuangcai_add", "scls_kuangcai_clear"],
 		subSkill: {
+			add: {
+				trigger: {
+					player: "useCard1"
+				},
+				filter(event, player) {
+					return player === _status.currentPhase;
+				},
+				silent: true,
+				priority: 5,
+				async content(event, trigger, player) {
+					if (player.storage.scls_kuangcai) player.storage.scls_kuangcai++;
+					else player.storage.scls_kuangcai = 1;
+				},
+			},
 			clear: {
 				trigger: {
 					player: "phaseAfter"
