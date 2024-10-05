@@ -559,7 +559,7 @@ const skills = {
 				}
 			}
 		},
-		subSkill: { as: { sub: true } },
+		subSkill: { as: { charlotte: true } },
 		ai: {
 			threaten: 0.6,
 			effect: {

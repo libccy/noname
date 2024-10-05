@@ -407,7 +407,7 @@ const skills = {
 			return "令对" + get.translation(event.player) + "造成的伤害+" + parseFloat(Math.min(3, game.roundNumber));
 		},
 		check(event, player) {
-			return get.attitude(player, event.player) < 0 && event.player.hasSkillTag("filterDamage", null, { player: player, card: event.card });
+			return get.damageEffect(event.player, player, player) > 0;
 		},
 		async content(event, trigger, player) {
 			trigger.num += Math.min(3, game.roundNumber);
