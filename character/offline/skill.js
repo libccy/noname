@@ -666,7 +666,7 @@ const skills = {
 			const { result: { links: [ card ] } } = await player
 				.chooseCardButton("爵制：选择要获得的牌", true, cards)
 				.set("ai", button => {
-					let player = get.event("player"), number = get.number(card);
+					let player = get.event("player"), number = get.number(button.link);
 					return player.getUseValue(
 						button.link,
 						null,

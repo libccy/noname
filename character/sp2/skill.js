@@ -2032,6 +2032,10 @@ const skills = {
 				popup: false,
 				firstDo: true,
 				content: function () {
+					if (trigger.addCount !== false) {
+						trigger.addCount = false;
+						trigger.player.getStat().card.sha--;
+					}
 					player.addTempSkill("dcjiaoxia_mark", "phaseUseAfter");
 					player.markAuto(
 						"dcjiaoxia_mark",

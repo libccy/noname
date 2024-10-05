@@ -25,7 +25,7 @@ const skills = {
 			check(button) {
 				const player = get.player();
 				if (button.link == "discard") return 2;
-				let bool = card => get.type(card) == "trick" && get.tag(card, "damage");
+				let bool = card => get.type(card) == "trick" && get.tag(card, "damage") > 0.5;
 				if (player.countCards("h", "sha") > 1 && player.countCards("h", bool) > 1) return 1;
 				return 3;
 			},
@@ -43,13 +43,14 @@ const skills = {
 							.chooseToDiscard(2, "he", true)
 							.set("ai", card => {
 								let player = get.player();
-								let bool = card => get.type(card) == "trick" && get.tag(card, "damage");
-								if (player.countCards("h", bool) == 1 && bool(card)) return 10 - get.value(card);
-								else if (card.name == "sha") return 9 - get.value(card);
+								let bool = card => get.type(card) == "trick" && get.tag(card, "damage") > 0.5;
+								if (card.name == "sha" || bool(card)) return 10 - get.value(card);
 								return 5 - get.value(card);
 							});
-						if (!player.countCards("h", card => card.name == "sha")) break;
-						if (!player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage"))) break;
+						if (!player.countCards("h", card => {
+							if (card.name == "sha") return true;
+							return get.type(card) == "trick" && get.tag(card, "damage") > 0.5;
+						})) break;
 					}
 					const evt = event.getParent("phaseUse", true);
 					if (!evt || event.name == "renxia_discard") return;
@@ -66,7 +67,7 @@ const skills = {
 					while (true) {
 						await player.draw(2);
 						if (player.countCards("h", card => card.name == "sha")) break;
-						if (player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage"))) break;
+						if (player.countCards("h", card => get.type(card) == "trick" && get.tag(card, "damage") > 0.5)) break;
 					}
 					const evt = event.getParent("phaseUse", true);
 					if (!evt || event.name == "renxia_draw") return;
@@ -7712,9 +7713,8 @@ const skills = {
 				forced: true,
 				popup: false,
 				content: function () {
-					var next = trigger.player.phaseDraw();
-					event.next.remove(next);
-					trigger.getParent("phase").next.push(next);
+					const evt = trigger.getParent("phase", true, true);
+					if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|olhongji");
 					player.removeSkill("olhongji_draw");
 				},
 			},
@@ -7724,9 +7724,8 @@ const skills = {
 				forced: true,
 				popup: false,
 				content: function () {
-					var next = trigger.player.phaseUse();
-					event.next.remove(next);
-					trigger.getParent("phase").next.push(next);
+					const evt = trigger.getParent("phase", true, true);
+					if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseUse|olhongji");
 					player.removeSkill("olhongji_use");
 				},
 			},
@@ -18818,7 +18817,7 @@ const skills = {
 			},
 		},
 		subSkill: {
-			used: { sub: true },
+			used: { charlotte: true },
 		},
 	},
 	//统率三军诸葛瑾和文聘

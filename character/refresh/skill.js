@@ -4663,9 +4663,8 @@ const skills = {
 				},
 				logTarget: "player",
 				content: function () {
-					var next = trigger.player.phaseDraw();
-					event.next.remove(next);
-					trigger.getParent().next.add(next);
+					const evt = trigger.getParent("phase", true, true);
+					if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|oljiezi");
 					trigger.player.removeMark("oljiezi", trigger.player.countMark("oljiezi"));
 				},
 			},
@@ -6153,15 +6152,12 @@ const skills = {
 			if (list.length >= player.hp) event.goon = true;
 			else player.chooseControl("摸牌阶段", "出牌阶段").set("prompt", "精策：选择要执行的额外阶段");
 			"step 1";
+			const evt = trigger.getParent("phase", true, true);
 			if (event.goon || result.index == 0) {
-				var next = player.phaseDraw();
-				event.next.remove(next);
-				trigger.getParent().next.push(next);
+				if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|decadejingce");
 			}
 			if (event.goon || result.index == 1) {
-				var next = player.phaseUse();
-				event.next.remove(next);
-				trigger.getParent().next.push(next);
+				if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseUse|decadejingce");
 			}
 		},
 	},
