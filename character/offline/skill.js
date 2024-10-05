@@ -556,6 +556,9 @@ const skills = {
 		trigger: {
 			player: "useCard1",
 		},
+		filter(event, player) {
+			return player.isPhaseUsing();
+		},
 		locked: false,
 		prompt2(event, player) {
 			return "摸一张牌" + (player.hasMark("scls_kuangcai") ? "" : "，本回合至多使用五张牌");
