@@ -4,7 +4,7 @@ export default {
 	"#olhuyi3": "游龙战长坂，可复七进七出。",
 	"#olhuyi4": "身跨白玉鞍，铁骑踏冰河。",
 	"#olhuyi5": "满弓望西北，弦惊夜行之虎。",
-	"#wuhujiang:die": "麦城残阳息长刀……",
+	"#wuhujiang:die": "麦城残阳洗长刀……",
 	"#wuhujiang2:die": "当阳空余声……",
 	"#wuhujiang3:die": "亢龙有悔……",
 	"#wuhujiang4:die": "西风寒，冷铁衣……",

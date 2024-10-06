@@ -13773,6 +13773,7 @@ const skills = {
 			return event.card && (event.card.name == "sha" || event.card.name == "juedou") && event.notLink();
 		},
 		forced: true,
+		charlotte: true,
 		content: function () {
 			trigger.num++;
 		},

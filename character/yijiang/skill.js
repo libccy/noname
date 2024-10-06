@@ -8108,7 +8108,8 @@ const skills = {
 					return 2 * es.reduce((acc, card) => {
 						return acc + get.value(card, player);
 					}, 0);
-				}());
+				}())
+				.forResult();
 		},
 		logTarget: "player",
 		async content(event, trigger, player) {
