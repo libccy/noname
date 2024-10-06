@@ -5201,11 +5201,7 @@ const skills = {
 					}
 					cards3.forEach(i => i.delete());
 					if (player == game.me) ui.updatehl();
-					if (!player.storage.jsrgmanjuan_used) {
-						player.when({ global: "phaseAfter" }).then(() => {
-							delete player.storage.jsrgmanjuan_used;
-						});
-					}
+					player.addTempSkill("jsrgmanjuan_used");
 					player.markAuto(
 						"jsrgmanjuan_used",
 						cards3.map(card => get.number(card, false))
@@ -5261,6 +5257,10 @@ const skills = {
 					if (player == game.me) ui.updatehl();
 				},
 			},
+			used: {
+				onremove:true,
+				charlotte:true,
+			}
 		},
 	},
 	jsrgyangming: {
