@@ -899,8 +899,11 @@ export const Content = {
 					"aiCard",
 					event.aiCard ||
 						function (target) {
-							var hs = target.getCards("h");
-							return { bool: true, cards: [hs.randomGet()] };
+							const getAi = get.event("ai") || function (card) {
+								return Math.random();
+							};
+							let hs = target.getCards("h").sort((a, b) => getAi(b) - getAi(a));
+							return { bool: true, cards: [hs[0]] };
 						}
 				);
 			next._args.remove("glow_result");

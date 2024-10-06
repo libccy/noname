@@ -688,9 +688,8 @@ const skills = {
 							lib.skill.chenliuwushi.change(player, -2);
 						} else {
 							player.popup("洗具");
-							const next = player.phaseDraw();
-							event.next.remove(next);
-							trigger.getParent("phase").next.push(next);
+							const evt = trigger.getParent("phase", true, true);
+							if (evt && evt.phaseList) evt.phaseList.splice(evt.num + 1, 0, "phaseDraw|clanqiajue");
 						}
 					});
 			}

@@ -269,7 +269,12 @@
     align-items: center;
     color: #e0dddd;
     text-shadow: none;
-    left:6%
+
+    left:6%;
+
+    /* word-break: break-all; */
+    word-break: break-word;
+
 }
 
 /* 方案二 */
