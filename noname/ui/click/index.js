@@ -3438,19 +3438,6 @@ export class Click {
 						});
 					});
 				}
-				if (dieAudios.length > 0) {
-					const skillNameSpan2 = document.createElement("span"),
-						skillNameSpanStyle2 = skillNameSpan2.style;
-					skillNameSpanStyle2.lineHeight = "1.9";
-					skillNameSpan2.innerHTML = `• 阵亡台词`;
-					intro.appendChild(skillNameSpan2);
-					dieAudios.forEach((text, index) => {
-						const dieTextSpan = document.createElement("span");
-						dieTextSpan.style.fontSize = "15.2px";
-						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
-						intro.appendChild(dieTextSpan);
-					});
-				}
 			}
 			
 			var intro2 = ui.create.div(".characterintro.intro2", uiintro);
@@ -3474,109 +3461,94 @@ export class Click {
 					current.classList.remove("active");
 				}
 				this.classList.add("active");
-				var skillname = get.translation(this.link);
-				var skilltranslationinfo = get.skillInfoTranslation(this.link);
-				if (
-					(lib.config.show_skillnamepinyin == "showPinyin2" ||
-						lib.config.show_skillnamepinyin == "showCodeIdentifier2") &&
-					skillname != "阵亡"
-				) {
-					var skillpinyin =
-						lib.config.show_skillnamepinyin == "showCodeIdentifier2"
-							? this.link
-							: get.pinyin(skillname);
-					intro2.innerHTML =
-						'<span style="font-weight:bold;margin-right:5px">' +
-						skillname +
-						"</span>" +
-						'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' +
-						"[" +
-						skillpinyin +
-						"]" +
-						"</span>" +
-						"  " +
-						skilltranslationinfo;
-				} else {
-					intro2.innerHTML =
-						'<span style="font-weight:bold;margin-right:5px">' +
-						skillname +
-						"</span>" +
-						skilltranslationinfo;
-				}
-				var info = get.info(this.link);
-				var skill = this.link;
-				var playername = this.linkname;
-				var skillnode = this;
-				if (info.derivation) {
-					var derivation = info.derivation;
-					if (typeof derivation == "string") {
-						derivation = [derivation];
-					}
-					for (var i = 0; i < derivation.length; i++) {
-						var derivationname = get.translation(derivation[i]);
-						var derivationtranslationinfo = get.skillInfoTranslation(derivation[i]);
-						if (
-							(lib.config.show_skillnamepinyin == "showPinyin2" ||
-								lib.config.show_skillnamepinyin == "showCodeIdentifier2") &&
-							derivationname.length <= 5 &&
-							derivation[i].indexOf("_faq") == -1
-						) {
-							var derivationpinyin =
-								lib.config.show_skillnamepinyin == "showCodeIdentifier2"
-									? derivation[i]
-									: get.pinyin(derivationname);
-							intro2.innerHTML +=
-								'<br><br><span style="font-weight:bold;margin-right:5px">' +
-								derivationname +
-								"</span>" +
-								'<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' +
-								"[" +
-								derivationpinyin +
-								"]" +
-								"</span>" +
-								"  " +
-								derivationtranslationinfo;
-						} else {
-							intro2.innerHTML +=
-								'<br><br><span style="font-weight:bold;margin-right:5px">' +
-								derivationname +
-								"</span>" +
-								derivationtranslationinfo;
-						}
-					}
-				}
-				if (info.alter) {
-					intro2.innerHTML += '<br><br><div class="hrefnode skillversion"></div>';
-					var skillversionnode = intro2.querySelector(".hrefnode.skillversion");
-					if (lib.config.vintageSkills.includes(skill)) {
-						skillversionnode.innerHTML = "切换至新版";
+				if (this.link != "dieAudios") {
+					var skillname = get.translation(this.link);
+					var skilltranslationinfo = get.skillInfoTranslation(this.link);
+					if ((lib.config.show_skillnamepinyin == "showPinyin2" || lib.config.show_skillnamepinyin == "showCodeIdentifier2") && skillname != "阵亡") {
+						var skillpinyin = lib.config.show_skillnamepinyin == "showCodeIdentifier2" ? this.link : get.pinyin(skillname);
+						intro2.innerHTML = '<span style="font-weight:bold;margin-right:5px">' + skillname + "</span>" + '<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' + "[" + skillpinyin + "]" + "</span>" + "  " + skilltranslationinfo;
 					} else {
-						skillversionnode.innerHTML = "切换至旧版";
+						intro2.innerHTML = '<span style="font-weight:bold;margin-right:5px">' + skillname + "</span>" + skilltranslationinfo;
 					}
-					skillversionnode.listen(function () {
-						if (lib.config.vintageSkills.includes(skill)) {
-							lib.config.vintageSkills.remove(skill);
-							lib.translate[skill + "_info"] = lib.translate[skill + "_info_alter"];
-						} else {
-							lib.config.vintageSkills.push(skill);
-							lib.translate[skill + "_info"] = lib.translate[skill + "_info_origin"];
+					var info = get.info(this.link);
+					var skill = this.link;
+					var playername = this.linkname;
+					let audioName = this.linkAudioName;
+					var skillnode = this;
+					if (info.derivation) {
+						var derivation = info.derivation;
+						if (typeof derivation == "string") {
+							derivation = [derivation];
 						}
-						game.saveConfig("vintageSkills", lib.config.vintageSkills);
-						clickSkill.call(skillnode, "init");
-					});
-				}
-				
-				if (lib.config.background_speak && e !== 'init') {
-					if (!this.playAudio) {
-						const audioList = get.Audio.skill({ skill: this.link, player: audioName || playername }).fileList;
-						this.playAudio = game.tryAudio({
-							audioList,
-							addVideo: false,
-							random: false,
-							autoplay: false
+						for (var i = 0; i < derivation.length; i++) {
+							var derivationname = get.translation(derivation[i]);
+							var derivationtranslationinfo = get.skillInfoTranslation(derivation[i]);
+							if ((lib.config.show_skillnamepinyin == "showPinyin2" || lib.config.show_skillnamepinyin == "showCodeIdentifier2") && derivationname.length <= 5 && derivation[i].indexOf("_faq") == -1) {
+								var derivationpinyin = lib.config.show_skillnamepinyin == "showCodeIdentifier2" ? derivation[i] : get.pinyin(derivationname);
+								intro2.innerHTML += '<br><br><span style="font-weight:bold;margin-right:5px">' + derivationname + "</span>" + '<span style="font-size:14px;font-family:SimHei,STHeiti,sans-serif">' + "[" + derivationpinyin + "]" + "</span>" + "  " + derivationtranslationinfo;
+							} else {
+								intro2.innerHTML += '<br><br><span style="font-weight:bold;margin-right:5px">' + derivationname + "</span>" + derivationtranslationinfo;
+							}
+						}
+					}
+					if (info.alter) {
+						intro2.innerHTML += '<br><br><div class="hrefnode skillversion"></div>';
+						var skillversionnode = intro2.querySelector(".hrefnode.skillversion");
+						if (lib.config.vintageSkills.includes(skill)) {
+							skillversionnode.innerHTML = "切换至新版";
+						} else {
+							skillversionnode.innerHTML = "切换至旧版";
+						}
+						skillversionnode.listen(function () {
+							if (lib.config.vintageSkills.includes(skill)) {
+								lib.config.vintageSkills.remove(skill);
+								lib.translate[skill + "_info"] = lib.translate[skill + "_info_alter"];
+							} else {
+								lib.config.vintageSkills.push(skill);
+								lib.translate[skill + "_info"] = lib.translate[skill + "_info_origin"];
+							}
+							game.saveConfig("vintageSkills", lib.config.vintageSkills);
+							clickSkill.call(skillnode, "init");
 						});
 					}
-					this.playAudio();
+
+					if (lib.config.background_speak && e !== "init") {
+						let name = bg.tempSkin || audioName || playername;
+						if (!this.playAudio || name != this.audioName) {
+							const audioList = get.Audio.skill({ skill: this.link, player: name }).fileList;
+							this.playAudio = game.tryAudio({
+								audioList,
+								addVideo: false,
+								random: false,
+								autoplay: false,
+							});
+							this.audioName = name;
+						}
+						this.playAudio();
+					}
+				} else {
+					let dieAudios = this.dieAudios;
+					intro2.innerHTML = '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>';
+					dieAudios.forEach((text, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.style.fontSize = "15.2px";
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
+						intro2.appendChild(dieTextSpan);
+					});
+					if (lib.config.background_speak && e !== "init") {
+						let name = bg.tempSkin || this.linkname;
+						if (!this.playAudio || name != this.audioName) {
+							let audioList = get.Audio.die({ player: { name: this.playername, skin: { name: name } } }).fileList;
+							this.playAudio = game.tryAudio({
+								audioList,
+								addVideo: false,
+								random: false,
+								autoplay: false,
+							});
+							this.audioName = name;
+						}
+						this.playAudio();
+					}
 				}
 			};
 		} else {
@@ -3781,20 +3753,6 @@ export class Click {
 						});
 					});
 				}
-
-				if (dieAudios.length > 0) {
-					const skillNameSpan = document.createElement("span"),
-						skillNameSpanStyle = skillNameSpan.style;
-					skillNameSpanStyle.fontWeight = "bold";
-					skillNameSpan.innerHTML = `<br>阵亡台词`;
-					introduction.appendChild(skillNameSpan);
-
-					dieAudios.forEach((text, index) => {
-						const dieTextSpan = document.createElement("span");
-						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
-						introduction.appendChild(dieTextSpan);
-					});
-				}
 			}
 			
 			const introduction2 = ui.create.div(".characterintro.intro2", uiintro);
@@ -3818,126 +3776,139 @@ export class Click {
 					current.classList.remove("active");
 				}
 				this.classList.add("active");
-				const skillNameSpan = document.createElement("span"),
-					skillNameSpanStyle = skillNameSpan.style;
-				skillNameSpanStyle.fontWeight = "bold";
-				const link = this.link,
-					skillName = get.translation(link);
-				skillNameSpan.innerHTML = skillName;
-				const showSkillNamePinyin = lib.config.show_skillnamepinyin;
-				if (showSkillNamePinyin != "doNotShow" && skillName != "阵亡") {
-					const ruby = document.createElement("ruby");
-					ruby.appendChild(skillNameSpan);
-					const leftParenthesisRP = document.createElement("rp");
-					leftParenthesisRP.textContent = "（";
-					ruby.appendChild(leftParenthesisRP);
-					const rt = document.createElement("rt");
-					rt.innerHTML =
-						showSkillNamePinyin == "showCodeIdentifier"
-							? link
-							: lib.translate[`${link}_rt`] || get.pinyin(skillName).join(" ");
-					ruby.appendChild(rt);
-					const rightParenthesisRP = document.createElement("rp");
-					rightParenthesisRP.textContent = "）";
-					ruby.appendChild(rightParenthesisRP);
-					const div = ui.create.div(introduction2);
-					div.style.marginRight = "5px";
-					div.appendChild(ruby);
-				} else {
-					skillNameSpanStyle.marginRight = "5px";
-					introduction2.appendChild(skillNameSpan);
-				}
-				htmlParser.innerHTML = get.skillInfoTranslation(this.link);
-				Array.from(htmlParser.childNodes).forEach((childNode) =>
-					introduction2.appendChild(childNode)
-				);
-				var info = get.info(this.link);
-				var skill = this.link;
-				var playername = this.linkname;
-				var skillnode = this;
-				let derivations = info.derivation;
-				if (derivations) {
-					if (typeof derivations == "string") derivations = [derivations];
-					derivations.forEach((derivation) => {
-						introduction2.appendChild(document.createElement("br"));
-						introduction2.appendChild(document.createElement("br"));
-						const derivationNameSpan = document.createElement("span"),
-							derivationNameSpanStyle = derivationNameSpan.style;
-						derivationNameSpanStyle.fontWeight = "bold";
-						const derivationName = get.translation(derivation);
-						derivationNameSpan.innerHTML = derivationName;
-						if (
-							showSkillNamePinyin != "doNotShow" &&
-							derivationName.length <= 5 &&
-							derivation.indexOf("_faq") == -1
-						) {
-							const ruby = document.createElement("ruby");
-							ruby.appendChild(derivationNameSpan);
-							const leftParenthesisRP = document.createElement("rp");
-							leftParenthesisRP.textContent = "（";
-							ruby.appendChild(leftParenthesisRP);
-							const rt = document.createElement("rt");
-							rt.innerHTML =
-								showSkillNamePinyin == "showCodeIdentifier"
-									? derivation
-									: lib.translate[`${derivation}_rt`] ||
-										get.pinyin(derivationName).join(" ");
-							ruby.appendChild(rt);
-							const rightParenthesisRP = document.createElement("rp");
-							rightParenthesisRP.textContent = "）";
-							ruby.appendChild(rightParenthesisRP);
-							const div = ui.create.div(introduction2);
-							div.style.marginRight = "5px";
-							div.appendChild(ruby);
-						} else {
-							derivationNameSpanStyle.marginRight = "5px";
-							introduction2.appendChild(derivationNameSpan);
-						}
-						htmlParser.innerHTML = get.skillInfoTranslation(derivation);
-						Array.from(htmlParser.childNodes).forEach((childNode) =>
-							introduction2.appendChild(childNode)
-						);
-					});
-				}
-				if (info.alter) {
-					introduction2.appendChild(document.createElement("br"));
-					introduction2.appendChild(document.createElement("br"));
-					ui.create.div(".hrefnode.skillversion", introduction2);
-					var skillversionnode = introduction2.querySelector(".hrefnode.skillversion");
-					if (lib.config.vintageSkills.includes(skill)) {
-						skillversionnode.innerHTML = "切换至新版";
+				if (this.link != "dieAudios") {
+					const skillNameSpan = document.createElement("span"),
+						skillNameSpanStyle = skillNameSpan.style;
+					skillNameSpanStyle.fontWeight = "bold";
+					const link = this.link,
+						skillName = get.translation(link);
+					skillNameSpan.innerHTML = skillName;
+					const showSkillNamePinyin = lib.config.show_skillnamepinyin;
+					if (showSkillNamePinyin != "doNotShow" && skillName != "阵亡") {
+						const ruby = document.createElement("ruby");
+						ruby.appendChild(skillNameSpan);
+						const leftParenthesisRP = document.createElement("rp");
+						leftParenthesisRP.textContent = "（";
+						ruby.appendChild(leftParenthesisRP);
+						const rt = document.createElement("rt");
+						rt.innerHTML = showSkillNamePinyin == "showCodeIdentifier" ? link : lib.translate[`${link}_rt`] || get.pinyin(skillName).join(" ");
+						ruby.appendChild(rt);
+						const rightParenthesisRP = document.createElement("rp");
+						rightParenthesisRP.textContent = "）";
+						ruby.appendChild(rightParenthesisRP);
+						const div = ui.create.div(introduction2);
+						div.style.marginRight = "5px";
+						div.appendChild(ruby);
 					} else {
-						skillversionnode.innerHTML = "切换至旧版";
+						skillNameSpanStyle.marginRight = "5px";
+						introduction2.appendChild(skillNameSpan);
 					}
-					skillversionnode.listen(function () {
-						if (lib.config.vintageSkills.includes(skill)) {
-							lib.config.vintageSkills.remove(skill);
-							lib.translate[skill + "_info"] = lib.translate[skill + "_info_alter"];
-						} else {
-							lib.config.vintageSkills.push(skill);
-							lib.translate[skill + "_info"] = lib.translate[skill + "_info_origin"];
-						}
-						game.saveConfig("vintageSkills", lib.config.vintageSkills);
-						clickSkill.call(skillnode, "init");
-					});
-				}
-				
-				if (lib.config.background_speak && e !== 'init') {
-					if (!this.playAudio) {
-						const audioList = get.Audio.skill({ skill: this.link, player: audioName || playername }).fileList;
-						this.playAudio = game.tryAudio({
-							audioList,
-							addVideo: false,
-							random: false,
-							autoplay: false
+					htmlParser.innerHTML = get.skillInfoTranslation(this.link);
+					Array.from(htmlParser.childNodes).forEach(childNode => introduction2.appendChild(childNode));
+					var info = get.info(this.link);
+					var skill = this.link;
+					var playername = this.linkname;
+					let audioName = this.linkAudioName;
+					var skillnode = this;
+					let derivations = info.derivation;
+					if (derivations) {
+						if (typeof derivations == "string") derivations = [derivations];
+						derivations.forEach(derivation => {
+							introduction2.appendChild(document.createElement("br"));
+							introduction2.appendChild(document.createElement("br"));
+							const derivationNameSpan = document.createElement("span"),
+								derivationNameSpanStyle = derivationNameSpan.style;
+							derivationNameSpanStyle.fontWeight = "bold";
+							const derivationName = get.translation(derivation);
+							derivationNameSpan.innerHTML = derivationName;
+							if (showSkillNamePinyin != "doNotShow" && derivationName.length <= 5 && derivation.indexOf("_faq") == -1) {
+								const ruby = document.createElement("ruby");
+								ruby.appendChild(derivationNameSpan);
+								const leftParenthesisRP = document.createElement("rp");
+								leftParenthesisRP.textContent = "（";
+								ruby.appendChild(leftParenthesisRP);
+								const rt = document.createElement("rt");
+								rt.innerHTML = showSkillNamePinyin == "showCodeIdentifier" ? derivation : lib.translate[`${derivation}_rt`] || get.pinyin(derivationName).join(" ");
+								ruby.appendChild(rt);
+								const rightParenthesisRP = document.createElement("rp");
+								rightParenthesisRP.textContent = "）";
+								ruby.appendChild(rightParenthesisRP);
+								const div = ui.create.div(introduction2);
+								div.style.marginRight = "5px";
+								div.appendChild(ruby);
+							} else {
+								derivationNameSpanStyle.marginRight = "5px";
+								introduction2.appendChild(derivationNameSpan);
+							}
+							htmlParser.innerHTML = get.skillInfoTranslation(derivation);
+							Array.from(htmlParser.childNodes).forEach(childNode => introduction2.appendChild(childNode));
 						});
 					}
-					this.playAudio();
+					if (info.alter) {
+						introduction2.appendChild(document.createElement("br"));
+						introduction2.appendChild(document.createElement("br"));
+						ui.create.div(".hrefnode.skillversion", introduction2);
+						var skillversionnode = introduction2.querySelector(".hrefnode.skillversion");
+						if (lib.config.vintageSkills.includes(skill)) {
+							skillversionnode.innerHTML = "切换至新版";
+						} else {
+							skillversionnode.innerHTML = "切换至旧版";
+						}
+						skillversionnode.listen(function () {
+							if (lib.config.vintageSkills.includes(skill)) {
+								lib.config.vintageSkills.remove(skill);
+								lib.translate[skill + "_info"] = lib.translate[skill + "_info_alter"];
+							} else {
+								lib.config.vintageSkills.push(skill);
+								lib.translate[skill + "_info"] = lib.translate[skill + "_info_origin"];
+							}
+							game.saveConfig("vintageSkills", lib.config.vintageSkills);
+							clickSkill.call(skillnode, "init");
+						});
+					}
+
+					if (lib.config.background_speak && e !== "init") {
+						let name = bg.tempSkin || audioName || playername;
+						if (!this.playAudio || name != this.audioName) {
+							const audioList = get.Audio.skill({ skill: this.link, player: name }).fileList;
+							this.playAudio = game.tryAudio({
+								audioList,
+								addVideo: false,
+								random: false,
+								autoplay: false,
+							});
+							this.audioName = name;
+						}
+						this.playAudio();
+					}
+				} else {
+					let dieAudios = this.dieAudios;
+					introduction2.innerHTML = '<span style="font-weight:bold;margin-right:5px">阵亡台词</span>';
+					dieAudios.forEach((text, index) => {
+						const dieTextSpan = document.createElement("span");
+						dieTextSpan.style.fontSize = "15.2px";
+						dieTextSpan.innerHTML = `<br>${dieAudios.length > 1 ? `${index + 1}. ` : ""}${text}`;
+						introduction2.appendChild(dieTextSpan);
+					});
+					if (lib.config.background_speak && e !== "init") {
+						let name = bg.tempSkin || this.linkname;
+						if (!this.playAudio || name != this.audioName) {
+							let audioList = get.Audio.die({ player: { name: this.playername, skin: { name: name } } }).fileList;
+							this.playAudio = game.tryAudio({
+								audioList,
+								addVideo: false,
+								random: false,
+								autoplay: false,
+							});
+							this.audioName = name;
+						}
+						this.playAudio();
+					}
 				}
 			};
 		}
-
 		var initskill = false;
+		let deri = [];
 		for (var i = 0; i < list.length; i++) {
 			if (!get.info(list[i]) || get.info(list[i]).nopop) continue;
 			if (!lib.translate[list[i]] || !lib.translate[list[i] + "_info"]) continue;
@@ -3948,10 +3919,85 @@ export class Click {
 			var current = ui.create.div(".menubutton.large", skills, clickSkill, skilltrans);
 			current.link = list[i];
 			current.linkname = name;
+			current.linkAudioName = audioName;
 			if (!initskill) {
 				initskill = true;
 				clickSkill.call(current, "init");
 			}
+			let derivations = get.info(list[i]).derivation;
+			if (derivations) {
+				if (!Array.isArray(derivations)) derivations = [derivations];
+				deri.addArray(derivations);
+			}
+		}
+		let border = get.groupnature(get.bordergroup(name), "raw");
+		for(let skill of deri) {
+			if (list.includes(skill)) continue;
+			let info = get.info(skill);
+			if (!info || info.nopop) continue;
+			if (!lib.translate[skill] || !lib.translate[skill + "_info"]) continue;
+			let tran = get.translation(skill);
+			if (tran.startsWith("&nbsp;")) {
+				tran = tran.slice(6);
+			}
+			tran = `<span data-nature="${border}">${tran}</span>`;
+			let currentx = ui.create.div(".menubutton.large", skills, clickSkill, tran);
+			currentx.link = skill;
+			currentx.linkname = name;
+			currentx.linkAudioName = audioName;
+			if (!initskill) {
+				initskill = true;
+				clickSkill.call(currentx, "init");
+			}
+		}
+		let dieAudios = get.Audio.die({ player: audioName }).audioList.map(i => i.text).filter(Boolean);
+		if(!dieAudios.length) dieAudios = get.Audio.die({ player: name }).audioList.map(i => i.text).filter(Boolean);
+		if (dieAudios.length) {
+			let dieaudio = ui.create.div(".menubutton.large", skills, clickSkill, "阵亡");
+			dieaudio.style.backgroundColor = "rgb(0, 0, 0, 1)";
+			dieaudio.link = "dieAudios";
+			dieaudio.dieAudios = dieAudios;
+			dieaudio.playername = name;
+			dieaudio.linkname = audioName;
+		}
+		if (lib.characterSubstitute[name]) {
+			let avatars2 = ui.create.div(".avatars", playerbg);
+			let skin = ui.create.div(".changeskin2", "查看其他皮肤", playerbg, function() {
+				playerbg.classList.add("scroll");
+				if (skin._created) {
+					return;
+				}
+				skin._created = true;
+				var createButtons = function (list, skinList) {
+					if (!list) return;
+					if (list.length >= 4) {
+						avatars2.classList.add("scroll");
+						if (lib.config.touchscreen) {
+							lib.setScroll(avatars2);
+						}
+					}
+					for (let i of list) {
+						let button = ui.create.div(avatars2, function () {
+							playerbg.classList.remove("scroll");
+							bg.style.backgroundImage = this.style.backgroundImage;
+							bg.tempSkin = this.name;
+						});
+						let iSTemp = false;
+						if (!lib.character[i] && skinList.some(skin => skin[0] == i)) {
+							iSTemp = true;
+							lib.character[i] = ["", "", 0, [], (skinList.find(skin => skin[0] == i) || [i, []])[1]];
+						}
+						button.name = i;
+						button.setBackground(i, "character");
+						if (iSTemp) delete lib.character[i];
+					}
+				};
+				let list = this.list,
+					skinList = this.skinList;
+				createButtons(list, skinList);
+			});
+			skin.skinList = lib.characterSubstitute[name];
+			skin.list = [name, ...lib.characterSubstitute[name].map(skin => skin[0])];
 		}
 
 		uiintro.addEventListener(lib.config.touchscreen ? "touchend" : "click", ui.click.touchpop);
