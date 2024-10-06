@@ -1942,7 +1942,14 @@ const skills = {
 							event.selectedButtons.remove(container);
 							event.selectedCards.removeArray(item);
 						} else {
-							if (event.selectedButtons.length >= limit) return;
+							if (event.selectedButtons.length >= limit) {
+								let precontainer = event.selectedButtons[0];
+								precontainer.classList.remove("selected");
+								event.selectedButtons.remove(precontainer);
+								let suit = get.suit(event.selectedCards[0], target),
+									cards = target.getCards("h", { suit: suit });
+								event.selectedCards.removeArray(cards);
+							}
 							container.classList.add("selected");
 							event.selectedButtons.add(container);
 							event.selectedCards.addArray(item);
@@ -2095,6 +2102,13 @@ const skills = {
 			let cards2 = result3.cards.slice().filter(card => lib.filter.canBeDiscarded(card, player, target));
 			if (cards2.length) await target.discard(cards2, "notBySelf");
 			if (cards1.length > cards2.length) await target.damage(player);
+			if (player.countMark("sbjianxiong") >= 2) return;
+			if (["sbjianxiong", "jdjianxiong"].some(skill => player.hasSkill(skill, null, null, false))) {
+				const result4 = await player
+					.chooseBool("是否获得1枚“治世”？")
+					.forResult();
+				if(result4.bool) player.addMark("sbjianxiong", 1);
+			}
 		},
 	},
 	mbcmjiushi: {
