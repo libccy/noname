@@ -4414,31 +4414,33 @@ const skills = {
 		filter: function (event, player) {
 			return event.type == "discard" && event.getParent(3).name == "piaoping" && player.countMark("tuoxian") > 0 && event.cards.filterInD("d").length > 0;
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			event.cards = trigger.cards.filterInD("d");
-			player.chooseTarget(lib.filter.notMe, get.prompt("tuoxian"), "令一名其他角色获得" + get.translation(event.cards)).set("ai", function (target) {
-				var player = _status.event.player,
-					att = get.attitude(player, target);
-				if (att < 0) return 0;
-				if (target.hasSkillTag("nogain")) att /= 10;
-				return att * Math.pow(1 + target.countCards("he"), 0.25);
-			});
-			"step 1";
-			if (result.bool) {
-				var target = result.targets[0];
-				event.target = target;
-				player.logSkill("tuoxian", target);
-				player.removeMark("tuoxian", 1);
-				target.gain(cards, "gain2");
-			} else event.finish();
-			"step 2";
-			target
+		async cost(event, trigger, player) {
+			const cards = trigger.cards.filterInD("d");
+			event.result = await player
+				.chooseTarget(lib.filter.notMe, get.prompt("tuoxian"), "令一名其他角色获得" + get.translation(cards))
+				.set("ai", function (target) {
+					const player = _status.event.player,
+						att = get.attitude(player, target);
+					if (att < 0) return 0;
+					if (target.hasSkillTag("nogain")) att /= 10;
+					return att * Math.pow(1 + target.countCards("he"), 0.25);
+				})
+				.forResult();
+			event.result.cards = cards;
+		},
+		async content(event, trigger, player) {
+			const target = event.targets[0],
+				cards = event.cards;
+			player.removeMark("tuoxian", 1);
+			target.gain(cards, "gain2");
+			const result = await target
 				.chooseControl()
-				.set("choiceList", ["弃置区域内的" + get.cnNumber(cards.length) + "张牌", "令" + get.translation(player) + "的〖漂萍〗于本回合内失效"])
+				.set("choiceList", [
+					"弃置区域内的" + get.cnNumber(cards.length) + "张牌",
+					"令" + get.translation(player) + "的〖漂萍〗于本回合内失效",
+				])
 				.set("ai", function () {
-					var player = _status.event.player,
+					const player = _status.event.player,
 						target = _status.event.getParent().player;
 					if (
 						player.hasCard(function (card) {
@@ -4458,16 +4460,18 @@ const skills = {
 					)
 						return 1;
 					return 0;
-				});
-			"step 3";
+				})
+				.forResult();
 			if (result.index == 0) {
-				if (target.countCards("j") > 0) target.discardPlayerCard(target, cards.length, true, "hej");
-				else target.chooseToDiscard("he", true, cards.length);
+				const num = Math.min(target.countCards("hej"), cards.length);
+				if (target.countCards("j") > 0) await target.discardPlayerCard(target, num, true, "hej");
+				else await target.chooseToDiscard("he", true, num);
 			} else player.tempBanSkill("piaoping");
 		},
 		init(player) {
 			player.addMark("tuoxian", 1, false);
 		},
+		onremove: true,
 		intro: { name2: "栗", content: "剩余可用#次" },
 	},
 	chuaili: {
@@ -4477,7 +4481,7 @@ const skills = {
 		filter: function (event, player) {
 			if (player == event.player || get.color(event.card) != "black") return false;
 			if (!player.hasSkill("piaoping", null, null, false)) return false;
-			return player.storage.piaoping == true;
+			return true;
 		},
 		content: function () {
 			if (player.storage.piaoping == true) {

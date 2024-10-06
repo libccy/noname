@@ -9985,10 +9985,11 @@ const skills = {
 			return player.isTurnedOver();
 		},
 		filter: function (event, player) {
-			if (event.checkJiushi) {
-				return true;
-			}
-			return false;
+			if (player.hasHistory("useCard", evt => {
+				if (evt.card.name != "jiu" || evt.getParent().name != "rejiushi1" ) return false;
+				return evt.getParent("damage", true) == event;
+			})) return false;
+			return player.isTurnedOver();
 		},
 		prompt: function (event, player) {
 			var str = "是否发动【酒诗】，将武将牌翻面";
@@ -13772,6 +13773,7 @@ const skills = {
 			return event.card && (event.card.name == "sha" || event.card.name == "juedou") && event.notLink();
 		},
 		forced: true,
+		charlotte: true,
 		content: function () {
 			trigger.num++;
 		},

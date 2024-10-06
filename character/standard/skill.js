@@ -503,6 +503,7 @@ const skills = {
 		filter(event) {
 			return event.card && (event.card.name == "sha" || event.card.name == "juedou") && event.notLink();
 		},
+		charlotte: true,
 		forced: true,
 		async content(event, trigger, player) {
 			trigger.num++;

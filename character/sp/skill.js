@@ -28470,6 +28470,9 @@ const skills = {
 	},
 	mingzhe: {
 		audio: 2,
+		audioname2: {
+			wangyuanji: "qc_mingzhe",
+		},
 		trigger: {
 			player: ["useCard", "respond", "loseAfter"],
 			global: "loseAsyncAfter",

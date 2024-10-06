@@ -2191,7 +2191,11 @@ const skills = {
 					return player.isTurnedOver();
 				},
 				filter(event, player) {
-					return event.checkJiushi;
+					if (player.hasHistory("useCard", evt => {
+						if (evt.card.name != "jiu" || evt.getParent().name != "mbcmjiushi_use" ) return false;
+						return evt.getParent("damage", true) == event;
+					})) return false;
+					return player.isTurnedOver();
 				},
 				prompt(event, player) {
 					return "是否发动【酒诗】，将武将牌翻面？";
@@ -2814,7 +2818,8 @@ const skills = {
 			if (gains.length) player.gain(gains.randomGets(Math.min(gains.length, num)), "gain2");
 		},
 		getNum: function (player, event) {
-			let num = get.mode() == "identity" ? 3 : 4;
+			//let num = get.mode() == "identity" ? 3 : 4;
+			let num = 3;
 			const history = game.getAllGlobalHistory("everything");
 			for (let i = history.length - 1; i >= 0; i--) {
 				const evt = history[i];
@@ -16573,7 +16578,7 @@ const skills = {
 			player: "phaseUseBegin",
 		},
 		direct: true,
-		derivation: ["qc_weimu", "qc_mingzhe"],
+		derivation: ["weimu", "mingzhe"],
 		filter: function (event, player) {
 			var es = player.getCards("e");
 			if (!es.length) return true;
@@ -16610,6 +16615,17 @@ const skills = {
 	},
 	qc_weimu: {
 		audio: true,
+		trigger: { global: "useCard1" },
+		forced: true,
+		firstDo: true,
+		filter(event, player) {
+			if (player.hasSkill("weimu")) return false;
+			if (event.player == player) return false;
+			if (get.color(event.card) != "black" || get.type(event.card) != "trick") return false;
+			var info = lib.card[event.card.name];
+			return info && info.selectTarget && info.selectTarget == -1 && !info.toself;
+		},
+		async content() {},
 		mod: {
 			targetEnabled: function (card, player, target) {
 				var bool = true;

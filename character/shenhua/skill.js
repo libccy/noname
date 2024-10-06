@@ -5422,6 +5422,9 @@ const skills = {
 	weimu: {
 		trigger: { global: "useCard1" },
 		audio: 2,
+		audioname2: {
+			wangyuanji: "qc_weimu",
+		},
 		forced: true,
 		firstDo: true,
 		filter(event, player) {

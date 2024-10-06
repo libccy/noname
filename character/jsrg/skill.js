@@ -10615,7 +10615,7 @@ const skills = {
 	//李密
 	jsrgnanquan: {
 		audio: 2,
-		enable: ["chooseToUse", "chooseToRespond"],
+		enable: "chooseToUse",
 		filter(event, player) {
 			if (!player.countCards("hs") || player.hasSkill("jsrgnanquan_used")) return false;
 			for (var i of lib.inpile) {
@@ -10701,9 +10701,6 @@ const skills = {
 				charlotte: true,
 				mod: {
 					cardEnabled: function (card, player) {
-						if (player.getStorage("jsrgnanquan_fengyin").includes(get.type(card))) return false;
-					},
-					cardRespondable: function (card, player) {
 						if (player.getStorage("jsrgnanquan_fengyin").includes(get.type(card))) return false;
 					},
 					cardSavable: function (card, player) {
