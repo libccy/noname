@@ -6154,12 +6154,12 @@ const skills = {
 					name: "乐泉",
 					name2: "乐泉",
 					markcount: () => 0,
-					content: "结束阶段，你可以弃置一张♦牌并回复1点体力。",
+					content: "结束阶段，你可以弃置一张♦牌，然后回复1点体力。",
 				},
 				content: function () {
 					"step 0";
 					player
-						.chooseToDiscard("乐泉：是否弃置一张♦牌并回复1点体力？", { suit: "diamond" }, "he")
+						.chooseToDiscard("乐泉：是否弃置一张♦牌，然后回复1点体力？", { suit: "diamond" }, "he")
 						.set("ai", card => {
 							if (_status.event.goon) return 7 - get.value(card);
 							return 0;
@@ -6184,12 +6184,12 @@ const skills = {
 					name: "藿溪",
 					name2: "藿溪",
 					markcount: () => 0,
-					content: "结束阶段，你可以弃置一张♥牌并摸两张牌。",
+					content: "结束阶段，你可以弃置一张♥牌，然后摸两张牌。",
 				},
 				content: function () {
 					"step 0";
 					player
-						.chooseToDiscard("藿溪：是否弃置一张♥牌并摸两张牌？", { suit: "heart" }, "he")
+						.chooseToDiscard("藿溪：是否弃置一张♥牌，然后摸两张牌？", { suit: "heart" }, "he")
 						.set("ai", card => {
 							return 6 - get.value(card);
 						})
