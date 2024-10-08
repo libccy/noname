@@ -1301,6 +1301,9 @@ window.noname_character_rank = {
 		"sb_zhugejin",
 	],
 	b: [
+		"jiangziya",
+		"shengongbao",
+		"nanjixianweng",
 		"liuxiecaojie",
 		"liutan",
 		"wenyuan",
@@ -2521,6 +2524,9 @@ window.noname_character_rank = {
 			"wangkuang",
 		],
 		rare: [
+			"jiangziya",
+			"shengongbao",
+			"nanjixianweng",
 			"scl_pangdegong",
 			"scl_peixiu",
 			"scl_zhenji",
