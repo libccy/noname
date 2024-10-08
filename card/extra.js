@@ -227,7 +227,7 @@ game.import("card", function () {
 				fullskin: true,
 				type: "trick",
 				enable: true,
-				//cardnature:'fire',
+				cardnature:'fire',
 				filterTarget: function (card, player, target) {
 					//if(player!=game.me&&player.countCards('h')<2) return false;
 					return target.countCards("h") > 0;
@@ -498,7 +498,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip1",
-				//cardnature:'fire',
 				distance: { attackFrom: -3 },
 				ai: {
 					basic: {
@@ -523,7 +522,6 @@ game.import("card", function () {
 				fullskin: true,
 				type: "equip",
 				subtype: "equip2",
-				//cardnature:'fire',
 				ai: {
 					value: function (card, player, index, method) {
 						if (player.isDisabled(2)) return 0.01;
@@ -1006,7 +1004,6 @@ game.import("card", function () {
 					trigger.num++;
 				},
 				ai: {
-					fireAttack: true,
 					effect: {
 						target: function (card, player, target, current) {
 							if (card.name == "sha") {

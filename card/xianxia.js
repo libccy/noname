@@ -35,6 +35,7 @@ game.import("card", function () {
 				audio: true,
 				fullskin: true,
 				type: "trick",
+				cardnature: "fire",
 				derivation: "ty_luxun",
 				cardimage: "huoshaolianying",
 				enable: true,

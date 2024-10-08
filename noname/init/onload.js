@@ -167,18 +167,25 @@ export async function onload() {
 		}
 
 		lib.card.list = lib.card.list
-			.filter(cardData => cardData[2] && !lib.card[cardData[2]].mode?.includes(lib.config.mode))
-			.map(cardData => {
+			.filter(cardData => {
+				if (!cardData[2]) return false;
 				if (cardData[2] === "huosha") {
-					cardData = cardData.slice(0);
 					cardData[2] = "sha";
 					cardData[3] = "fire";
 				} else if (cardData[2] === "leisha") {
-					cardData = cardData.slice(0);
 					cardData[2] = "sha";
 					cardData[3] = "thunder";
+				} else if (cardData[2] === "icesha") {
+					cardData[2] = "sha";
+					cardData[3] = "ice";
+				} else if (cardData[2] === "cisha") {
+					cardData[2] = "sha";
+					cardData[3] = "stab";
+				} else if (cardData[2] === "kamisha") {
+					cardData[2] = "sha";
+					cardData[3] = "kami";
 				}
-				return cardData;
+				return lib.card[cardData[2]] && !lib.card[cardData[2]].mode?.includes(lib.config.mode);
 			});
 	}
 
