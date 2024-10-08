@@ -5049,16 +5049,16 @@ const skills = {
 		audio: 2,
 		trigger: { global: "phaseDiscardBegin" },
 		filter: function (event, player) {
-			if (event.player == player) return false;
 			return event.player.isDamaged();
 		},
-		direct: true,
-		content: function () {
-			"step 0";
-			var str = get.translation(trigger.player);
-			player
+		async cost(event, trigger, player) {
+			let str = get.translation(trigger.player);
+			const result = await player
 				.chooseControl("弃牌，+1", "摸牌，-1", "cancel2")
-				.set("choiceList", ["令" + str + "弃置一张牌，且其本回合手牌上限+1", "令" + str + "摸一张牌，且其本回合手牌上限-1"])
+				.set("choiceList", [
+					"令" + str + "弃置一张牌，且其本回合手牌上限+1",
+					"令" + str + "摸一张牌，且其本回合手牌上限-1"
+				])
 				.set("ai", function () {
 					let player = _status.event.player,
 						target = _status.event.getTrigger().player,
@@ -5082,38 +5082,42 @@ const skills = {
 						];
 					return res.indexOf(Math.max(...res));
 				})
-				.set("prompt", get.prompt("olrunwei", trigger.player));
-			"step 1";
-			if (result.index != 2) {
-				player.logSkill("olrunwei", trigger.player);
-				if (result.index == 0) {
-					trigger.player
-						.chooseToDiscard("he", true)
-						.set("ai", card => {
-							if (get.position(card) == "e") return get.event().e - get.value(card);
-							return 1 / (get.value(card) || 0.5);
-						})
-						.set(
-							"e",
-							(function () {
-								if (
-									!trigger.player.hasCard(i => {
-										return get.value(i, trigger.player) <= 6;
-									}, "e")
-								)
-									return 0;
-								if (!trigger.player.needsToDiscard(-2)) return 0;
-								return 6.2;
-							})()
-						);
-					trigger.player.addTempSkill("olrunwei_+");
-					trigger.player.addMark("olrunwei_+", 1, false);
-				}
-				if (result.index == 1) {
-					trigger.player.draw();
-					trigger.player.addTempSkill("olrunwei_-");
-					trigger.player.addMark("olrunwei_-", 1, false);
-				}
+				.set("prompt", get.prompt("olrunwei", trigger.player))
+				.forResult();
+			event.result = {
+				bool: result.control !== "cancel2",
+				cost_data: result.index
+			};
+		},
+		logTarget: "player",
+		async content(event, trigger, player) {
+			if (event.cost_data === 0) {
+				await trigger.player
+					.chooseToDiscard("he", true)
+					.set("ai", card => {
+						if (get.position(card) == "e") return get.event().e - get.value(card);
+						return 1 / (get.value(card) || 0.5);
+					})
+					.set(
+						"e",
+						(function () {
+							if (
+								!trigger.player.hasCard(i => {
+									return get.value(i, trigger.player) <= 6;
+								}, "e")
+							)
+								return 0;
+							if (!trigger.player.needsToDiscard(-2)) return 0;
+							return 6.2;
+						})()
+					);
+				trigger.player.addTempSkill("olrunwei_+");
+				trigger.player.addMark("olrunwei_+", 1, false);
+			}
+			if (event.cost_data === 1) {
+				await trigger.player.draw();
+				trigger.player.addTempSkill("olrunwei_-");
+				trigger.player.addMark("olrunwei_-", 1, false);
 			}
 		},
 		subSkill: {
