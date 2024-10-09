@@ -210,6 +210,9 @@ const skills = {
 			global: "phaseBefore",
 			player: ["enterGame", "phaseJieshuBegin"],
 		},
+		filter(event, player) {
+			return event.name !== "phase" || game.phaseNumber === 0;
+		},
 		frequent: true,
 		async cost(event, trigger, player) {
 			if (trigger.name !== "phaseJieshu") event.result = { bool: true };
