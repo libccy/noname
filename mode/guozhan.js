@@ -19739,8 +19739,6 @@ export default () => {
 			},
 		},
 		translate: {
-			ye: "野",
-			ye2: "野心家",
 			yexinjia_mark: "野心家",
 	
 			bumingzhi: "不明置",
