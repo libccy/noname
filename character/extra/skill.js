@@ -1030,23 +1030,34 @@ const skills = {
 			player: ["chooseToUseAfter", "chooseToRespondAfter"],
 		},
 		filter(event, player) {
-			if (player.getRoundHistory("useSkill", evt => evt.skill == "xinrenjie").length >= 4) return false;
+			if (player.countMark("xinrenjie_used") >= 4) return false;
 			return event.respondTo && event.respondTo[0] !== player && !event.result.bool;
 		},
 		forced: true,
 		async content(event, trigger, player) {
-			player.addMark(event.name, 1);
+			player.addMark("xinrenjie", 1);
+			player.addTempSkill("xinrenjie_used", "roundStart");
+			player.addMark("xinrenjie_used", 1, false);
 		},
 		intro: {
 			name2: "忍",
 			content: "mark",
 		},
 		marktext: "忍",
-		hiddenCard: () => true,
+		hiddenCard: (player) => player.countMark("xinrenjie_used") < 4,
 		ai: {
 			combo: "xinjilve",
 			respondSha: true,
 			respondShan: true,
+			skillTagFilter(player){
+				if (player.countMark("xinrenjie_used") >= 4) return false;
+			},
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
 		},
 	},
 	xinbaiyin: {

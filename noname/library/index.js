@@ -243,9 +243,9 @@ export class Library {
 	//函数钩子
 	/**
 	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
-	 * 
+	 *
 	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
-	 * 
+	 *
 	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
 	 */
 	hooks = freezeButExtensible({ ...defaultHooks });
@@ -379,35 +379,35 @@ export class Library {
 										typeof yingbianZhuzhanAI == "function"
 											? yingbianZhuzhanAI(player, card, source, targets)
 											: cardx => {
-												var info = get.info(card);
-												if (info && info.ai && info.ai.yingbian) {
-													var ai = info.ai.yingbian(card, source, targets, player);
-													if (!ai) return 0;
-													return ai - get.value(cardx);
-												} else if (get.attitude(player, source) <= 0) return 0;
-												return 5 - get.value(cardx);
-											},
+													var info = get.info(card);
+													if (info && info.ai && info.ai.yingbian) {
+														var ai = info.ai.yingbian(card, source, targets, player);
+														if (!ai) return 0;
+														return ai - get.value(cardx);
+													} else if (get.attitude(player, source) <= 0) return 0;
+													return 5 - get.value(cardx);
+											  },
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
 								game.resume();
 							};
-							("step 1");
+							"step 1";
 							var type = get.type2(card);
 							event.list = game.filterPlayer(current => current != player && current.countCards("h") && (_status.connectMode || current.hasCard(cardx => get.type2(cardx) == type, "h"))).sortBySeat(_status.currentPhase || player);
 							event.id = get.id();
-							("step 2");
+							"step 2";
 							if (!event.list.length) event.finish();
 							else if (_status.connectMode && (event.list[0].isOnline() || event.list[0] == game.me)) event.goto(4);
 							else event.send((event.current = event.list.shift()), event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
-							("step 3");
+							"step 3";
 							if (result.bool) {
 								event.zhuzhanresult = event.current;
 								event.zhuzhanresult2 = result;
 								if (event.current != game.me) game.delayx();
 								event.goto(8);
 							} else event.goto(2);
-							("step 4");
+							"step 4";
 							var id = event.id,
 								sendback = (result, player) => {
 									if (result && result.id == id && !event.zhuzhanresult && result.bool) {
@@ -444,16 +444,16 @@ export class Library {
 									if (value != player) value.showTimer();
 								});
 							event.withol = withol;
-							("step 5");
+							"step 5";
 							if (!result || !result.bool || event.zhuzhanresult) return;
 							game.broadcast("cancel", event.id);
 							event.zhuzhanresult = game.me;
 							event.zhuzhanresult2 = result;
-							("step 6");
+							"step 6";
 							if (event.withol && !event.resultOL) game.pause();
-							("step 7");
+							"step 7";
 							game.players.forEach(value => value.hideTimer());
-							("step 8");
+							"step 8";
 							if (event.zhuzhanresult) {
 								var target = event.zhuzhanresult;
 								target.line(player, "green");
@@ -4145,19 +4145,19 @@ export class Library {
 					},
 				},
 				show_tip: {
-					name: '显示tip标记',
+					name: "显示tip标记",
 					init: false,
 					unfrequent: true,
 					onclick(bool) {
 						game.saveConfig("show_tip", bool);
 						if (lib.config.show_tip) {
 							game.css({
-								'.tipContainer': {
-									'display': 'flex !important'
-								}
+								".tipContainer": {
+									display: "flex !important",
+								},
 							});
 						} else {
-							game.css({ '.tipContainer': { 'display': 'none !important' } });
+							game.css({ ".tipContainer": { display: "none !important" } });
 						}
 					},
 				},
@@ -8217,10 +8217,10 @@ export class Library {
 	genAwait(item) {
 		return gnc.is.generator(item)
 			? gnc.of(function* () {
-				for (const content of item) {
-					yield content;
-				}
-			})()
+					for (const content of item) {
+						yield content;
+					}
+			  })()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -9536,6 +9536,7 @@ export class Library {
 		western: "西",
 		key: "键",
 		jin: "晋",
+		ye: "野",
 		double: "双",
 		wei2: "魏国",
 		shu2: "蜀国",
@@ -9545,6 +9546,7 @@ export class Library {
 		western2: "西方",
 		key2: "KEY",
 		jin2: "晋朝",
+		ye2: "野心家",
 		double2: "双势力",
 		male: "男",
 		female: "女",
@@ -10815,16 +10817,16 @@ export class Library {
 					const cardName = get.name(cards[0], player);
 					return cardName
 						? new lib.element.VCard({
-							name: cardName,
-							nature: get.nature(cards[0], player),
-							suit: get.suit(cards[0], player),
-							number: get.number(cards[0], player),
-							isCard: true,
-							cards: [cards[0]],
-							storage: {
-								stratagem_buffed: 1,
-							},
-						})
+								name: cardName,
+								nature: get.nature(cards[0], player),
+								suit: get.suit(cards[0], player),
+								number: get.number(cards[0], player),
+								isCard: true,
+								cards: [cards[0]],
+								storage: {
+									stratagem_buffed: 1,
+								},
+						  })
 						: new lib.element.VCard();
 				}
 				return null;
@@ -11543,7 +11545,7 @@ export class Library {
 				"step 0";
 				player._groupChosen = true;
 				player.chooseControl(get.is.double(player.name1, true)).set("prompt", "请选择你的势力");
-				("step 1");
+				"step 1";
 				player.changeGroup(result.control);
 			},
 		},
@@ -11744,7 +11746,7 @@ export class Library {
 		fengyin: {
 			init: function (player, skill) {
 				player.addSkillBlocker(skill);
-				player.addTip(skill, '非锁定技失效');
+				player.addTip(skill, "非锁定技失效");
 			},
 			onremove: function (player, skill) {
 				player.removeSkillBlocker(skill);
@@ -12026,7 +12028,7 @@ export class Library {
 				"step 0";
 				event.dying = trigger.player;
 				if (!event.acted) event.acted = [];
-				("step 1");
+				"step 1";
 				if (trigger.player.isDead()) {
 					event.finish();
 					return;
@@ -12081,7 +12083,7 @@ export class Library {
 				} else {
 					event._result = { bool: false };
 				}
-				("step 2");
+				"step 2";
 				if (result.bool) {
 					var player = trigger.player;
 					if (player.hp <= 0 && !trigger.nodying && !player.nodying && player.isAlive() && !player.isOut() && !player.removed) event.goto(0);
@@ -12171,7 +12173,7 @@ export class Library {
 			content: function () {
 				"step 0";
 				event.logvid = trigger.getLogv();
-				("step 1");
+				"step 1";
 				event.targets = game.filterPlayer(function (current) {
 					return current != event.player && current.isLinked();
 				});
@@ -12181,7 +12183,7 @@ export class Library {
 				event._args = [trigger.num, trigger.nature, trigger.cards, trigger.card];
 				if (trigger.source) event._args.push(trigger.source);
 				else event._args.push("nosource");
-				("step 2");
+				"step 2";
 				if (event.targets.length) {
 					var target = event.targets.shift();
 					if (target.isLinked()) target.damage.apply(target, event._args.slice(0));
@@ -12822,7 +12824,7 @@ export class Library {
 								navigator.clipboard
 									.readText()
 									.then(read)
-									.catch(_ => { });
+									.catch(_ => {});
 							} else {
 								var input = ui.create.node("textarea", ui.window, { opacity: "0" });
 								input.select();
@@ -14033,8 +14035,9 @@ export class Library {
 			},
 		],
 		[
-			"鼎",
+			"九鼎",
 			{
+				showName: "鼎",
 				color: "#ffccff",
 				nature: "black",
 			},
@@ -14058,6 +14061,14 @@ export class Library {
 			{
 				color: "#ffd700",
 				nature: "metal",
+			},
+		],
+		[
+			"燕幽",
+			{
+				showName: "幽",
+				color: "#ff6a6a",
+				nature: "red",
 			},
 		],
 	]);

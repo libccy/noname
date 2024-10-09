@@ -2102,10 +2102,11 @@ const skills = {
 			let cards2 = result3.cards.slice().filter(card => lib.filter.canBeDiscarded(card, player, target));
 			if (cards2.length) await target.discard(cards2, "notBySelf");
 			if (cards1.length > cards2.length) await target.damage(player);
-			if (player.countMark("sbjianxiong") >= 2) return;
+			if (event.name !== "sbqingzheng" || player.countMark("sbjianxiong") >= 2) return;
 			if (["sbjianxiong", "jdjianxiong"].some(skill => player.hasSkill(skill, null, null, false))) {
 				const result4 = await player
 					.chooseBool("是否获得1枚“治世”？")
+					.set("choice", Math.random() >= 0.5)
 					.forResult();
 				if(result4.bool) player.addMark("sbjianxiong", 1);
 			}

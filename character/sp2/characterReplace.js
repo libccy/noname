@@ -5,7 +5,7 @@ const characterReplaces = {
 	zhangchangpu: ["ol_zhangchangpu", "zhangchangpu", "sp_zhangchangpu"],
 	huangfusong: ["huangfusong", "sp_huangfusong", "jsrg_huangfusong", "old_huangfusong"],
 	dingyuan: ["ol_dingyuan", "dingyuan"],
-	quyi: ["quyi", "re_quyi"],
+	quyi: ["quyi", "re_quyi", "yy_quyi"],
 	hansui: ["hansui", "re_hansui", "xin_hansui", "jsrg_hansui"],
 	jin_simashi: ["dc_simashi", "jin_simashi", "simashi", "std_simashi", "jd_jin_simashi"],
 	jin_yanghuiyu: ["jin_yanghuiyu", "yanghuiyu"],

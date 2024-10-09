@@ -1,8 +1,8 @@
 const characterReplaces = {
 	caocao: ["caocao", "re_caocao", "sb_caocao", "dc_caocao", "jd_sb_caocao"],
 	guojia: ["guojia", "re_guojia", "yj_sb_guojia", "ps1059_guojia", "ps2070_guojia", "jsrg_guojia"],
-	simayi: ["simayi", "re_simayi", "dc_sb_simayi", "jsrg_simayi", "ps_simayi", "ps2068_simayi", "huan_simayi"],
-	jin_simayi: ["jin_simayi", "junk_simayi", "ps_jin_simayi"],
+	simayi: ["simayi", "re_simayi", "dc_sb_simayi", "jsrg_simayi", "ps_simayi", "ps2068_simayi", "yy_simayi"],
+	jin_simayi: ["jin_simayi", "junk_simayi", "huan_simayi", "ps_jin_simayi"],
 	zhenji: ["zhenji", "re_zhenji", "sb_zhenji", "yj_zhenji"],
 	xuzhu: ["xuzhu", "re_xuzhu"],
 	zhangliao: ["zhangliao", "re_zhangliao"],
@@ -31,7 +31,7 @@ const characterReplaces = {
 	huatuo: ["huatuo", "re_huatuo", "old_huatuo"],
 	huaxiong: ["huaxiong", "re_huaxiong", "old_huaxiong", "sb_huaxiong", "ol_huaxiong"],
 	yuanshu: ["yuanshu", "re_yuanshu", "yl_yuanshu", "old_yuanshu", "ol_yuanshu", "star_yuanshu"],
-	gongsunzan: ["gongsunzan", "re_gongsunzan", "dc_gongsunzan", "xin_gongsunzan", "sb_gongsunzan", "sp_gongsunzan"],
+	gongsunzan: ["gongsunzan", "re_gongsunzan", "dc_gongsunzan", "xin_gongsunzan", "sb_gongsunzan", "sp_gongsunzan", "yy_gongsunzan"],
 	re_lidian: ["re_lidian", "old_re_lidian", "junk_lidian"],
 };
 

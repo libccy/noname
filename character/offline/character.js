@@ -1,11 +1,18 @@
 const characters = {
+	yy_quyi: ["male", "qun", 4, ["yyfuqi", "jiaozi"], ["die:quyi"]],
+	yy_gongsunzan: ["male", "qun", 4, ["yyqizhen", "yicong", "yymujun"], ["zhu"]],
+	yy_wenchou: ["male", "qun", 4, ["yyxuezhan", "yyyazhen"]],
+	yy_gongsunyuan: ["male", "qun", 4, ["yyxuanshi", "yyxiongye"], ["zhu"]],
+	yy_yuanshao: ["male", "qun", 4, ["yysudi", "yyqishe", "yyxuanzhen"], ["zhu"]],
+	yy_simayi: ["male", "wei", 4, ["yyyanggu", "yyzuifu"]],
+	yy_caorui: ["male", "wei", 4, ["yyhuituo", "yymingjian", "xingshuai"], ["zhu", "die:caorui"]],
 	scl_pangdegong: {
 		sex: "male",
 		group: "qun",
 		hp: 3,
 		skills: ["scls_yinshi", "scls_pingcai"],
 		dieAudios: ["pangdegong"],
-		trashBin: ["character:pangdegong"]
+		trashBin: ["character:pangdegong"],
 	},
 	scl_sunhanhua: {
 		sex: "female",
@@ -13,7 +20,7 @@ const characters = {
 		hp: 3,
 		skills: ["scls_chongxu", "scls_miaojian", "scls_lianhua"],
 		dieAudios: ["sunhanhua"],
-		trashBin: ["character:sunhanhua"]
+		trashBin: ["character:sunhanhua"],
 	},
 	scl_miheng: {
 		sex: "male",
@@ -21,7 +28,7 @@ const characters = {
 		hp: 3,
 		skills: ["scls_kuangcai", "scls_shejian"],
 		dieAudios: ["miheng"],
-		trashBin: ["character:miheng"]
+		trashBin: ["character:miheng"],
 	},
 	scl_peixiu: {
 		sex: "male",
@@ -38,7 +45,7 @@ const characters = {
 		hp: 4,
 		skills: ["scls_lingren"],
 		dieAudios: ["caoying"],
-		trashBin: ["character:caoying"]
+		trashBin: ["character:caoying"],
 	},
 	scl_luotong: {
 		sex: "male",
@@ -46,13 +53,13 @@ const characters = {
 		hp: 4,
 		skills: ["scls_qinzheng"],
 		dieAudios: ["luotong"],
-		trashBin: ["character:luotong"]
+		trashBin: ["character:luotong"],
 	},
 	ty_anyingx: ["male", "qun", 4, ["tyzhuiling", "tyxihun", "tyxianqi", "tyfansheng"]],
-	ty_anying: ["male", "qun", 4 , ["tyliupo", "tyzhuiling", "tyxihun", "tyxianqi"]],
-	ty_wuque: ["male", "qun", 4 , ["tyansha", "tycangshen", "tyxiongren"]],
-	ty_yanque: ["male", "qun", 4 , ["tysiji", "tycangshen"]],
-	ty_wangque: ["male", "qun", 3 , ["tydaifa", "tycangshen"]],
+	ty_anying: ["male", "qun", 4, ["tyliupo", "tyzhuiling", "tyxihun", "tyxianqi"]],
+	ty_wuque: ["male", "qun", 4, ["tyansha", "tycangshen", "tyxiongren"]],
+	ty_yanque: ["male", "qun", 4, ["tysiji", "tycangshen"]],
+	ty_wangque: ["male", "qun", 3, ["tydaifa", "tycangshen"]],
 	ty_fanjiang: ["male", "wu", 4, ["tybianta", "tybenxiang", "tyxiezhan"]],
 	ty_zhangda: ["male", "wu", 4, ["tyxingsha", "tyxianshou", "tyxiezhan"]],
 	ty_liue: ["male", "wu", 5, ["tyxiyu"]],
@@ -71,7 +78,7 @@ const characters = {
 	ty_huangzhong: ["male", "shu", 4, ["xinliegong", "tyyizhuang"]],
 	ty_liaohua: ["male", "shu", 4, ["tydangxian", "tyfuli"]],
 	ty_fengxí: ["male", "shu", 4, ["tyqingkou"], ["character:tw_fengxí"]],
-	ty_zhangnan: ["male", "shu", 4 ,["tyfenwu"], ["character:tw_zhangnan"]],
+	ty_zhangnan: ["male", "shu", 4, ["tyfenwu"], ["character:tw_zhangnan"]],
 	ty_zhaorong: ["male", "shu", 4, ["tyyuantao"]],
 	ty_chengjix: ["male", "shu", 3, ["tyzhongen", "tyliebao"]],
 	ty_chenshi: ["male", "shu", 4, ["tyzhuan"]],
@@ -110,7 +117,7 @@ const characters = {
 	jx_guanyu: ["male", "shu", 4, ["jxwusheng", "jsrgguanjue", "nuzhan"]],
 	jx_shen_caoren: ["male", "shen", 4, ["jxjushou"], ["wei"]],
 	jx_shen_liubiao: ["male", "shen", 2, ["jxxiongju", "jxfujing", "jxyongrong"], ["qun"]],
-	yj_tianchuan: ["female", "qun", 3 ,["pshuying", "psqianjing", "psbianchi"]],
+	yj_tianchuan: ["female", "qun", 3, ["pshuying", "psqianjing", "psbianchi"]],
 	yj_zhonghui: ["male", "wei", 4, ["psmouchuan", "pszizhong", "psjizun", "psqingsuan"], ["zhu"]],
 	yj_ehuan: ["male", "qun", 5, ["psdiwan", "pssuiluan", "psconghan"], ["doublegroup:shu:qun"]],
 	yj_zhouji: ["female", "wu", 3, ["psyanmou", "pszhanyan", "psyuhuo"], ["name:周|null"]],
