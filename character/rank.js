@@ -2022,7 +2022,7 @@ window.noname_character_rank = {
 		epic: [
 			"yy_quyi",
 			"yy_yuanshao",
-			"yy_smiayi",
+			"yy_simayi",
 			"yy_caorui",
 			"scl_miheng",
 			"scl_caoying",
