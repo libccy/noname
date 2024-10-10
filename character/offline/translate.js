@@ -888,6 +888,9 @@ const translates = {
 	yymingjian_info: "其他角色的出牌阶段开始时，你可以展示所有手牌并交给其一种花色的所有牌，然后其本回合使用的下一张牌额外结算一次。",
 	yy_zhaoyun: "燕幽赵云",
 	yy_zhaoyun_prefix: "燕幽",
+	yy_baihuxiaoqi: "白虎骁骑",
+	yy_baihuxiaoqi_skill: "白虎骁骑",
+	yy_baihuxiaoqi_info: "锁定技，若你的装备区牌数X不少于：1张，你的攻击范围+X；2张，你使用【杀】的额定次数+X；3张，你计算与其他角色的距离-X；4张，摸牌阶段，你多摸X张牌。",
 };
 
 export default translates;
