@@ -11,6 +11,141 @@ export const Content = {
 	emptyEvent: async event => {
 		await event.trigger(event.name);
 	},
+	chooseNumbers: function () {
+		'step 0';
+		event.numbers = [];
+		if (event['chooseTime'] && _status.connectMode && !game.online) {
+			event.time = lib.configOL.choose_timeout;
+			game.broadcastAll(function (time) {
+				lib.configOL.choose_timeout = time;
+			}, event['chooseTime']);
+		}
+		if (event.isMine()) {
+			_status.imchoosing = true;
+			event.settleed = false;
+			event.dialog = ui.create.dialog(event.prompt || '请调整以下数值', 'forcebutton', 'hidden');
+			if (event.prompt2) event.dialog.addText(event.prompt2);
+			event.switchToAuto = function () {
+				if (!event.filterOk(event)) {
+					if (!event.forced) event._result = {bool: false};
+					else event._result = 'ai';
+				} else {
+					event._result = {bool: true, numbers: event.numbers};
+				}
+				event.dialog.close();
+				if (ui.confirm) ui.confirm.close();
+				game.resume();
+				_status.imchoosing = false;
+			};
+
+			function optionUpdate(select) {
+				var index = parseInt(select.id.slice(6));
+				var item = event.list[index], thisNum = event.numbers[index];
+				while (select.childElementCount) select.removeChild(select.firstChild);
+				if (Array.isArray(item)) {
+					var sort = item.sort((a, b) => a - b);
+					if (!thisNum) {
+						thisNum = sort[0];
+						event.numbers.splice(index, 1, thisNum);
+					}
+					for (var num of sort) {
+						var option = document.createElement('option');
+						option.innerHTML = num;
+						if (event['optprompt']) {
+							if (typeof event['optprompt'] == 'string') {
+								option.innerHTML = event['optprompt'].replace('#', num).replace('$', get.cnNumber(num, true));
+							} else if (typeof event['optprompt'] == 'function') {
+								option.innerHTML = event['optprompt'](num, index);
+							}
+						}
+						option.value = num;
+						if (num == thisNum) option.selected = true;
+						if (!event.filterSelect(num, index, event)) option.disabled = true;
+						select.appendChild(option);
+					}
+				} else {
+					var max = (item.max || 9);
+					if (!thisNum) {
+						thisNum = item.min || 0;
+						event.numbers.splice(index, 1, thisNum);
+					}
+					if (event.terminal) var actual = event.terminal - event.numbers.reduce((sum, num) => sum + num, 0) + thisNum;
+					for (var num = item.min || 0; num <= Math.min((actual || max), max); num += item.base || 1) {
+						var option = document.createElement('option');
+						option.innerHTML = num;
+						if (event['optprompt']) {
+							if (typeof event['optprompt'] == 'string') {
+								option.innerHTML = event['optprompt'].replace('#', num).replace('$', get.cnNumber(num, true));
+							} else if (typeof event['optprompt'] == 'function') {
+								option.innerHTML = event['optprompt'](num, index);
+							}
+						}
+						option.value = num;
+						if (num == thisNum) option.selected = true;
+						if (!event.filterSelect(num, index, event)) option.disabled = true;
+						select.appendChild(option);
+					}
+				}
+			}
+
+			for (var index = 0; index < event.list.length; index++) {
+				event.numbers.push(void 0);
+				event.dialog.addText(event.list[index].prompt || '选择一个数值');
+				var select = document.createElement('select');
+				select.id = `select${index}`;
+				select.classList.add('add-setting');
+				select.style.margin = '0';
+				select.style.width = '30%';
+				select.style.position = 'relative';
+				select.onchange = function () {
+					event.numbers[parseInt(this.id.slice(6))] = parseInt(this.value);
+					for (var index = 0; index < event.list.length; index++) optionUpdate(event.dialog.content.querySelector(`[id = 'select${index}']`));
+					if (event.filterOk(event)) {
+						ui.create.confirm('o');
+					} else {
+						if (!event.forced) ui.create.confirm('c');
+						else if (ui.confirm) ui.confirm.close();
+					}
+				}
+				optionUpdate(select);
+				event.dialog.content.appendChild(select);
+			}
+			event.dialog.add(' <br> ');
+			event.dialog.open();
+			event.custom.replace.confirm = function (bool) {
+				if (bool) event._result = {bool: true, numbers: event.numbers};
+				else event._result = {bool: false};
+				event.dialog.close();
+				if (ui.confirm) ui.confirm.close();
+				game.resume();
+				_status.imchoosing = false;
+			};
+			if (event.filterOk(event)) {
+				ui.create.confirm('o');
+			} else {
+				if (!event.forced) ui.create.confirm('c');
+				else if (ui.confirm) ui.confirm.close();
+			}
+			game.pause();
+			game.countChoose();
+			event.choosing = true;
+		} else if (event.isOnline()) {
+			event.send();
+		} else {
+			event.result = 'ai';
+		}
+		'step 1'
+		if (event.time) game.broadcastAll(function (time) {
+			lib.configOL.choose_timeout = time;
+		}, event.time);
+		var _result = event.result || result;
+		if ((!_result || _result == 'ai' || (event.forced && !_result.bool)) && event.processAI) {
+			var numbers = event.processAI(event);
+			if (numbers) _result = {numbers: numbers, bool: true};
+			else _result = {bool: false};
+		}
+		event.result = _result;
+	},
 	//变更武将牌
 	async changeCharacter(event, trigger, player) {
 		const rawPairs = [player.name1];
