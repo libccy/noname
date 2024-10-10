@@ -28,33 +28,20 @@ export class Pagination {
         swEvent: 'click',
     };
     /**
-     * @param { number } [totalPageCount] 
+     * @param { Partial<PaginationState> } paramsObj 
      */
-    constructor(totalPageCount = 1) {
-        if (!totalPageCount) return;
+    constructor(paramsObj = {}) {
         if (!Pagination.loaded) {
             Pagination.loaded = true;
             lib.init.css(lib.assetURL + "layout/default/pagination.css");
         }
-        this.state.totalPageCount = totalPageCount;
-        if (this.state.totalPageCount > this.state.maxShowBtnCount + 2) {
-            this.state.activePosition = Math.ceil(this.state.maxShowBtnCount / 2);
-        }
-    }
-    /**
-     * 根据初始化数据并渲染dom
-     * @param { Partial<PaginationState> } paramsObj 
-     */
-    init(paramsObj = {}) {
         let { state } = this;
         for (const [key, value] of Object.entries(paramsObj)) {
             state[key] = value;
         }
-        // 当需要省略符号占位时，确定active的位置
-        if (this.state.totalPageCount > this.state.maxShowBtnCount + 2) {
-            this.state.activePosition = Math.ceil(this.state.maxShowBtnCount / 2);
+        if (state.totalPageCount > state.maxShowBtnCount + 2) {
+            state.activePosition = Math.ceil(state.maxShowBtnCount / 2);
         }
-        this.renderPageDOM();
     }
     /** 切换页码并设置按钮点击事件 */
     switchPage() {
