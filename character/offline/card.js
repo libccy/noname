@@ -255,7 +255,7 @@ const cards = {
 			},
 		},
 	},
-	yy_baihuxiaoqi: {
+	yy_baimaxiaoqi: {
 		audio: true,
 		fullskin: true,
 		type: "equip",
@@ -267,7 +267,7 @@ const cards = {
 			globalFrom: -1,
 			globalTo: +1,
 		},
-		skills: ["yy_baihuxiaoqi_skill"],
+		skills: ["yy_baimaxiaoqi_skill"],
 		ai: {
 			equipValue(card, player) {
 				return 5 + player.countCards("e");
