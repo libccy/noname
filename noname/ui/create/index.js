@@ -1220,13 +1220,15 @@ export class Create {
 					packsource.classList.remove("thundertext");
 				}
 			}
-			const buttons = dialog.content.querySelector(".buttons");
-			/** @type { Pagination } */
-			const p = dialog.paginationMap.get(buttons);
-			if (p) {
-				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-				p.state.data = array;
-				p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
+			if (dialog.paginationMaxCount.get("character")) {
+				const buttons = dialog.content.querySelector(".buttons");
+				/** @type { Pagination } */
+				const p = dialog.paginationMap.get(buttons);
+				if (p) {
+					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+					p.state.data = array;
+					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
+				}
 			}
 			if (e) e.stopPropagation();
 		};
@@ -1322,13 +1324,15 @@ export class Create {
 						}
 					}
 				}
-				const buttons = dialog.content.querySelector(".buttons");
-				/** @type { Pagination } */
-				const p = dialog.paginationMap.get(buttons);
-				if (p) {
-					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-					p.state.data = array;
-					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
+				if (dialog.paginationMaxCount.get("character")) {
+					const buttons = dialog.content.querySelector(".buttons");
+					/** @type { Pagination } */
+					const p = dialog.paginationMap.get(buttons);
+					if (p) {
+						const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+						p.state.data = array;
+						p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
+					}
 				}
 			};
 			for (var i = 0; i < groups.length; i++) {
@@ -1513,8 +1517,8 @@ export class Create {
 		dialog.classList.add("scroll1");
 		dialog.classList.add("scroll2");
 		dialog.classList.add("scroll3");
-		dialog.supportsPagination = true;
-		dialog.paginationMaxCount.set("character", 10);
+		dialog.supportsPagination = Boolean(parseInt(lib.config.showMax_character_number));
+		dialog.paginationMaxCount.set("character", parseInt(lib.config.showMax_character_number));
 		dialog.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", function () {
 			_status.clicked2 = true;
 		});
@@ -1607,40 +1611,41 @@ export class Create {
 				clickCapt.call(node[lib.config.character_dialog_tool]);
 			}
 		}
-
-		/** @type { HTMLDivElement } */
-		// @ts-ignore
-		const buttons = dialog.content.querySelector(".buttons");
-		const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-		// 传入初始配置
-		const p = new Pagination({
-			// 数据
-			data: array,
-			// 总页数(向上取整)
-			totalPageCount: Math.ceil(array.length / 10),
-			// 父元素
-			container: dialog.content,
-			// 添加到容器的哪个子元素后面
-			insertAfter: buttons,
-			// 回调修改数据
-			onPageChange: state => {
-				const { pageNumber, data } = state;
-				// 设一个dialog一页显示10张武将牌
-				data.forEach((item, index) => {
-					const maxCount = dialog.paginationMaxCount.get("character");
-					if (index >= (pageNumber - 1) * maxCount && index < pageNumber * maxCount) {
-						item.classList.remove("nodisplay");
-					} else {
-						item.classList.add("nodisplay");
-					}
-				});
-			},
-			// 触发什么事件来更改当前页数，默认为click
-			changePageEvent: "click",
-		});
-		dialog.paginationMap.set(buttons, p);
-		// 渲染元素
-		p.renderPageDOM();
+		if (dialog.paginationMaxCount.get("character")) {
+			/** @type { HTMLDivElement } */
+			// @ts-ignore
+			const buttons = dialog.content.querySelector(".buttons");
+			const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+			// 传入初始配置
+			const p = new Pagination({
+				// 数据
+				data: array,
+				// 总页数(向上取整)
+				totalPageCount: Math.ceil(array.length / dialog.paginationMaxCount.get("character")),
+				// 父元素
+				container: dialog.content,
+				// 添加到容器的哪个子元素后面
+				insertAfter: buttons,
+				// 回调修改数据
+				onPageChange: state => {
+					const { pageNumber, data } = state;
+					// 设一个dialog一页显示10张武将牌
+					data.forEach((item, index) => {
+						const maxCount = dialog.paginationMaxCount.get("character");
+						if (index >= (pageNumber - 1) * maxCount && index < pageNumber * maxCount) {
+							item.classList.remove("nodisplay");
+						} else {
+							item.classList.add("nodisplay");
+						}
+					});
+				},
+				// 触发什么事件来更改当前页数，默认为click
+				changePageEvent: "click",
+			});
+			dialog.paginationMap.set(buttons, p);
+			// 渲染元素
+			p.renderPageDOM();
+		}
 
 		// 搜索框，by Curpond
 		let container = dialog.querySelector(".content-container>.content");
@@ -1662,13 +1667,23 @@ export class Create {
 				input.focus();
 				return;
 			}
-			let list = [];
+			let list = [],
+				reg = new RegExp(value, "g");
 			for (let btn of dialog.buttons) {
-				let reg = new RegExp(value, "g");
 				if (reg.test(get.translation(btn.link)) || reg.test(lib.translate[`${btn.link}_ab`])) {
 					btn.classList.remove("nodisplay");
 				} else {
 					btn.classList.add("nodisplay");
+				}
+			}
+			if (dialog.paginationMaxCount.get("character")) {
+				const buttons = dialog.content.querySelector(".buttons");
+				/** @type { Pagination } */
+				const p = dialog.paginationMap.get(buttons);
+				if (p) {
+					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+					p.state.data = array;
+					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
 				}
 			}
 		};
