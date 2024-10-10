@@ -1639,8 +1639,6 @@ export class Create {
 			changePageEvent: "click",
 		});
 		dialog.paginationMap.set(buttons, p);
-		// 手动限制数据
-		p.state.onPageChange?.(p.state);
 		// 渲染元素
 		p.renderPageDOM();
 
