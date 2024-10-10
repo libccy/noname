@@ -4,6 +4,7 @@
  */
 
  .pagination {
+	padding-inline-start: 0px;
 	margin-top: 18px;
 	font-size: 0;
 	text-align: center;

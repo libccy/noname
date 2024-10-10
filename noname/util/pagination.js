@@ -209,15 +209,22 @@ export class Pagination {
 		if (state.insertAfter) {
 			let afterElement = state.insertAfter instanceof Element ? state.insertAfter : this.selectorEle(state.insertAfter);
 			if (!afterElement || !pageContainer.contains(afterElement)) {
-				console.error(`未根据配置找到兄弟元素`);
-				return;
+				console.error(`未根据配置找到兄弟元素，元素将添加到父元素结尾`);
+				pageContainer.insertAdjacentHTML("beforeend", paginationStr);
+				// @ts-ignore
+				this.#dom = pageContainer.lastElementChild;
+			} else {
+				afterElement.insertAdjacentHTML("afterend", paginationStr);
+				// @ts-ignore
+				this.#dom = afterElement.nextElementSibling;
+                // @ts-ignore
+                this.#dom.style.position = 'static';
 			}
-			afterElement.insertAdjacentHTML("afterend", paginationStr);
 		} else {
 			pageContainer.insertAdjacentHTML("beforeend", paginationStr);
+			// @ts-ignore
+			this.#dom = pageContainer.lastElementChild;
 		}
-		// @ts-ignore
-		this.#dom = pageContainer.querySelector("ul.pagination");
 		this.switchPage();
 	}
 	/**
