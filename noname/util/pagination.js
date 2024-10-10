@@ -19,7 +19,7 @@ export class Pagination {
 		pageNumber: 1,
 		totalPageCount: 1,
 		container: "body",
-		maxShowBtnCount: 5,
+		maxShowBtnCount: 3,
 		pCName: "page-li",
 		activeCName: "page-active",
 		dataNumberAttr: "data-number",
