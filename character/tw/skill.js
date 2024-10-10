@@ -5404,9 +5404,11 @@ const skills = {
 			} else {
 				player.draw();
 				target.addSkill("twxianfeng_others");
-				if (!target.storage.twxianfeng_others) target.storage.twxianfeng_others = {};
-				if (typeof target.storage.twxianfeng_others[player.playerid] != "number") target.storage.twxianfeng_others[player.playerid] = 0;
-				target.storage.twxianfeng_others[player.playerid]++;
+				game.broadcastAll((target, id) => {
+					if (!target.storage.twxianfeng_others) target.storage.twxianfeng_others = {};
+					if (typeof target.storage.twxianfeng_others[id] !== "number") target.storage.twxianfeng_others[id] = 1;
+					else target.storage.twxianfeng_others[id]++;
+				}, target, player.playerid);
 			}
 		},
 		subSkill: {
@@ -10030,6 +10032,7 @@ const skills = {
 				player.line(target);
 				target.storage.twqianxi2 = event.color;
 				target.addTempSkill("twqianxi2");
+				target.markSkill("twqianxi2");
 				player.addTempSkill("twqianxi_self");
 				player.markAuto("twqianxi_self", [target]);
 			}
@@ -10062,6 +10065,7 @@ const skills = {
 					for (var target of targets) {
 						target.storage.twqianxi3 = target.storage.twqianxi2;
 						target.addTempSkill("twqianxi3", { player: "phaseAfter" });
+						target.markSkill("twqianxi3");
 					}
 				},
 			},
