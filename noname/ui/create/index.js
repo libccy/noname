@@ -10,6 +10,7 @@ import { extensionMenu } from "./menu/pages/exetensionMenu.js";
 import { optionsMenu } from "./menu/pages/optionsMenu.js";
 import { otherMenu } from "./menu/pages/otherMenu.js";
 import { startMenu } from "./menu/pages/startMenu.js";
+import { Pagination } from "../../util/pagination.js";
 
 export class Create {
 	/**
@@ -1219,6 +1220,16 @@ export class Create {
 					packsource.classList.remove("thundertext");
 				}
 			}
+			const buttons = dialog.content.querySelector(".buttons");
+			/** @type { Pagination } */
+			const p = dialog.paginationMap.get(buttons);
+			if (p) {
+				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+				p.state.data = array;
+				p.setTotalPageCount(Math.ceil(array.length / 10));
+				// 手动限制数据
+				p.state.onPageChange?.(p.state);
+			}
 			if (e) e.stopPropagation();
 		};
 		for (i = 0; i < namecapt.length; i++) {
@@ -1262,6 +1273,7 @@ export class Create {
 			var span = document.createElement("span");
 			newlined.appendChild(span);
 			span.style.margin = "8px";
+			/** 点击筛选某势力的武将 */
 			var clickGroup = function () {
 				if (_status.dragged) return;
 				if (dialog.currentcapt2 == "最近" && dialog.currentcaptnode2 != this && !dialog.currentcaptnode2.inited) {
@@ -1311,6 +1323,16 @@ export class Create {
 							}
 						}
 					}
+				}
+				const buttons = dialog.content.querySelector(".buttons");
+				/** @type { Pagination } */
+				const p = dialog.paginationMap.get(buttons);
+				if (p) {
+					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+					p.state.data = array;
+					p.setTotalPageCount(Math.ceil(array.length / 10));
+					// 手动限制数据
+					p.state.onPageChange?.(p.state);
 				}
 			};
 			for (var i = 0; i < groups.length; i++) {
@@ -1489,11 +1511,15 @@ export class Create {
 		} else {
 			list.sort(lib.sort.character);
 		}
+		// 自由选将
 		dialog = ui.create.dialog("hidden");
 		dialog.classList.add("noupdate");
 		dialog.classList.add("scroll1");
 		dialog.classList.add("scroll2");
 		dialog.classList.add("scroll3");
+		dialog.supportsPagination = true;
+		dialog.paginationMaxCount.set("character", 10);
+		dialog.paginationMaxCount.set("characterx", 10);
 		dialog.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", function () {
 			_status.clicked2 = true;
 		});
@@ -1587,8 +1613,43 @@ export class Create {
 			}
 		}
 
-		//仅仅下面是新加的，by Curpond
+		/** @type { HTMLDivElement } */
+		// @ts-ignore
+		const buttons = dialog.content.querySelector(".buttons");
+		const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+		// 传入初始配置
+		const p = new Pagination({
+			// 数据
+			data: array,
+			// 总页数(向上取整)
+			totalPageCount: Math.ceil(array.length / 10),
+			// 父元素
+			container: dialog.content,
+			// 添加到容器的哪个子元素后面
+			insertAfter: buttons,
+			// 回调修改数据
+			onPageChange: state => {
+				const { pageNumber, data } = state;
+				// 设一个dialog一页显示10张武将牌
+				data.forEach((item, index) => {
+					const maxCount = dialog.paginationMaxCount.get("character");
+					if (index >= (pageNumber - 1) * maxCount && index < pageNumber * maxCount) {
+						item.classList.remove("nodisplay");
+					} else {
+						item.classList.add("nodisplay");
+					}
+				});
+			},
+			// 触发什么事件来更改当前页数，默认为click
+			changePageEvent: "click",
+		});
+		dialog.paginationMap.set(buttons, p);
+		// 手动限制数据
+		p.state.onPageChange?.(p.state);
+		// 渲染元素
+		p.renderPageDOM();
 
+		// 搜索框，by Curpond
 		let container = dialog.querySelector(".content-container>.content");
 		let Searcher = ui.create.div(".searcher.caption");
 		let input = document.createElement("input");
@@ -1964,7 +2025,7 @@ export class Create {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + "game", "keyWords", function () { });
+		lib.init.js(lib.assetURL + "game", "keyWords", function () {});
 
 		lib.updateURL = lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding;
 
@@ -2345,7 +2406,7 @@ export class Create {
 						typeResult.equip ??= [];
 						typeResult.delay ??= [];
 						for (let key of Object.keys(typeResult).sort((a, b) => {
-							let arr = ['basic', 'trick', 'equip', 'delay', 'jiqi', 'spell', 'zhenfa', 'food', 'jiguan', 'land'];
+							let arr = ["basic", "trick", "equip", "delay", "jiqi", "spell", "zhenfa", "food", "jiguan", "land"];
 							return arr.indexOf(a) - arr.indexOf(b);
 						})) {
 							let result = Object.groupBy(typeResult[key], card => get.name(card));

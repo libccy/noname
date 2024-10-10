@@ -16,6 +16,7 @@ export class Pagination {
 	 * @type { PaginationState }
 	 */
 	state = {
+		data: [],
 		pageNumber: 1,
 		totalPageCount: 1,
 		container: "body",
@@ -141,7 +142,8 @@ export class Pagination {
 						evaNumberLi[i].setAttribute(state.dataNumberAttr, value);
 					}
 				}
-				this.addClass(evaNumberLi[state.maxShowBtnCount + 1 - (state.totalPageCount - pageNumber)], state.activeCName);
+				const active = Array.from(evaNumberLi).find(item => item.getAttribute(state.dataNumberAttr) === String(pageNumber));
+				if (active) this.addClass(active, state.activeCName);
 			}
 		} else {
 			// 不需要省略符号占位
@@ -185,7 +187,7 @@ export class Pagination {
 			this.#dom = void 0;
 		}
 
-		let { totalPageCount, pCName, prevCName, disbalePrevCName, pageNumberCName, activeCName, dataNumberAttr, maxShowBtnCount, nextCName, disbaleNextCName } = state;
+		let { totalPageCount, pCName, prevCName, disbalePrevCName, pageNumber, pageNumberCName, activeCName, dataNumberAttr, maxShowBtnCount, nextCName, disbaleNextCName } = state;
 
 		let paginationStr = `
 				<ul class="pagination">
@@ -245,6 +247,7 @@ export class Pagination {
 			ele = ele.parentNode;
 		}
 		this.switchPage();
+		this.gotoPage(pageNumber);
 	}
 	/**
 	 * 判断按钮合法性
@@ -311,9 +314,11 @@ export class Pagination {
 	 * @param { number } totalPageCount
 	 */
 	setTotalPageCount(totalPageCount) {
-		this.state.totalPageCount = totalPageCount;
-		if (this.state.totalPageCount > this.state.maxShowBtnCount + 2) {
-			this.state.activePosition = Math.ceil(this.state.maxShowBtnCount / 2);
+		let { state } = this;
+		state.pageNumber = 1;
+		state.totalPageCount = totalPageCount;
+		if (state.totalPageCount > state.maxShowBtnCount + 2) {
+			state.activePosition = Math.ceil(state.maxShowBtnCount / 2);
 		}
 		this.renderPageDOM();
 	}
