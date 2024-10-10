@@ -1886,6 +1886,7 @@ const skills = {
 				suitCards.spade ??= [];
 				suitCards.club ??= [];
 				let dialog = (event.dialog = ui.create.dialog());
+				dialog.classList.add("fullheight");
 				event.control_ok = ui.create.control("ok", link => {
 					_status.imchoosing = false;
 					event.dialog.close();
