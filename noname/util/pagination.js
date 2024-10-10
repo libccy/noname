@@ -187,19 +187,19 @@ export class Pagination {
 		let { totalPageCount, pCName, prevCName, disbalePrevCName, pageNumberCName, activeCName, dataNumberAttr, maxShowBtnCount, nextCName, disbaleNextCName } = state;
 
 		let paginationStr = `
-                <ul class="pagination">
-                    <li class="${pCName} ${prevCName} ${disbalePrevCName}">上一页</li>
-                    <li class="${pCName} ${pageNumberCName} ${activeCName}" ${dataNumberAttr}='1'>1</li>
-            `;
+				<ul class="pagination">
+					<li class="${pCName} ${prevCName} ${disbalePrevCName}">上一页</li>
+					<li class="${pCName} ${pageNumberCName} ${activeCName}" ${dataNumberAttr}='1'>1</li>
+			`;
 		if (totalPageCount - 2 > maxShowBtnCount) {
 			paginationStr += `<li class="${pCName} number-ellipsis ellipsis-head" style="display: none;">...</li>`;
 			for (let i = 2; i < maxShowBtnCount + 2; i++) {
 				paginationStr += `<li class="${pCName} ${pageNumberCName} ${i === 1 ? activeCName : ""}" ${dataNumberAttr}='${i}'>${i}</li>`;
 			}
 			paginationStr += `
-                <li class="${pCName} number-ellipsis ellipsis-tail">...</li>
-                <li class="${pCName} ${pageNumberCName}" ${dataNumberAttr}='${totalPageCount}'>${totalPageCount}</li>
-            `;
+				<li class="${pCName} number-ellipsis ellipsis-tail">...</li>
+				<li class="${pCName} ${pageNumberCName}" ${dataNumberAttr}='${totalPageCount}'>${totalPageCount}</li>
+			`;
 		} else {
 			for (let i = 2; i <= totalPageCount; i++) {
 				paginationStr += `<li class="${pCName} ${pageNumberCName}" ${dataNumberAttr}='${i}'>${i}</li>`;
@@ -217,8 +217,8 @@ export class Pagination {
 				afterElement.insertAdjacentHTML("afterend", paginationStr);
 				// @ts-ignore
 				this.#dom = afterElement.nextElementSibling;
-                // @ts-ignore
-                this.#dom.style.position = 'static';
+				// @ts-ignore
+				this.#dom.style.position = 'static';
 			}
 		} else {
 			pageContainer.insertAdjacentHTML("beforeend", paginationStr);
