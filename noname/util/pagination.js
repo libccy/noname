@@ -10,7 +10,7 @@ import { lib } from "../../noname.js";
 export class Pagination {
 	/** 是否加载了分页类对应的css文件 */
 	static loaded = false;
-	/** @type { HTMLUListElement | void } 渲染的dom元素 */
+	/** @type { HTMLUListElement } 渲染的dom元素 */
 	#dom;
 	/**
 	 * @type { PaginationState }
@@ -173,7 +173,7 @@ export class Pagination {
 	/** 渲染Dom */
 	renderPageDOM() {
 		let { state } = this;
-		let pageContainer = state.container instanceof Element ? state.container : this.selectorEle(state.container);
+		let pageContainer = state.container instanceof Element ? state.container : document.querySelector(state.container);
 		if (!pageContainer) {
 			console.error(`未根据配置找到父元素`);
 			return;
@@ -181,6 +181,7 @@ export class Pagination {
 
 		if (this.#dom instanceof HTMLElement && pageContainer.contains(this.#dom)) {
 			pageContainer.removeChild(this.#dom);
+			// @ts-ignore
 			this.#dom = void 0;
 		}
 
@@ -208,7 +209,7 @@ export class Pagination {
 		paginationStr += `<li class="${pCName} ${nextCName}${totalPageCount === 1 ? " " + disbaleNextCName : ""}">下一页</li></ul>`;
 		
 		if (state.insertAfter) {
-			let afterElement = state.insertAfter instanceof Element ? state.insertAfter : this.selectorEle(state.insertAfter);
+			let afterElement = state.insertAfter instanceof Element ? state.insertAfter : document.querySelector(state.insertAfter);
 			if (!afterElement || !pageContainer.contains(afterElement)) {
 				console.error(`未根据配置找到兄弟元素，元素将添加到父元素结尾`);
 				pageContainer.insertAdjacentHTML("beforeend", paginationStr);
@@ -277,7 +278,9 @@ export class Pagination {
 	 * @returns { ReturnType<typeof document['querySelectorAll']> }
 	 */
 	selectorEle(selector, all = false) {
-		return all ? document.querySelectorAll(selector) : document.querySelector(selector);
+		// return all ? document.querySelectorAll(selector) : document.querySelector(selector);
+		const dom = this.#dom || document;
+		return all ? dom.querySelectorAll(selector) : dom.querySelector(selector);
 	}
 	/**
 	 * @param { Element } eleObj
