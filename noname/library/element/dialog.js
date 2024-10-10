@@ -22,7 +22,21 @@ export class Dialog extends HTMLDivElement {
 	noforcebutton;
 	/** @type { boolean } */
 	noopen;
-
+	/** 
+	 * dialog添加数据是否支持分页
+	 * @type { boolean }
+	 **/
+	supportsPagination;
+	/**
+	 * dialog中储存的分页元素(用来兼容一个dialog中多个分页的情况)
+	 * @type { Map<HTMLElement, typeof import("../../util/pagination.js").Pagination> }
+	 */
+	paginationMap;
+	/** 
+	 * 根据数据类型，为每一个类型分配一页的最大数据量
+	 * @type { Map<keyof UI['create']['buttonPresets'], number> }
+	 */
+	paginationMaxCount;
 	// @ts-ignore
 	constructor(...args) {
 		if (args[0] instanceof Dialog) {
@@ -39,6 +53,9 @@ export class Dialog extends HTMLDivElement {
 		// @ts-ignore
 		const dialog = ui.create.div(".dialog");
 		Object.setPrototypeOf(dialog, (lib.element.Dialog || Dialog).prototype);
+		dialog.supportsPagination = false;
+		dialog.paginationMap = new Map();
+		dialog.paginationMaxCount = new Map();
 		dialog.contentContainer = ui.create.div(".content-container", dialog);
 		dialog.content = ui.create.div(".content", dialog.contentContainer);
 		dialog.bar1 = ui.create.div(".bar.top", dialog);
