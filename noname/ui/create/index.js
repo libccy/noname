@@ -1226,7 +1226,7 @@ export class Create {
 			if (p) {
 				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
 				p.state.data = array;
-				p.setTotalPageCount(Math.ceil(array.length / 10));
+				p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
 				// 手动限制数据
 				p.state.onPageChange?.(p.state);
 			}
@@ -1330,7 +1330,7 @@ export class Create {
 				if (p) {
 					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
 					p.state.data = array;
-					p.setTotalPageCount(Math.ceil(array.length / 10));
+					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
 					// 手动限制数据
 					p.state.onPageChange?.(p.state);
 				}
@@ -1519,7 +1519,6 @@ export class Create {
 		dialog.classList.add("scroll3");
 		dialog.supportsPagination = true;
 		dialog.paginationMaxCount.set("character", 10);
-		dialog.paginationMaxCount.set("characterx", 10);
 		dialog.addEventListener(lib.config.touchscreen ? "touchend" : "mouseup", function () {
 			_status.clicked2 = true;
 		});
