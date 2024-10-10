@@ -3,9 +3,10 @@ const characters = {
 	yy_gongsunzan: ["male", "qun", 4, ["yyqizhen", "yicong", "yymujun"], ["zhu"]],
 	yy_wenchou: ["male", "qun", 4, ["yyxuezhan", "yyyazhen"]],
 	yy_gongsunyuan: ["male", "qun", 4, ["yyxuanshi", "yyxiongye"], ["zhu"]],
-	yy_yuanshao: ["male", "qun", 4, ["yysudi", "yyqishe", "yyxuanzhen"], ["zhu"]],
+	yy_yuanshao: ["male", "qun", 4, ["yysudi", "yyqishe", "yylinzhen"], ["zhu"]],
 	yy_simayi: ["male", "wei", 4, ["yyyanggu", "yyzuifu"]],
-	yy_caorui: ["male", "wei", 4, ["yyhuituo", "yymingjian", "xingshuai"], ["zhu", "die:caorui"]],
+	yy_caorui: ["male", "wei", 3, ["yyhuituo", "yymingjian", "xingshuai"], ["zhu", "die:caorui"]],
+	yy_zhaoyun: ["male", "qun", 3, ["longdan", "chongzhen", "yicong"], ["die:zhaoyun"]],
 	scl_pangdegong: {
 		sex: "male",
 		group: "qun",

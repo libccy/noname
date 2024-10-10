@@ -223,16 +223,16 @@ const skills = {
 			if (card) player.gain(card, "gain2");
 		},
 	},
-	yyxuanzhen: {
+	yylinzhen: {
 		zhuSkill: true,
-		global: "yyxuanzhen_global",
+		global: "yylinzhen_global",
 		subSkill: {
 			global: {
 				zhuSkill: true,
 				mod: {
 					inRange(from, to) {
 						if (from === to || from.group !== "qun") return;
-						if (to.hasZhuSkill("yyxuanzhen", from)) return true;
+						if (to.hasZhuSkill("yylinzhen", from)) return true;
 					},
 				},
 			},
