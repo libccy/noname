@@ -206,7 +206,17 @@ export class Pagination {
 			}
 		}
 		paginationStr += `<li class="${pCName} ${nextCName}${totalPageCount === 1 ? " " + disbaleNextCName : ""}">下一页</li></ul>`;
-		pageContainer.insertAdjacentHTML("beforeend", paginationStr);
+		if (state.insertAfter) {
+            let afterElement = state.insertAfter instanceof Element ? state.insertAfter : this.selectorEle(state.insertAfter);
+            if (!afterElement || !pageContainer.contains(afterElement)) {
+                console.error(`未根据配置找到兄弟元素`);
+                return;
+            }
+            afterElement.insertAdjacentHTML("afterend", paginationStr);
+        }
+        else {
+            pageContainer.insertAdjacentHTML("beforeend", paginationStr);
+        }
 		// @ts-ignore
 		this.#dom = pageContainer.querySelector("ul.pagination");
 		this.switchPage();
