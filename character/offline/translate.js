@@ -872,8 +872,8 @@ const translates = {
 	yysudi_info: "锁定技，攻击范围包含你的角色响应你使用的牌后，你摸一张牌。",
 	yyqishe: "齐射",
 	yyqishe_info: "①游戏开始时，你从游戏外获得一张【万箭齐发】。②结束阶段，你可以获得弃牌堆中的一张【万箭齐发】。",
-	yyxuanzhen: "眩阵",
-	yyxuanzhen_info: "主公技，锁定技。你视为在其他群势力角色的攻击范围内。",
+	yylinzhen: "临阵",
+	yylinzhen_info: "主公技，锁定技。你视为在其他群势力角色的攻击范围内。",
 	yy_simayi: "燕幽司马懿",
 	yy_simayi_prefix: "燕幽",
 	yyyanggu: "佯固",
@@ -886,6 +886,8 @@ const translates = {
 	yyhuituo_info: "当你受到1点伤害后，你可以令一名角色进行一次判定，若结果为红色/黑色，其回复1点体力/摸一张牌。",
 	yymingjian: "明鉴",
 	yymingjian_info: "其他角色的出牌阶段开始时，你可以展示所有手牌并交给其一种花色的所有牌，然后其本回合使用的下一张牌额外结算一次。",
+	yy_zhaoyun: "燕幽赵云",
+	yy_zhaoyun_prefix: "燕幽",
 };
 
 export default translates;
