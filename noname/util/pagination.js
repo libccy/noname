@@ -25,7 +25,7 @@ export class Pagination {
         disbalePrevCName: 'no-prev',
         disbaleNextCName: 'no-next',
         pageNumberCName: 'page-number',
-        swEvent: 'click',
+        changePageEvent: 'click',
     };
     /**
      * @param { Partial<PaginationState> } paramsObj 
@@ -53,7 +53,7 @@ export class Pagination {
             return;
         }
         pCNameList.forEach(item => {
-            item.addEventListener(state.swEvent, (/** @type { Event } */ e) => {
+            item.addEventListener(state.changePageEvent, (/** @type { Event } */ e) => {
                 /** @type { HTMLElement } */
                 // @ts-ignore
                 const currentPageEle = e.target;
