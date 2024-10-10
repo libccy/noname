@@ -8,7 +8,10 @@ import { lib } from "../../noname.js";
  * 简单分页类
  */
 export class Pagination {
+    /** 是否加载了分页类对应的css文件 */
     static loaded = false;
+    /** @type { HTMLUListElement | void } 渲染的dom元素 */
+    #dom;
     /**
      * @type { PaginationState }
      */
@@ -76,7 +79,7 @@ export class Pagination {
                     this.gotoPage(pageNumber);
                 }
             });
-        })
+        });
     }
     /**
      * 跳转页数
@@ -179,6 +182,12 @@ export class Pagination {
             console.error(`未根据配置找到父元素`);
             return;
         }
+
+        if (this.#dom instanceof HTMLElement && pageContainer.contains(this.#dom)) {
+            pageContainer.removeChild(this.#dom);
+            this.#dom = void 0;
+        }
+
         let { 
             totalPageCount, 
             pCName, 
@@ -194,8 +203,8 @@ export class Pagination {
 
         let paginationStr = `
                 <ul class="pagination">
-                <li class="${pCName} ${prevCName} ${disbalePrevCName}">上一页</li>
-                <li class="${pCName} ${pageNumberCName} ${activeCName}" ${dataNumberAttr}='1'>1</li>
+                    <li class="${pCName} ${prevCName} ${disbalePrevCName}">上一页</li>
+                    <li class="${pCName} ${pageNumberCName} ${activeCName}" ${dataNumberAttr}='1'>1</li>
             `;
         if (totalPageCount - 2 > maxShowBtnCount) {
             paginationStr += `<li class="${pCName} number-ellipsis ellipsis-head" style="display: none;">...</li>`;
@@ -212,8 +221,9 @@ export class Pagination {
             }
         }
         paginationStr += `<li class="${pCName} ${nextCName}${totalPageCount === 1 ? ' ' + disbaleNextCName : ''}">下一页</li></ul>`;
-        // pageContainer.innerHTML = paginationStr;
         pageContainer.insertAdjacentHTML('beforeend', paginationStr);
+        // @ts-ignore
+        this.#dom = pageContainer.querySelector('ul.pagination');
         this.switchPage();
     }
     /**
