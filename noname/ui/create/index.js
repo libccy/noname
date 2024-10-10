@@ -1025,6 +1025,7 @@ export class Create {
 		var list = [];
 		const groups = [];
 		var dialog;
+		/** 筛选武将的信息 */
 		var node = ui.create.div(".caption.pointerspan");
 		if (get.is.phoneLayout()) {
 			node.style.fontSize = "30px";
@@ -1090,6 +1091,7 @@ export class Create {
 		var newlined = false;
 		var newlined2;
 		var packsource;
+		/** 点击筛选中的按钮 */
 		var clickCapt = function (e) {
 			if (_status.dragged) return;
 			if (dialog.currentcapt2 == "最近" && dialog.currentcaptnode2 != this && !dialog.currentcaptnode2.inited) {
