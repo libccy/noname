@@ -255,5 +255,27 @@ const cards = {
 			},
 		},
 	},
+	yy_baihuxiaoqi: {
+		audio: true,
+		fullskin: true,
+		type: "equip",
+		subtype: "equip6",
+		subtypes: ["equip3", "equip4"],
+		nomod: true,
+		nopower: true,
+		distance: {
+			globalFrom: -1,
+			globalTo: +1,
+		},
+		skills: ["yy_baihuxiaoqi_skill"],
+		ai: {
+			equipValue(card, player) {
+				return 5 + player.countCards("e");
+			},
+			basic: {
+				equipValue: 6,
+			},
+		},
+	},
 };
 export default cards;

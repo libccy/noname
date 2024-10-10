@@ -3,6 +3,30 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//燕幽烽火
+	//白虎骁骑
+	yy_baihuxiaoqi_skill: {
+		equipSkill: true,
+		mod: {
+			attackRange(player, num) {
+				if (player.countVCards("e") > 0) return num + player.countVCards("e");
+			},
+			cardUsable(card, player, num) {
+				if (card.name != "sha") return;
+				if (player.countVCards("e") > 1) return num + player.countVCards("e");
+			},
+			globalFrom(player, target, num) {
+				if (player.countVCards("e") > 2) return num - player.countVCards("e");
+			},
+		},
+		trigger: { player: "phaseDrawBegin2" },
+		filter(event, player) {
+			return player.countVCards("e") > 3 && !event.numFixed;
+		},
+		forced: true,
+		content() {
+			trigger.num += player.countVCards("e");
+		},
+	},
 	//麹义
 	yyfuqi: {
 		audio: "fuqi",
