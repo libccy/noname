@@ -1227,8 +1227,6 @@ export class Create {
 				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
 				p.state.data = array;
 				p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-				// 手动限制数据
-				p.state.onPageChange?.(p.state);
 			}
 			if (e) e.stopPropagation();
 		};
@@ -1331,8 +1329,6 @@ export class Create {
 					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
 					p.state.data = array;
 					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-					// 手动限制数据
-					p.state.onPageChange?.(p.state);
 				}
 			};
 			for (var i = 0; i < groups.length; i++) {

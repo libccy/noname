@@ -98,58 +98,60 @@ export class Pagination {
 		if (len === 0 || this.isIllegal(pageNumber)) {
 			return;
 		}
-		// 清除 active 样式
-		const active = this.selectorEle(`.${state.pCName}.${state.activeCName}`);
-		if (active) this.removeClass(active, state.activeCName);
-		if (state.activePosition) {
-			let rEllipseSign = state.totalPageCount - (state.maxShowBtnCount - state.activePosition) - 1;
-			// 左边不需要出现省略符号占位
-			if (pageNumber <= state.maxShowBtnCount && pageNumber < rEllipseSign) {
-				if (+(evaNumberLi[1].getAttribute(state.dataNumberAttr) || 0) > 2) {
+		if (state.pageNumber !== pageNumber) {
+			// 清除 active 样式
+			const active = this.selectorEle(`.${state.pCName}.${state.activeCName}`);
+			if (active) this.removeClass(active, state.activeCName);
+			if (state.activePosition) {
+				let rEllipseSign = state.totalPageCount - (state.maxShowBtnCount - state.activePosition) - 1;
+				// 左边不需要出现省略符号占位
+				if (pageNumber <= state.maxShowBtnCount && pageNumber < rEllipseSign) {
+					if (+(evaNumberLi[1].getAttribute(state.dataNumberAttr) || 0) > 2) {
+						for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
+							let value = String(i + 1);
+							// @ts-ignore
+							evaNumberLi[i].innerText = value;
+							evaNumberLi[i].setAttribute(state.dataNumberAttr, value);
+						}
+					}
+					this.hiddenEllipse(".ellipsis-head");
+					this.hiddenEllipse(".ellipsis-tail", false);
+					this.addClass(evaNumberLi[pageNumber - 1], state.activeCName);
+				}
+				// 两边都需要出现省略符号占位
+				if (pageNumber > state.maxShowBtnCount && pageNumber < rEllipseSign) {
+					// 针对 maxShowBtnCount===1 的特殊处理
+					this.hiddenEllipse(".ellipsis-head", pageNumber === 2 && state.maxShowBtnCount === 1);
+					this.hiddenEllipse(".ellipsis-tail", false);
 					for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
-						let value = String(i + 1);
+						let value = String(pageNumber + (i - state.activePosition));
 						// @ts-ignore
 						evaNumberLi[i].innerText = value;
 						evaNumberLi[i].setAttribute(state.dataNumberAttr, value);
 					}
+					this.addClass(evaNumberLi[state.activePosition], state.activeCName);
 				}
-				this.hiddenEllipse(".ellipsis-head");
-				this.hiddenEllipse(".ellipsis-tail", false);
+				// 右边不需要出现省略符号占位
+				if (pageNumber >= rEllipseSign) {
+					this.hiddenEllipse(".ellipsis-tail");
+					this.hiddenEllipse(".ellipsis-head", false);
+					if (+(evaNumberLi[len - 2].getAttribute(state.dataNumberAttr) || 0) < state.totalPageCount - 1) {
+						for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
+							let value = String(state.totalPageCount - (state.maxShowBtnCount - i) - 1);
+							// @ts-ignore
+							evaNumberLi[i].innerText = value;
+							evaNumberLi[i].setAttribute(state.dataNumberAttr, value);
+						}
+					}
+					const active = Array.from(evaNumberLi).find(item => item.getAttribute(state.dataNumberAttr) === String(pageNumber));
+					if (active) this.addClass(active, state.activeCName);
+				}
+			} else {
+				// 不需要省略符号占位
 				this.addClass(evaNumberLi[pageNumber - 1], state.activeCName);
 			}
-			// 两边都需要出现省略符号占位
-			if (pageNumber > state.maxShowBtnCount && pageNumber < rEllipseSign) {
-				// 针对 maxShowBtnCount===1 的特殊处理
-				this.hiddenEllipse(".ellipsis-head", pageNumber === 2 && state.maxShowBtnCount === 1);
-				this.hiddenEllipse(".ellipsis-tail", false);
-				for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
-					let value = String(pageNumber + (i - state.activePosition));
-					// @ts-ignore
-					evaNumberLi[i].innerText = value;
-					evaNumberLi[i].setAttribute(state.dataNumberAttr, value);
-				}
-				this.addClass(evaNumberLi[state.activePosition], state.activeCName);
-			}
-			// 右边不需要出现省略符号占位
-			if (pageNumber >= rEllipseSign) {
-				this.hiddenEllipse(".ellipsis-tail");
-				this.hiddenEllipse(".ellipsis-head", false);
-				if (+(evaNumberLi[len - 2].getAttribute(state.dataNumberAttr) || 0) < state.totalPageCount - 1) {
-					for (let i = 1; i < state.maxShowBtnCount + 1; i++) {
-						let value = String(state.totalPageCount - (state.maxShowBtnCount - i) - 1);
-						// @ts-ignore
-						evaNumberLi[i].innerText = value;
-						evaNumberLi[i].setAttribute(state.dataNumberAttr, value);
-					}
-				}
-				const active = Array.from(evaNumberLi).find(item => item.getAttribute(state.dataNumberAttr) === String(pageNumber));
-				if (active) this.addClass(active, state.activeCName);
-			}
-		} else {
-			// 不需要省略符号占位
-			this.addClass(evaNumberLi[pageNumber - 1], state.activeCName);
+			state.pageNumber = pageNumber;
 		}
-		state.pageNumber = pageNumber;
 		state.onPageChange && state.onPageChange(state);
 		// 判断 上一页 下一页 是否可使用
 		this.switchPrevNextAble();
@@ -255,7 +257,7 @@ export class Pagination {
 	 */
 	isIllegal(pageNumber) {
 		let { state } = this;
-		return state.pageNumber === pageNumber || Math.ceil(pageNumber) !== pageNumber || pageNumber > state.totalPageCount || pageNumber < 1 || typeof pageNumber !== "number" || pageNumber !== pageNumber;
+		return /*state.pageNumber === pageNumber || */Math.ceil(pageNumber) !== pageNumber || pageNumber > state.totalPageCount || pageNumber < 1 || typeof pageNumber !== "number" || pageNumber !== pageNumber;
 	}
 	/**
 	 * 隐藏/显示省略符号占位
