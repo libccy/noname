@@ -4551,6 +4551,7 @@ const skills = {
 				player.line(target, "green");
 				target.storage.reqianxi_effect = [event.color, player];
 				target.addTempSkill("reqianxi_effect");
+				target.markSkill("reqianxi_effect");
 			}
 		},
 		subSkill: {

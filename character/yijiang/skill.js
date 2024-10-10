@@ -8704,9 +8704,9 @@ const skills = {
 			"step 2";
 			if (result.bool && result.targets.length) {
 				result.targets[0].storage.qianxi2 = event.color;
-				result.targets[0].addTempSkill("qianxi2");
 				player.line(result.targets, "green");
-				game.addVideo("storage", result.targets[0], ["qianxi2", event.color]);
+				result.targets[0].addTempSkill("qianxi2");
+				result.targets[0].markSkill("qianxi2");
 			}
 		},
 		ai: {
