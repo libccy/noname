@@ -22,7 +22,13 @@ export class Dialog extends HTMLDivElement {
 	noforcebutton;
 	/** @type { boolean } */
 	noopen;
-
+	/** dialog添加数据是否支持分页 */
+	supportsPagination = false;
+	/** 
+	 * 支持分页的数据类型
+	 * @type { (keyof UI['create']['buttonPresets'])[] }
+	 */
+	paginationType = [];
 	// @ts-ignore
 	constructor(...args) {
 		if (args[0] instanceof Dialog) {

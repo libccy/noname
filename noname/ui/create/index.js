@@ -1024,6 +1024,7 @@ export class Create {
 		}
 		var list = [];
 		const groups = [];
+		/** @type { Dialog } */
 		var dialog;
 		/** 筛选武将的信息 */
 		var node = ui.create.div(".caption.pointerspan");
