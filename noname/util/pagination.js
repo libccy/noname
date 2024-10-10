@@ -206,6 +206,7 @@ export class Pagination {
 			}
 		}
 		paginationStr += `<li class="${pCName} ${nextCName}${totalPageCount === 1 ? " " + disbaleNextCName : ""}">下一页</li></ul>`;
+		
 		if (state.insertAfter) {
 			let afterElement = state.insertAfter instanceof Element ? state.insertAfter : this.selectorEle(state.insertAfter);
 			if (!afterElement || !pageContainer.contains(afterElement)) {
@@ -224,6 +225,23 @@ export class Pagination {
 			pageContainer.insertAdjacentHTML("beforeend", paginationStr);
 			// @ts-ignore
 			this.#dom = pageContainer.lastElementChild;
+		}
+
+		// 在dialog中使用分页，将应用shadowed这个css类名以靠近dialog样式
+		let ele = this.#dom;
+		while (ele !== null) {
+			// @ts-ignore
+			if (ele.classList.contains('dialog')) {
+				// @ts-ignore
+				Array.from(this.#dom.children).forEach(item => {
+					if (item.classList.contains("number-ellipsis") || item.classList.contains("ellipsis-tail")) return;
+					item.classList.add("shadowed");
+				});
+				break;
+			}
+			if (ele === document.body) break;
+			// @ts-ignore
+			ele = ele.parentNode;
 		}
 		this.switchPage();
 	}
