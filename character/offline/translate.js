@@ -877,7 +877,7 @@ const translates = {
 	yy_simayi: "燕幽司马懿",
 	yy_simayi_prefix: "燕幽",
 	yyyanggu: "佯固",
-	yyyanggu_info: "转换技。阳，当你受到伤害后，你可以回复1点体力；阴，你可以将一张手牌当作【诱敌深入】使用。",
+	yyyanggu_info: "转换技。阳，当你受到伤害后，你可以回复1点体力；阴，你可以将一张手牌当作【声东击西】使用。",
 	yyzuifu: "罪缚",
 	yyzuifu_info: "每回合限一次，一名角色于摸牌阶段外获得牌后，若场上没有角色处于濒死状态，则你可以对其造成1点伤害。",
 	yy_caorui: "燕幽曹叡",
@@ -888,9 +888,9 @@ const translates = {
 	yymingjian_info: "其他角色的出牌阶段开始时，你可以展示所有手牌并交给其一种花色的所有牌，然后其本回合使用的下一张牌额外结算一次。",
 	yy_zhaoyun: "燕幽赵云",
 	yy_zhaoyun_prefix: "燕幽",
-	yy_baihuxiaoqi: "白虎骁骑",
-	yy_baihuxiaoqi_skill: "白虎骁骑",
-	yy_baihuxiaoqi_info: "锁定技，若你的装备区牌数X不少于：1张，你的攻击范围+X；2张，你使用【杀】的额定次数+X；3张，你计算与其他角色的距离-X；4张，摸牌阶段，你多摸X张牌。",
+	yy_baimaxiaoqi: "白马骁骑",
+	yy_baimaxiaoqi_skill: "白马骁骑",
+	yy_baimaxiaoqi_info: "锁定技，若你的装备区牌数X不少于：1张，你的攻击范围+X；2张，你使用【杀】的额定次数+X；3张，你计算与其他角色的距离-X；4张，摸牌阶段，你多摸X张牌。",
 };
 
 export default translates;

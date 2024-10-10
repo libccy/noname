@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//燕幽烽火
 	//白虎骁骑
-	yy_baihuxiaoqi_skill: {
+	yy_baimaxiaoqi_skill: {
 		equipSkill: true,
 		mod: {
 			attackRange(player, num) {
@@ -270,8 +270,8 @@ const skills = {
 		},
 		filterCard: true,
 		position: "h",
-		viewAs: { name: "youdishenru" },
-		prompt: "将一张手牌当作【诱敌深入】使用",
+		viewAs: { name: "shengdong" },
+		prompt: "将一张手牌当作【声东击西】使用",
 		check(card) {
 			return 7 - get.value(card);
 		},
@@ -283,13 +283,11 @@ const skills = {
 		marktext: "☯",
 		intro: {
 			content(storage) {
-				if (storage) return "你可以将一张手牌当作【诱敌深入】使用";
+				if (storage) return "你可以将一张手牌当作【声东击西】使用";
 				return "当你受到伤害后，你可以回复1点体力";
 			},
 		},
 		group: "yyyanggu_effect",
-		global: "g_youdishenru",
-		derivation: "youdishenru",
 		subSkill: {
 			effect: {
 				trigger: { player: "damageEnd" },
