@@ -467,6 +467,7 @@ const characters = {
 		groupBorder: "jin",
 		hp: 4,
 		skills: ["jsrgqiantun", "jsrgxiezheng", "jsrgzhaoxiong"],
+		names: "司马|昭",
 	},
 	jsrg_dengai: {
 		sex: "male",
