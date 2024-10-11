@@ -433,7 +433,7 @@ const characters = {
 		sex: "female",
 		group: "jin",
 		hp: 3,
-		skills: ["jsrgfuyu", "jsrgshanzheng", "jsrgxiongbao", "jsrgliedu"],
+		skills: ["jsrgshanzheng", "jsrgxiongbao", "jsrgliedu"],
 	},
 	jsrg_wenyang: {
 		sex: "male",
@@ -445,7 +445,7 @@ const characters = {
 		sex: "male",
 		group: "wei",
 		hp: 4,
-		skills: ["jsrgbeizhi", "jsrgshenji"],
+		skills: ["jsrgzuozhan", "jsrgcuibing", "jsrglangan"],
 		names: "诸葛|诞",
 	},
 	jsrg_wangjun: {
@@ -456,9 +456,23 @@ const characters = {
 	},
 	jsrg_limi: {
 		sex: "male",
-		group: "jin",
+		group: "shu",
+		groupBorder: "jin",
 		hp: 3,
-		skills: ["jsrgnanquan", "jsrgminfeng"],
+		skills: ["jsrgciyin", "jsrgchendu"],
+	},
+	jsrg_simazhao: {
+		sex: "male",
+		group: "wei",
+		groupBorder: "jin",
+		hp: 4,
+		skills: ["jsrgqiantun", "jsrgxiezheng", "jsrgzhaoxiong"],
+	},
+	jsrg_dengai: {
+		sex: "male",
+		group: "wei",
+		hp: 4,
+		skills: ["jsrgpiqi", "jsrgzhoulin"],
 	},
 };
 

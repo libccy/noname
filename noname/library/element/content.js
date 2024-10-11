@@ -884,29 +884,35 @@ export const Content = {
 		});
 		if (!event.targets.length) event.result = { bool: false };
 		else {
-			var next = player
-				.chooseCardOL(event.targets, get.translation(player) + "发起了议事，请选择展示的手牌", true)
-				.set("type", "debate")
-				.set("source", player)
-				.set(
-					"ai",
-					event.ai ||
-						function (card) {
-							return Math.random();
-						}
-				)
-				.set(
-					"aiCard",
-					event.aiCard ||
-						function (target) {
-							const getAi = get.event("ai") || function (card) {
+			if (event.fixedResult) {
+				event.targets = event.targets.removeArray(event.fixedResult.map(i => i[0]));
+			}
+			if (event.targets.length) {
+				var next = player
+					.chooseCardOL(event.targets, get.translation(player) + "发起了议事，请选择展示的手牌", true)
+					.set("type", "debate")
+					.set("source", player)
+					.set(
+						"ai",
+						event.ai ||
+							function (card) {
 								return Math.random();
-							};
-							let hs = target.getCards("h").sort((a, b) => getAi(b) - getAi(a));
-							return { bool: true, cards: [hs[0]] };
-						}
-				);
-			next._args.remove("glow_result");
+							}
+					)
+					.set(
+						"aiCard",
+						event.aiCard ||
+							function (target) {
+								const getAi = get.event("ai") || function (card) {
+									return Math.random();
+								};
+								let hs = target.getCards("h").sort((a, b) => getAi(b) - getAi(a));
+								return { bool: true, cards: [hs[0]] };
+							}
+					);
+				next._args.remove("glow_result");
+			}
+			else event.noselected = true;
 		}
 		"step 1";
 		var red = [],
@@ -914,12 +920,14 @@ export const Content = {
 			others = [];
 		event.opinions = ["red", "black"];
 		event.videoId = lib.status.videoId++;
-		for (var i = 0; i < event.targets.length; i++) {
-			var card = result[i].cards[0],
-				target = event.targets[i];
-			if (card == "red" || get.color(card, target) == "red") red.push([target, card]);
-			else if (card == "black" || get.color(card, target) == "black") black.push([target, card]);
-			else others.push([target, card]);
+		if (!event.noselected) {
+			for (var i = 0; i < event.targets.length; i++) {
+				var card = result[i].cards[0],
+					target = event.targets[i];
+				if (card == "red" || get.color(card, target) == "red") red.push([target, card]);
+				else if (card == "black" || get.color(card, target) == "black") black.push([target, card]);
+				else others.push([target, card]);
+			}
 		}
 		if (event.fixedResult) {
 			for (var i = 0; i < event.fixedResult.length; i++) {
