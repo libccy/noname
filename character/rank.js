@@ -1255,6 +1255,9 @@ window.noname_character_rank = {
 		"sb_zhugejin",
 		"xin_quancong",
 		"yy_quancong",
+		"re_lvmeng",
+		"re_huaxiong",
+		"ol_sb_huaxiong",
 	],
 	b: [
 		"jiangziya",
@@ -1681,10 +1684,8 @@ window.noname_character_rank = {
 		"old_re_lidian",
 		"re_xuzhu",
 		"re_xushu",
-		"re_lvmeng",
 		"re_luxun",
 		"re_huatuo",
-		"re_huaxiong",
 		"re_gongsunzan",
 		"ol_xiaoqiao",
 		"ol_sp_zhugeliang",
@@ -1809,7 +1810,7 @@ window.noname_character_rank = {
 		"yadan",
 		"std_yuejin",
 	],
-	c: ["xiahoudun", "zhaoyun", "huanggai", "luxun", "lvbu", "guanyu", "zhangfei", "yl_luzhi", "lvqian", "re_zhangliang", "sp_taishici", "liuyao", "panzhangmazhong", "caiyong", "caoxiu", "caozhang", "caojie", "hanhaoshihuan", "liaohua", "sunluban", "xin_xushu", "madai", "lisu", "re_hejin", "hansui", "gaolan", "furong", "yangyi", "dengzhi", "yj_zhangliao", "yj_zhanghe", "tw_yj_zhanghe", "xin_gongsunzan", "re_dongzhuo", "old_yuanshu", "re_hanhaoshihuan", "lingju", "panfeng", "hanba", "ns_fanchou", "zhangchunhua", "weiguan", "re_chenqun", "sp_huaxin", "sp_xujing", "caimaozhangyun", "ahuinan", "mushun", "tw_dengzhi", "tw_furong", "tw_niujin", "tw_zhangnan", "macheng", "old_caorui", "old_dingfeng", "old_gaoshun", "old_huanghao", "old_liubiao", "luoxian", "ol_huban", "sb_menghuo", "old_caocao", "sb_yl_luzhi"],
+	c: ["xiahoudun", "zhaoyun", "huanggai", "luxun", "lvbu", "yj_lvbu", "guanyu", "zhangfei", "yl_luzhi", "lvqian", "re_zhangliang", "sp_taishici", "liuyao", "panzhangmazhong", "caiyong", "caoxiu", "caozhang", "caojie", "hanhaoshihuan", "liaohua", "sunluban", "xin_xushu", "madai", "lisu", "re_hejin", "hansui", "gaolan", "furong", "yangyi", "dengzhi", "yj_zhangliao", "yj_zhanghe", "tw_yj_zhanghe", "xin_gongsunzan", "re_dongzhuo", "old_yuanshu", "re_hanhaoshihuan", "lingju", "panfeng", "hanba", "ns_fanchou", "zhangchunhua", "weiguan", "re_chenqun", "sp_huaxin", "sp_xujing", "caimaozhangyun", "ahuinan", "mushun", "tw_dengzhi", "tw_furong", "tw_niujin", "tw_zhangnan", "macheng", "old_caorui", "old_dingfeng", "old_gaoshun", "old_huanghao", "old_liubiao", "luoxian", "ol_huban", "sb_menghuo", "old_caocao", "sb_yl_luzhi"],
 	d: ["chendong", "lvmeng", "huaxiong", "gongsunzan", "xuzhu", "old_huaxiong", "chengpu", "zhangwen", "dingyuan", "xin_chengpu", "sunshao", "tadun", "zangba", "junk_zhangrang", "junk_simayi", "key_youta", "old_chenqun", "duanwei", "wangxiang", "duji", "bianxi", "clan_wuban", "wangjun", "xin_wuyi", "xin_zhuzhi", "tw_guanqiujian", "tw_xiahouen", "tw_yl_luzhi", "junk_huangyueying", "junk_liubei", "new_caoren", "old_handang", "old_zhoutai", "tengfanglan", "junk_lidian", "junk_duanwei", "std_panfeng", "qianzhao"],
 	rarity: {
 		legend: [
@@ -2381,6 +2382,9 @@ window.noname_character_rank = {
 			"wangkuang",
 		],
 		rare: [
+			"re_lvmeng",
+			"re_huaxiong",
+			"ol_sb_huaxiong",
 			"xin_quancong",
 			"yy_quancong",
 			"yy_gongsunyuan",
