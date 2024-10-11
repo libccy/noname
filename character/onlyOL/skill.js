@@ -104,7 +104,7 @@ const skills = {
 						const sha = new lib.element.VCard({ name: "sha" });
 						if (current.isIn() && current.canUse(sha, aim, false)) {
 							current.line(aim);
-							await current.useCard(sha, aim, false);
+							await current.useCard(sha, aim, false, "noai");
 						}
 					}
 					break;
