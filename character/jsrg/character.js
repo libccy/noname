@@ -456,7 +456,8 @@ const characters = {
 	},
 	jsrg_limi: {
 		sex: "male",
-		group: "jin",
+		group: "shu",
+		groupBorder: "jin",
 		hp: 3,
 		skills: ["jsrgnanquan", "jsrgminfeng"],
 	},
