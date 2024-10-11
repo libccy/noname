@@ -2,6 +2,18 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//线下幻系列
+	yjqingjian: {
+		trigger: { player: "phaseJieshuBegin" },
+		filter(event, player) {
+			return player.hasHistory("sourceDamage", evt => evt.player.group === "qun" && evt.player !== player);
+		},
+		forced: true,
+		zhuSkill: true,
+		content() {
+			player.draw();
+		},
+	},
 	//燕幽烽火
 	//全琮
 	yyyaoming: {
