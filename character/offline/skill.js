@@ -177,15 +177,15 @@ const skills = {
 					const storage = player.storage["yyqizhen_effect"];
 					const targets = Object.keys(storage)
 						.filter(id => {
-							return storage[id].includes(event);
+							return storage[id].includes(trigger);
 						})
 						.slice()
 						.map(id => storage[id][0]);
-					const goon = game.getGlobalHistory("damage", evt => evt.card === trigger.card).reduce((sum, evt) => sum + evt.num, 0);
+					const goon = game.getGlobalHistory("changeHp", evt => evt.getParent().name === "damage" && evt.getParent().card === trigger.card).reduce((sum, evt) => sum - evt.num, 0);
 					for (const target of targets) {
 						if (goon) {
 							player.line(target);
-							await player.draw(num);
+							await player.draw(goon);
 						} else {
 							if (!target.isIn() || !target.countDiscardableCards(player, "e")) continue;
 							player.line(target);
