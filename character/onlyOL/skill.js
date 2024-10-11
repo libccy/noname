@@ -91,7 +91,6 @@ const skills = {
 				case 0:
 					for (const current of [player, target]) {
 						const aim = current === player ? target : player;
-						current.line(aim);
 						if (current.isIn()) {
 							current.line(aim);
 							await current.discardPlayerCard(aim, "he", true);
