@@ -521,8 +521,6 @@ const translates = {
 	jxfujing_info: "锁定技，摸牌阶段开始前，你跳过此阶段并视为使用一张【荆襄盛世】；以此法获得牌的其他角色本轮首次对你使用牌时需弃置一张牌。",
 	jxyongrong: "雍容",
 	jxyongrong_info: "每回合限一次，你造成/受到伤害时，若受伤角色/伤害来源的手牌数小于你，你可以交给其一张牌令此伤害+1/-1。",
-	jx_sunjian: "荆孙坚",
-	jx_sunjian_prefix: "荆",
 	jx_zhouyu: "荆周瑜",
 	jx_zhouyu_prefix: "荆",
 	jx_guanyu: "荆关羽",
@@ -891,6 +889,10 @@ const translates = {
 	yy_baimaxiaoqi: "白马骁骑",
 	yy_baimaxiaoqi_skill: "白马骁骑",
 	yy_baimaxiaoqi_info: "锁定技，若你的装备区牌数X不少于：1张，你的攻击范围+X；2张，你使用【杀】的额定次数+X；3张，你计算与其他角色的距离-X；4张，摸牌阶段，你多摸X张牌。",
+	yy_quancong: "燕幽全琮",
+	yy_quancong_prefix: "燕幽",
+	yyyaoming: "邀名",
+	yyyaoming_info: "出牌阶段各限一次，或当你受到伤害后，你可以：①弃置一名手牌数大于等于你的其他角色的一张牌；②令一名手牌数小于等于你的角色摸一张牌。",
 };
 
 export default translates;

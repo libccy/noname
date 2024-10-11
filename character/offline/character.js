@@ -7,6 +7,7 @@ const characters = {
 	yy_simayi: ["male", "wei", 4, ["yyyanggu", "yyzuifu"]],
 	yy_caorui: ["male", "wei", 3, ["yyhuituo", "yymingjian", "xingshuai"], ["zhu", "die:caorui"]],
 	yy_zhaoyun: ["male", "qun", 3, ["longdan", "chongzhen", "yicong"], ["die:zhaoyun"]],
+	yy_quancong: ["male", "wu", 4, ["yyyaoming"], ["die:xin_quancong"]],
 	scl_pangdegong: {
 		sex: "male",
 		group: "qun",
@@ -113,7 +114,6 @@ const characters = {
 	jd_sb_jiangwei: ["male", "shu", 4, ["jdsbtiaoxin", "jdsbzhiji"], ["character:sb_jiangwei", "die:sb_jiangwei"]],
 	jd_sb_daqiao: ["female", "wu", 3, ["jdsbguose", "jdsbliuli"], ["character:sb_daqiao", "die:sb_daqiao"]],
 	jd_simayan: ["male", "jin", 3, ["jdjuqi", "jdfengtu", "jdtaishi"], ["zhu"]],
-	jx_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie", "twpolu"]],
 	jx_zhouyu: ["male", "wu", 4, ["jxxiongzi", "jxzhanyan"]],
 	jx_guanyu: ["male", "shu", 4, ["jxwusheng", "jsrgguanjue", "nuzhan"]],
 	jx_shen_caoren: ["male", "shen", 4, ["jxjushou"], ["wei"]],

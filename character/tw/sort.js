@@ -5,7 +5,7 @@ const characterSort = {
 	tw_yunchouren: ["tw_xujing", "tw_qiaogong"],
 	tw_yunchouyong: ["tw_zongyu", "tw_chendong", "tw_sunyi"],
 	tw_yunchouyan: ["tw_jiangqing"],
-	tw_zhu: ["tw_beimihu", "tw_ol_sunjian", "ol_liuyu", "tw_menghuo"],
+	tw_zhu: ["tw_beimihu", "ol_liuyu", "tw_menghuo"],
 	tw_swordsman: ["xia_yuzhenzi", "xia_shie", "xia_shitao", "xia_guanyu", "xia_liubei", "xia_xiahousone", "xia_xiahoudun", "xia_zhangwei", "xia_xushu", "xia_wangyue", "xia_liyàn", "xia_tongyuan", "xia_lusu", "xia_dianwei", "xia_zhaoe", "xia_xiahouzie"],
 	tw_beidingzhongyuan: ["huan_luxun", "huan_liushan", "huan_zhugeliang", "huan_jiangwei", "huan_zhanghe", "huan_zhugeguo", "huan_weiyan", "huan_simayi", "huan_zhaoyun"],
 	tw_mobile: ["nashime", "tw_gexuan", "tw_zhugeguo", "tw_yj_zhanghe"],

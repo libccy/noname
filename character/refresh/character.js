@@ -122,7 +122,7 @@ const characters = {
 	ol_yuanshao: ["male", "qun", 4, ["olluanji", "olxueyi"], ["zhu"]],
 	re_menghuo: ["male", "shu", 4, ["huoshou", "rezaiqi"]],
 	ol_dongzhuo: ["male", "qun", 8, ["oljiuchi", "roulin", "benghuai", "olbaonue"], ["zhu"]],
-	ol_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie"]],
+	ol_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie", "twpolu"], ["zhu"]],
 	re_caopi: ["male", "wei", 3, ["rexingshang", "refangzhu", "songwei"], ["zhu"]],
 	ol_jiangwei: ["male", "shu", 4, ["oltiaoxin", "olzhiji"]],
 	ol_caiwenji: ["female", "qun", 3, ["olbeige", "duanchang"]],

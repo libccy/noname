@@ -5012,7 +5012,6 @@ const skills = {
 		audioname: ["re_sunjian", "sunce", "re_sunben", "re_sunce", "ol_sunjian"],
 		audioname2: {
 			re_sunyi: "gzyinghun_re_sunyi",
-			tw_ol_sunjian: "yinghun_ol_sunjian",
 			boss_sunce: "yinghun_sunce",
 		},
 		mod: {
@@ -5100,7 +5099,6 @@ const skills = {
 		audioname: ["re_sunjian", "sunce", "re_sunben", "re_sunce", "ol_sunjian", "sb_sunce"],
 		audioname2: {
 			re_sunyi: "gzyinghun_re_sunyi",
-			tw_ol_sunjian: "yinghun_ol_sunjian",
 		},
 		mod: {
 			aiOrder(player, card, num) {
