@@ -3,6 +3,109 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
 	//燕幽烽火
+	//全琮
+	yyyaoming: {
+		audio: "sbyaoming",
+		enable: "phaseUse",
+		trigger: { player: "damageEnd" },
+		filter(event, player) {
+			return game.hasPlayer(target => {
+				if (target.countCards("he") && target.countCards("h") >= player.countCards("h")) {
+					if (target !== player && (event.name === "damage" || !player.getStorage("yyyaoming_used").includes("弃牌"))) return true;
+				}
+				if (target.countCards("h") <= player.countCards("h")) {
+					if (event.name === "damage" || !player.getStorage("yyyaoming_used").includes("摸牌")) return true;
+				}
+				return false;
+			});
+		},
+		filterTarget(card, player, target) {
+			if (target !== player && target.countCards("he") && target.countCards("h") >= player.countCards("h") && !player.getStorage("yyyaoming_used").includes("弃牌")) return true;
+			if (target.countCards("h") <= player.countCards("h") && !player.getStorage("yyyaoming_used").includes("摸牌")) return true;
+			return false;
+		},
+		prompt() {
+			const player = get.player(),
+				storage = player.getStorage("yyyaoming_used");
+			return ["弃牌", "摸牌"]
+				.filter(i => !storage.includes(i))
+				.map(i => {
+					return {
+						弃牌: "弃置一名手牌数不小于你的其他角色的一张牌",
+						摸牌: "令一名手牌数不大于你的角色摸一张牌",
+					}[i];
+				})
+				.join("，或");
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(
+					get.prompt("yyyaoming"),
+					(card, player, target) => {
+						if (target !== player && target.countCards("he") && target.countCards("h") >= player.countCards("h")) return true;
+						if (target.countCards("h") <= player.countCards("h")) return true;
+						return false;
+					},
+					"弃置一名手牌数不小于你的其他角色的一张牌，或令一名手牌数不大于你的角色摸一张牌"
+				)
+				.set("ai", target => {
+					const player = get.player();
+					return get.effect(target, { name: "yyyaoming" }, player, player);
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const target = event.target || event.targets[0];
+			let choice = ["弃牌", "摸牌"].filter(choice => {
+					if (!(trigger?.name === "damage" || !player.getStorage("yyyaoming_used").includes(choice))) return false;
+					if (choice === "弃牌") return target !== player && target.countCards("he") && target.countCards("h") >= player.countCards("h");
+					return target.countCards("h") <= player.countCards("h");
+				}),
+				result;
+			if (choice.length === 1) result = { control: choice[0] };
+			else
+				result = await player
+					.chooseControl(choice)
+					.set("choiceList", ["弃置" + get.translation(target) + "一张牌", "令" + get.translation(target) + "摸一张牌"])
+					.set("prompt", "邀名：请选择一项")
+					.set("ai", () => {
+						const player = get.player(),
+							event = get.event().getParent(),
+							target = event.target || event.targets[0];
+						return get.effect(target, { name: "guohe_copy2" }, player, player) > get.effect(target, { name: "draw" }, player, player) ? 0 : 1;
+					})
+					.forResult();
+			if (result.control === "弃牌") await player.discardPlayerCard(target, "he", true);
+			else await target.draw();
+			if (!(trigger?.name === "damage")) {
+				player.addTempSkill("yyyaoming_used", "phaseUseAfter");
+				player.markAuto("yyyaoming_used", [result.control]);
+			}
+		},
+		ai: {
+			order: 7,
+			result: {
+				player(player, target) {
+					let eff = [0, 0],
+						hs = player.countCards("h"),
+						ht = target.countCards("h");
+					if (hs >= ht) {
+						eff[0] = get.effect(target, { name: "draw" }, player, player);
+					}
+					if (hs <= ht) {
+						eff[1] = get.effect(target, { name: "guohe_copy2" }, player, player);
+					}
+					return Math.max.apply(Math, eff);
+				},
+			},
+		},
+		subSkill: {
+			used: {
+				charlotte: true,
+				onremove: true,
+			},
+		},
+	},
 	//白虎骁骑
 	yy_baimaxiaoqi_skill: {
 		equipSkill: true,

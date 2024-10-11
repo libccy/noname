@@ -7,6 +7,7 @@ const characters = {
 	yy_simayi: ["male", "wei", 4, ["yyyanggu", "yyzuifu"]],
 	yy_caorui: ["male", "wei", 3, ["yyhuituo", "yymingjian", "xingshuai"], ["zhu", "die:caorui"]],
 	yy_zhaoyun: ["male", "qun", 3, ["longdan", "chongzhen", "yicong"], ["die:zhaoyun"]],
+	yy_quancong: ["male", "wu", 4, ["yyyaoming"], ["die:xin_quancong"]],
 	scl_pangdegong: {
 		sex: "male",
 		group: "qun",

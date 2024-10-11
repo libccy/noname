@@ -38,7 +38,7 @@ const characterReplaces = {
 	caoxiu: ["caoxiu", "re_caoxiu", "xin_caoxiu", "tw_caoxiu", "old_caoxiu"],
 	xiahoushi: ["xiahoushi", "re_xiahoushi", "sb_xiahoushi", "sp_xiahoushi"],
 	zhangyi: ["zhangyi", "re_zhangyi", "xin_zhangyi"],
-	quancong: ["quancong", "re_quancong", "xin_quancong", "old_quancong"],
+	quancong: ["quancong", "re_quancong", "xin_quancong", "old_quancong", "yy_quancong"],
 	sunxiu: ["sunxiu", "re_sunxiu", "xin_sunxiu"],
 	zhuzhi: ["zhuzhi", "re_zhuzhi", "xin_zhuzhi", "old_zhuzhi"],
 	liuyu: ["liuyu", "dc_liuyu", "ol_liuyu"],

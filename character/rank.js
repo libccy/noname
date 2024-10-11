@@ -1254,6 +1254,8 @@ window.noname_character_rank = {
 		"mb_jiachong",
 		"sb_jiaxu",
 		"sb_zhugejin",
+		"xin_quancong",
+		"yy_quancong",
 	],
 	b: [
 		"jiangziya",
@@ -1774,7 +1776,6 @@ window.noname_character_rank = {
 		"tw_puyangxing",
 		"ruanhui",
 		"xin_mamidi",
-		"xin_quancong",
 		"dc_caiyang",
 		"re_caiyong",
 		"liyixiesheng",
@@ -2382,6 +2383,8 @@ window.noname_character_rank = {
 			"wangkuang",
 		],
 		rare: [
+			"xin_quancong",
+			"yy_quancong",
 			"yy_gongsunyuan",
 			"jiangziya",
 			"shengongbao",
