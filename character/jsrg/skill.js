@@ -10563,13 +10563,14 @@ const skills = {
 			if (!event.getd || !event.getl) return false;
 			let cards = event.getd();
 			return cards.some(card => {
+				if (get.position(card) != "d") return false;
 				if (get.type(card) != "equip") return false;
 				if (!player.canEquip(card, true)) return false;
 				return game.hasPlayer(current => {
 					let evt = event.getl(current);
-					if (evt?.es?.includes(card)) return true;
-					if (evt?.js?.includes(card)) return true;
-					return false;
+					if (!(evt?.es?.includes(card) || evt?.js?.includes(card))) return false;
+					if (card.willBeDestroyed("discardPile", current, event)) return false;
+					return true;
 				});
 			});
 		},
