@@ -521,8 +521,6 @@ const translates = {
 	jxfujing_info: "锁定技，摸牌阶段开始前，你跳过此阶段并视为使用一张【荆襄盛世】；以此法获得牌的其他角色本轮首次对你使用牌时需弃置一张牌。",
 	jxyongrong: "雍容",
 	jxyongrong_info: "每回合限一次，你造成/受到伤害时，若受伤角色/伤害来源的手牌数小于你，你可以交给其一张牌令此伤害+1/-1。",
-	jx_sunjian: "荆孙坚",
-	jx_sunjian_prefix: "荆",
 	jx_zhouyu: "荆周瑜",
 	jx_zhouyu_prefix: "荆",
 	jx_guanyu: "荆关羽",

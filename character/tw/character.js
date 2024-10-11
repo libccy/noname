@@ -31,7 +31,6 @@ const characters = {
 	xia_zhangwei: ["female", "qun", 3, ["twhuzhong", "twfenwang"]],
 	tw_zhanghong: ["male", "wu", 3, ["twquanqian", "twrouke"]],
 	tw_zhangzhao: ["male", "wu", 3, ["twlijian", "twchungang"]],
-	tw_ol_sunjian: ["male", "wu", "4/5", ["gzyinghun", "wulie", "twpolu"], ["zhu"]],
 	tw_menghuo: ["male", "qun", 4, ["huoshou", "rezaiqi", "twqiushou"], ["zhu"]],
 	ol_liuyu: ["male", "qun", 2, ["zongzuo", "zhige", "twchongwang"], ["zhu"]],
 	tw_gongsunfan: ["male", "qun", 4, ["twhuiyuan", "twshoushou"], ["name:公孙|范"]],

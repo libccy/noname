@@ -586,8 +586,6 @@ const translates = {
 	twshijun_info: "主公技，其他群势力角色出牌阶段限一次，若你没有“米”，其可以摸一张牌，然后将一张牌置于你的武将牌上，称为“米”。",
 	twjuxiang: "踞襄",
 	twjuxiang_info: "主公技，其他群势力角色出牌阶段限一次，其可以选择其装备区的一张牌移动到你的装备区中，若你对应的装备栏已被废除，则改为交给你此装备牌，然后恢复你的对应装备栏。",
-	tw_ol_sunjian: "TW孙坚",
-	tw_ol_sunjian_prefix: "TW",
 	twpolu: "破虏",
 	twpolu_info: "主公技，当吴势力角色杀死一名角色或死亡后，你可以令任意名角色各摸X张牌（X为你此前发动过此技能的次数+1）。",
 	tw_menghuo: "TW孟获",
