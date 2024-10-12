@@ -155,7 +155,7 @@ const skills = {
 		},
 		forced: true,
 		content() {
-			player.addTempSkill("olsbyangwei_attack");
+			player.addSkill("olsbyangwei_attack");
 			player.addMark("olsbyangwei_attack", 1, false);
 		},
 		group: "olsbyangwei_discard",
@@ -189,7 +189,7 @@ const skills = {
 				},
 				forced: true,
 				content() {
-					player.addTempSkill("olsbyangwei_defend");
+					player.addSkill("olsbyangwei_defend");
 					player.addMark("olsbyangwei_defend", 1, false);
 				},
 			},
