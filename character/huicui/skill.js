@@ -9447,7 +9447,7 @@ const skills = {
 	},
 	//纪灵
 	dcshuangren: {
-		audio: 2,
+		audio: "shuangren",
 		trigger: { player: "phaseUseBegin" },
 		direct: true,
 		preHidden: true,

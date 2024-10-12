@@ -4,7 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//TW孙鲁班
 	twzenhui: {
-		audio: 'xinzenhui',
+		audio: 'chanhui',
 		trigger: { player: 'useCardToPlayer' },
 		filter: function (event, player) {
 			if (event.targets.length != 1) return false;
@@ -6474,7 +6474,7 @@ const skills = {
 	},
 	//蒋济
 	twjichou: {
-		audio: 2,
+		audio: 3,
 		enable: "chooseToUse",
 		group: ["twjichou_ban", "twjichou_give"],
 		filter: function (event, player) {
@@ -9085,7 +9085,7 @@ const skills = {
 	},
 	//蒋钦
 	twshangyi: {
-		audio: "shangyi",
+		audio: "spshangyi",
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -9339,7 +9339,7 @@ const skills = {
 	bingyi_xin_guyong: { audio: 2 },
 	//陈武董袭
 	twyilie: {
-		audio: "spyilie",
+		audio: "duanxie",
 		trigger: { player: "phaseUseBegin" },
 		direct: true,
 		content: function () {
@@ -9380,7 +9380,7 @@ const skills = {
 			},
 			miss: {
 				charlotte: true,
-				audio: "spyilie",
+				audio: "duanxie",
 				trigger: { player: ["useCardToTargeted", "shaMiss"] },
 				filter: function (event, player, name) {
 					if (name == "useCardToTargeted") return event.card.name == "sha" && event.target.isLinked();
@@ -9394,7 +9394,7 @@ const skills = {
 		},
 	},
 	twfenming: {
-		audio: "spfenming",
+		audio: "fenming",
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter: function (event, player) {
 			return game.hasPlayer(function (target) {
@@ -9447,7 +9447,7 @@ const skills = {
 	},
 	//韩当
 	twgongji: {
-		audio: "regongji",
+		audio: "gongji",
 		enable: "phaseUse",
 		usable: 1,
 		position: "he",
@@ -9566,7 +9566,7 @@ const skills = {
 	twjiefan: {
 		skillAnimation: true,
 		animationColor: "wood",
-		audio: "jiefan_re_handang",
+		audio: "jiefan",
 		limited: true,
 		enable: "phaseUse",
 		filterTarget: true,
@@ -9745,7 +9745,7 @@ const skills = {
 	},
 	//法正
 	twxuanhuo: {
-		audio: "rexuanhuo",
+		audio: "xuanhuo",
 		trigger: { player: "phaseDrawEnd" },
 		filter: function (event, player) {
 			return player.countCards("he") > 1 && game.countPlayer() > 2;
@@ -9853,11 +9853,11 @@ const skills = {
 		},
 	},
 	twenyuan: {
-		audio: "reenyuan",
+		audio: "enyuan",
 		group: ["twenyuan1", "twenyuan2"],
 	},
 	twenyuan1: {
-		audio: "reenyuan",
+		audio: ["enyuan1.mp3", "enyuan2.mp3"],
 		trigger: {
 			global: ["gainAfter", "loseAsyncAfter"],
 		},
@@ -9929,7 +9929,7 @@ const skills = {
 		},
 	},
 	twenyuan2: {
-		audio: "reenyuan",
+		audio: ["enyuan3.mp3", "enyuan4.mp3"],
 		trigger: { player: "damageEnd" },
 		logTarget: "source",
 		sourceSkill: "twenyuan",
@@ -12052,8 +12052,9 @@ const skills = {
 		},
 	},
 	twchuhai: {
-		audio: "chuhai",
+		audio: ["xianghai1.mp3", "xianghai2.mp3", "chuhai1.mp3", "chuhai2.mp3", "chuhai3.mp3"],
 		trigger: { global: "phaseEnd" },
+		logAudio: () => 4,
 		filter: function (event, player) {
 			var targets = [];
 			player.getHistory("sourceDamage", evt => {
@@ -12084,7 +12085,7 @@ const skills = {
 		},
 		subSkill: {
 			lose: {
-				audio: "chuhai",
+				audio: "chuhai3.mp3",
 				trigger: {
 					global: ["gainAfter", "loseAsyncAfter"],
 				},
@@ -12668,7 +12669,7 @@ const skills = {
 	},
 	//陈震
 	twmuyue: {
-		audio: 1,
+		audio: "shameng1.mp3",
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -12754,7 +12755,7 @@ const skills = {
 		},
 	},
 	twchayi: {
-		audio: 1,
+		audio: "shameng2.mp3",
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
 		content: function () {
@@ -14035,7 +14036,7 @@ const skills = {
 	},
 	//曹休
 	twqianju: {
-		audio: 2,
+		audio: "xinqingxi1.mp3",
 		trigger: { source: "damageSource" },
 		filter: function (event, player) {
 			return get.distance(player, event.player) <= 1 && player.countCards("e") < 5;
@@ -14059,7 +14060,7 @@ const skills = {
 		},
 	},
 	twqingxi: {
-		audio: "xinqingxi",
+		audio: "xinqingxi2.mp3",
 		trigger: { player: "useCardToPlayered" },
 		filter: function (event, player) {
 			return event.card.name == "sha" && player.getHistory("useCard", evt => evt.card.name == "sha").indexOf(event.getParent()) == 0;
@@ -14997,7 +14998,7 @@ const skills = {
 	},
 	//吴景
 	twfenghan: {
-		audio: 2,
+		audio: "liubing",
 		trigger: { player: "useCardToPlayered" },
 		direct: true,
 		usable: 1,
@@ -15028,7 +15029,7 @@ const skills = {
 		},
 	},
 	twcongji: {
-		audio: 2,
+		audio: "heji",
 		trigger: {
 			player: "loseAfter",
 			global: "loseAsyncAfter",
@@ -18146,6 +18147,7 @@ const skills = {
 		},
 	},
 	cuijin: {
+		audio: 2,
 		trigger: { global: "useCard" },
 		direct: true,
 		filter: function (event, player) {

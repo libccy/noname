@@ -1,6 +1,6 @@
 const characters = {
 	re_xushu: ["male", "shu", 4, ["zhuhai", "qianxin"]],
-	re_lidian: ["male", "wei", 3, ["xunxun", "xinwangxi"]],
+	re_lidian: ["male", "wei", 3, ["xunxun", "xinwangxi"], ["die:lidian"]],
 	re_zhongyao: ["male", "wei", 3, ["rehuomo", "zuoding"], ["clan:颍川钟氏"]],
 	xin_zhangliang: ["male", "qun", 4, ["rejijun", "refangtong"]],
 	re_simalang: ["male", "wei", 3, ["requji", "rejunbing"], ["name:司马|朗"]],

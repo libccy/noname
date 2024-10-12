@@ -612,6 +612,9 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const { target, position } = event.cost_data;
+			game.broadcastAll(function () {
+				if (lib.config.background_speak) game.playAudio("skill", "dclieqiong_" + position);
+			});
 			const positionObj = lib.skill[event.name].positions[position];
 			let next = game.createEvent(event.name + "effect", false);
 			next.setContent(positionObj.content);
@@ -6627,8 +6630,7 @@ const skills = {
 		},
 	},
 	caopi_xingdong: {
-		audio: "olfangquan",
-		audioname: ["shen_caopi"],
+		audio: true,
 		subSkill: {
 			mark: {
 				mark: true,
@@ -6875,7 +6877,6 @@ const skills = {
 	rerende_shen_caopi: { audio: 1 },
 	rezhiheng_shen_caopi: { audio: 1 },
 	olluanji_shen_caopi: { audio: 1 },
-	olfangquan_shen_caopi: { audio: 1 },
 	olzhiti: {
 		audio: "drlt_zhiti",
 		global: "olzhiti2",
@@ -7397,6 +7398,7 @@ const skills = {
 		audio: 2,
 		trigger: { player: "phaseDiscardEnd" },
 		direct: true,
+		logAudio: index => (typeof index === "number" ? "qinyin" + index + ".mp3" : 2),
 		filter(event, player) {
 			var cards = [];
 			player.getHistory("lose", function (evt) {
@@ -7449,7 +7451,7 @@ const skills = {
 			if (result.control == "cancel2") {
 				event.finish();
 			} else {
-				player.logSkill("qinyin");
+				player.logSkill("qinyin", null, null, null, [result.control == "回复体力" ? 2 : 1]);
 				event.bool = result.control == "回复体力";
 				event.num = 0;
 				event.players = game.filterPlayer();
@@ -9084,7 +9086,8 @@ const skills = {
 	},
 	gongxin: {
 		audio: 2,
-		audioname: ["re_lvmeng", "gexuan"],
+		audioname: ["re_lvmeng"],
+		audioname2: { gexuan: "gongxin_gexuan" },
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget(card, player, target) {

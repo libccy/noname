@@ -524,6 +524,7 @@ game.import("card", function () {
 				},
 			},
 			qibaodao: {
+				audio: "qibaodao2",
 				equipSkill: true,
 				trigger: { source: "damageBegin1" },
 				forced: true,

@@ -55,7 +55,7 @@ const characters = {
 	gongsunyuan: ["male", "qun", 4, ["huaiyi"], ["name:公孙|渊"]],
 	guotufengji: ["male", "qun", 3, ["jigong", "shifei"], ["name:郭|图-逢|纪"]],
 
-	xin_liru: ["male", "qun", 3, ["xinjuece", "xinmieji", "xinfencheng"]],
+	xin_liru: ["male", "qun", 3, ["xinjuece", "xinmieji", "xinfencheng"], ["die:liru"]],
 
 	guohuanghou: ["female", "wei", 3, ["jiaozhao", "danxin"], ["name:郭|null"]],
 	liuyu: ["male", "qun", 2, ["xinzhige", "xinzongzuo"]],

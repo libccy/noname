@@ -14703,7 +14703,7 @@ const skills = {
 		derivation: "dczimu",
 	},
 	dczimu: {
-		audio: 2,
+		audio: 1,
 		trigger: { player: "damageEnd" },
 		forced: true,
 		mark: true,
@@ -19234,6 +19234,10 @@ const skills = {
 			},
 		},
 	},
+	reyingzi_gexuan: { audio: 1 },
+    guanxing_gexuan: { audio: 1 },
+    zhiyan_gexuan: { audio: 1 },
+    gongxin_gexuan: { audio: 1 },
 	tuiyan: {
 		audio: 2,
 		trigger: { player: "phaseUseBegin" },

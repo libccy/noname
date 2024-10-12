@@ -2740,6 +2740,7 @@ const skills = {
 		},
 	},
 	tongbo: {
+		audio: 2,
 		trigger: { player: "phaseDrawAfter" },
 		direct: true,
 		filter: function (event, player) {
@@ -6881,7 +6882,6 @@ const skills = {
 			neg: true,
 		},
 		audio: 2,
-		audioname: ["xin_zhangyi"],
 		trigger: { player: ["useCard1", "respond"] },
 		firstDo: true,
 		forced: true,
@@ -6891,6 +6891,7 @@ const skills = {
 		content: function () { },
 	},
 	wurong: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		filter: function (event, player) {
@@ -11216,11 +11217,12 @@ const skills = {
 	luoying: {
 		//unique:true,
 		//gainable:true,
+		audio: 2,
 		group: ["luoying_discard", "luoying_judge"],
 		subfrequent: ["judge"],
 		subSkill: {
 			discard: {
-				audio: 2,
+				audio: 'luoying',
 				trigger: { global: "loseAfter" },
 				filter: function (event, player) {
 					if (event.type != "discard" || event.getlx === false) return false;
@@ -11261,7 +11263,7 @@ const skills = {
 				},
 			},
 			judge: {
-				audio: 2,
+				audio: 'luoying',
 				trigger: { global: "cardsDiscardAfter" },
 				//frequent:'check',
 				direct: true,

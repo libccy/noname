@@ -245,5 +245,5 @@ export default {
 	"#rerende_shen_caopi1": "这些都是孤赏赐给你的。",
 	"#rezhiheng_shen_caopi1": "有些事情，还需多加思索。",
 	"#olluanji_shen_caopi1": "违逆我的，都该处罚。",
-	"#olfangquan_shen_caopi1": "此等小事，你们处理即可。",
+	"#caopi_xingdong": "此等小事，你们处理即可。",
 };

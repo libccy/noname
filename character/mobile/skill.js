@@ -2722,7 +2722,7 @@ const skills = {
 	},
 	//霍骏
 	sidai: {
-		audio: "twsidai",
+		audio: ["twsidai1.mp3", "sidai.mp3"],
 		enable: "phaseUse",
 		usable: 1,
 		locked: false,
@@ -2808,7 +2808,7 @@ const skills = {
 		},
 	},
 	jieyu: {
-		audio: "twjieyu",
+		audio: ["twjieyu1.mp3", "jieyu.mp3"],
 		trigger: { player: "phaseJieshuBegin" },
 		filter: function (event, player) {
 			for (let i = 0; i < ui.discardPile.childElementCount; i++) {
@@ -3846,7 +3846,7 @@ const skills = {
 		},
 	},
 	yimou: {
-		audio: "twyimou",
+		audio: ["twyimou1.mp3", "yimou.mp3"],
 		inherit: "twyimou",
 		content: function () {
 			"step 0";
@@ -3909,7 +3909,7 @@ const skills = {
 	},
 	//蒋济
 	jilun: {
-		audio: "twjilun",
+		audio: 2,
 		inherit: "twjilun",
 		filter: function (event, player) {
 			return player.hasSkill("twjichou", null, false, false);
@@ -3952,7 +3952,7 @@ const skills = {
 				intro: { content: "mark" },
 			},
 			effect: {
-				audio: "twjilun",
+				audio: "jilun",
 				trigger: { global: "phaseJieshuBegin" },
 				filter: function (event, player) {
 					return player.hasMark("jilun_mark");
@@ -4420,6 +4420,7 @@ const skills = {
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget: lib.filter.notMe,
+		logAudio: index => (typeof index === "number" ? "xinwurong" + index + ".mp3" : 1),
 		content: function () {
 			"step 0";
 			player
@@ -4430,6 +4431,7 @@ const skills = {
 				.set("ai", button => 1 + Math.random());
 			"step 1";
 			if (result.bool) {
+				player.logSkill("xinwurong", target, null, null, [result.player == "db_def1" ? 3 : 2]);
 				if (result.player == "db_def1") {
 					target.damage();
 					player.draw();
@@ -9873,6 +9875,7 @@ const skills = {
 	xinzenhui2: {},
 	xinjiaojin: {
 		audio: 2,
+		audioname2: { "tw_sunluban": "jiaojin" },
 		trigger: { player: "damageBegin4" },
 		filter: function (event, player) {
 			return player.countCards("he", { type: "equip" }) && event.source && event.source.hasSex("male");

@@ -4947,7 +4947,8 @@ const skills = {
 	},
 	xinzhiyan: {
 		audio: "zhiyan",
-		audioname: ["gexuan", "re_yufan", "xin_yufan"],
+		audioname: ["re_yufan", "xin_yufan"],
+		audioname2: { gexuan: "zhiyan_gexuan" },
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
 		content: function () {
@@ -8600,6 +8601,7 @@ const skills = {
 		},
 	},
 	xinyicong: {
+		audio: "yicong",
 		mod: {
 			globalFrom: function (from, to, current) {
 				return current - Math.max(0, from.hp - 1);
@@ -12976,7 +12978,8 @@ const skills = {
 	},
 	reguanxing: {
 		audio: "guanxing",
-		audioname: ["jiangwei", "re_jiangwei", "re_zhugeliang", "gexuan", "ol_jiangwei"],
+		audioname: ["jiangwei", "re_jiangwei", "re_zhugeliang", "ol_jiangwei"],
+		audioname2: { gexuan: "guanxing_gexuan" },
 		trigger: { player: ["phaseZhunbeiBegin", "phaseJieshuBegin"] },
 		frequent: true,
 		filter: function (event, player, name) {
@@ -13916,8 +13919,9 @@ const skills = {
 	},
 	reyingzi: {
 		audio: 2,
-		audioname: ["sunce", "gexuan", "re_sunben", "re_sunce"],
+		audioname: ["sunce", "re_sunben", "re_sunce"],
 		audioname2: {
+			gexuan: "reyingzi_gexuan",
 			re_sunyi: "reyingzi_re_sunyi",
 			heqi: "reyingzi_heqi",
 			re_heqi: "reyingzi_heqi",
