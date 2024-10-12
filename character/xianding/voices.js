@@ -1,4 +1,5 @@
 export default {
+	"#jiangqin:die": "竟……破我阵法……",
 	"#dcyanzuo1": "提笔欲续出师表，何日重登蜀道？",
 	"#dcyanzuo2": "我族以诗书传家，苑中未绝琅琅。",
 	"#dczuyin1": "蒙先祖之佑，未觉春秋之寒。",
@@ -198,7 +199,6 @@ export default {
 	"#dc_xujing:die": "时人如江鲫，所逐者功利尔……",
 	"#rebaobian1": "变可生，不变则死。",
 	"#rebaobian2": "适时而动，穷极则变。",
-	"#dc_daxiaoqiao:die": "伯符，公瑾，请一定要守护住我们的江东啊！",
 	"#dcposuo1": "绯纱婆娑起，佳人笑靥红。",
 	"#dcposuo2": "红烛映俏影，一舞影斑斓。",
 	"#dcxiaoren1": "红绡举腕重，明眸最溺人。",

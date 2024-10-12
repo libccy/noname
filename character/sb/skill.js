@@ -324,11 +324,13 @@ const skills = {
 	sbluanwu: {
 		audio: 4,
 		inherit: "luanwu",
+		logAudio: () => 2,
 		contentBefore() {
 			player.addTempSkill("sbluanwu_add");
 		},
 		subSkill: {
 			add: {
+				audio: ["sbluanwu3.mp3", "sbluanwu4.mp3"],
 				trigger: {
 					global: "loseHpEnd",
 				},
@@ -375,6 +377,7 @@ const skills = {
 			target: "useCardToTarget",
 			global: "roundStart",
 		},
+		logAudio: index => (typeof index === "number" ? "sbweimu" + index + ".mp3" : 4),
 		filter(event, player) {
 			if (event.name == "useCardToTarget") return get.type(event.card, null, false) == "trick" && get.color(event.card) == "black";
 			if (event.name == "addJudge") return get.color(event.card) == "black";
@@ -390,7 +393,10 @@ const skills = {
 			return get.subtype(card) == "equip2" || (get.type(card) == "trick" && get.color(card) == "black");
 		},
 		forced: true,
+		popup: false,
 		async content(event, trigger, player) {
+			if (trigger.name == "useCardToTarget" || trigger.name == "addJudge") player.logSkill("sbweimu", null, null, null, [get.rand(1, 2)]);
+			else player.logSkill("sbweimu", null, null, null, [get.rand(3, 4)]);
 			if (trigger.name == "useCardToTarget") {
 				trigger.targets.remove(player);
 				trigger.getParent().triggeredTargets2.remove(player);

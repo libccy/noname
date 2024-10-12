@@ -29164,7 +29164,7 @@ const skills = {
 	juyi: {
 		skillAnimation: true,
 		animationColor: "thunder",
-		audio: 1,
+		audio: 2,
 		derivation: ["benghuai", "weizhong"],
 		trigger: { player: "phaseZhunbeiBegin" },
 		filter: function (event, player) {
@@ -29755,6 +29755,7 @@ const skills = {
 				},
 				forced: true,
 				logTarget: "player",
+				logAudio: () => ["xinfu_jianjie1.mp3", "xinfu_jianjie2.mp3"],
 				content: function () {
 					"step 0";
 					if (lib.skill.jianjie.hasMark("huoji", player, trigger.player)) {
@@ -29795,6 +29796,7 @@ const skills = {
 				},
 			},
 			huoji: {
+				audio: "huoji",
 				marktext: "龙",
 				intro: {
 					name: "龙印",
@@ -29828,6 +29830,7 @@ const skills = {
 				},
 			},
 			lianhuan: {
+				audio: "lianhuan",
 				marktext: "凤",
 				intro: {
 					name: "凤印",
@@ -29894,6 +29897,7 @@ const skills = {
 				},
 			},
 			yeyan: {
+				audio: "yeyan",
 				inherit: "yeyan",
 				filter: function (event, player) {
 					const huoji = player.getStorage("jianjie_huoji"),

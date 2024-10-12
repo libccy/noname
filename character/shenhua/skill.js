@@ -6917,6 +6917,7 @@ const skills = {
 		},
 	},
 	hongyan: {
+		audio: true,
 		mod: {
 			suit(card, suit) {
 				if (suit == "spade") return "heart";
@@ -6924,8 +6925,7 @@ const skills = {
 		},
 	},
 	xinhongyan: {
-		audio: 2,
-		audioname: ["sb_xiaoqiao"],
+		audio: "hongyan",
 		mod: {
 			suit(card, suit) {
 				if (suit == "spade") return "heart";

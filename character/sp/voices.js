@@ -524,6 +524,7 @@ export default {
 	"#gongao1": "恪尽职守，忠心事主。",
 	"#gongao2": "攻城拔寨，建功立业。",
 	"#juyi1": "司马氏篡权，我当替天伐之！",
+	"#juyi2": "若国有难，吾当举义。",
 	"#benghuai_zhugedan1": "咳……咳咳……",
 	"#weizhong1": "定当夷司马氏三族！",
 	"#zhugedan:die": "诸葛一氏定会为我复仇！",

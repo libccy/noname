@@ -271,7 +271,6 @@ export default {
 	"#ol_dingyuan:die": "你我父子，此恩今日断！",
 	"#spweiwu1": "凉州寸土，不可拱手让人。",
 	"#spweiwu2": "明遵旨，暗忤意。",
-	"#re_hansui:die": "马侄儿为何？啊！！",
 	"#yujue1": "国库空虚，鬻爵可解。",
 	"#yujue2": "卖官鬻爵，酣歌畅饮。",
 	"#tuxing1": "国之兴亡，休戚相关。",
