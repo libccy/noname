@@ -472,7 +472,7 @@ export default () => {
 				gz_sp_duyu: ["male", "qun", 4, ["spwuku", "spmiewu"]],
 				gz_huaxin: ["male", "wei", 3, ["wanggui", "fakexibing"]],
 				gz_luyusheng: ["female", "wu", 3, ["fakezhente", "fakezhiwei"]],
-				gz_zongyu: ["male", "shu", 3, ["zyqiao", "fakechengshang"]],
+				gz_zongyu: ["male", "shu", 3, ["zyqiao", "gzchengshang"]],
 				gz_miheng: ["male", "qun", 3, ["fakekuangcai", "gzshejian"], ["gzskin", "die:re_miheng"]],
 				gz_fengxi: ["male", "wu", 3, ["gzyusui", "gzboyan"], ["gzskin"]],
 				gz_dengzhi: ["male", "shu", 3, ["gzjianliang", "gzweimeng"], ["gzskin"]],
@@ -1356,6 +1356,48 @@ export default () => {
 							}
 						},
 					},
+				},
+			},
+			//宗预
+			gzchengshang: {
+				audio: "chengshang",
+				trigger: { player: "useCardAfter" },
+				filter(event, player) {
+					if (player.hasHistory("sourceDamage", evt => evt.card === event.card)) return false;
+					return event.targets?.some(i => i.isIn() && i.countCards("he"));
+				},
+				usable: 1,
+				async cost(event, trigger, player) {
+					event.result = await player
+						.chooseTarget(get.prompt2("gzchengshang"), (card, player, target) => {
+							return get.event().getTrigger().targets.includes(target) && target.countCards("he");
+						})
+						.set("ai", target => {
+							var att = get.attitude(_status.event.player, target);
+							if (att > 0) return Math.sqrt(att) / 10;
+							return 5 - att;
+						})
+						.forResult();
+				},
+				async content(event, trigger, player) {
+					const result = await target
+						.chooseToGive(player, "he", true, "give")
+						.set("ai", card => {
+							const player = get.player(),
+								source = get.event().getParent().player,
+								cardx = get.event().getTrigger().card;
+							if (get.suit(card) === get.suit(cardx) && get.number(card) === get.number(cardx)) {
+								return 1145141919810 * get.sgn(-get.attitude(player, source));
+							}
+							return -get.value(card);
+						})
+						.forResult();
+					if (result?.bool && result.cards?.length) {
+						const card = result.cards[0];
+						if (get.suit(card) === get.suit(trigger.card) && get.number(card) === get.number(trigger.card)) {
+							await player.removeSkills("gzchengshang");
+						}
+					}
 				},
 			},
 			//官盗2023
@@ -11956,6 +11998,13 @@ export default () => {
 				trigger: { target: "useCardToTargeted" },
 				filter: function (event, player) {
 					if (player == event.player || event.targets.length != 1 || !event.player.isIn()) return false;
+					if (
+						!target.hasCard(function (card) {
+							return lib.filter.canBeDiscarded(card, player, target);
+						}, "he") &&
+						_status.event.dying
+					)
+						return false;
 					var hs = player.getCards("h");
 					if (hs.length == 0) return false;
 					for (var i of hs) {
@@ -12010,6 +12059,7 @@ export default () => {
 						str = get.translation(target);
 					event.target = target;
 					if (!target.isIn()) event.finish();
+					else if (_status.event.dying) event._result = { index: 0 };
 					else if (
 						!target.hasCard(function (card) {
 							return lib.filter.canBeDiscarded(card, player, target);
@@ -20761,7 +20811,7 @@ export default () => {
 			gzkuangcai: "狂才",
 			gzkuangcai_info: "锁定技，你的回合内，你使用牌无距离和次数限制，无视防具且不能被【无懈可击】响应；弃牌阶段开始时，若你本回合使用过牌但没造成伤害，本回合你的手牌上限-2；若你本回合造成的伤害点数不小于你使用的牌数，你将手牌摸至体力上限且本回合手牌上限+2。",
 			gzshejian: "舌箭",
-			gzshejian_info: "当你成为其他角色使用牌的唯一目标后，你可以弃置所有手牌。若如此做，你选择一项：⒈弃置其等量的牌。⒉对其造成1点伤害。",
+			gzshejian_info: "当你成为其他角色使用牌的唯一目标后，你可以弃置所有手牌。若如此做，你选择一项：⒈弃置其等量的牌。⒉若没有角色处于濒死状态，对其造成1点伤害。",
 			gzzhidao: "雉盗",
 			gzzhidao2: "雉盗",
 			gzzhidao_info: "锁定技，出牌阶段开始时，你选择一名其他角色，然后直到此回合结束，你与其的距离视为1且你不能使用牌指定除你与其外的角色为目标；当你于出牌阶段内首次对其造成伤害后，你获得其区域内的一张牌。",
@@ -21372,6 +21422,8 @@ export default () => {
 			gzduoshi_info: "出牌阶段开始时，你可以视为使用【以逸待劳】。",
 			gzhengjiang: "横江",
 			gzhengjiang_info: "当你受到伤害后，你可以令当前回合角色本回合的手牌上限-X（X为其装备区牌数且至少为1）。然后其本回合弃牌阶段结束时，若其未于此阶段弃牌，则你将手牌摸至体力上限。",
+			gzchengshang: "承赏",
+			gzchengshang_info: "每回合限一次，当你使用指定了目标的牌结算完毕后，若你未因此牌造成过伤害，则你可以令其中一名目标角色交给你一张牌，若此牌和你使用的牌的花色和点数均相同，则你失去此技能。",
 
 			guozhan_default: "国战标准",
 			guozhan_zhen: "君临天下·阵",
@@ -21617,7 +21669,6 @@ export default () => {
 			"#gzduannian2": "一别两宽，不负相思。",
 			"#gzlianyou1": "莲花佑兴，业火可兴。",
 			"#gzlianyou2": "昔日莲花开，今日红火燃。",
-			"#anyong2": "冀州暗潮汹涌，群仕居危思变。",
 			"#jianglue1": "奇谋为短，将略为要。",
 			"#jianglue2": "为将者，需有谋略。",
 			"#fz_wusheng": "武节不减，圣德加身。",
