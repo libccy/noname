@@ -11,7 +11,7 @@ export class Pagination {
 	/** 是否加载了分页类对应的css文件 */
 	static loaded = false;
 	/** @type { HTMLUListElement } 渲染的dom元素 */
-	#dom;
+	element;
 	/**
 	 * @type { PaginationState }
 	 */
@@ -183,10 +183,10 @@ export class Pagination {
 			return;
 		}
 
-		if (this.#dom instanceof HTMLElement && pageContainer.contains(this.#dom)) {
-			pageContainer.removeChild(this.#dom);
+		if (this.element instanceof HTMLElement && pageContainer.contains(this.element)) {
+			pageContainer.removeChild(this.element);
 			// @ts-ignore
-			this.#dom = void 0;
+			this.element = void 0;
 		}
 
 		let { totalPageCount, pCName, prevCName, disbalePrevCName, pageNumber, pageNumberCName, activeCName, dataNumberAttr, maxShowBtnCount, nextCName, disbaleNextCName } = state;
@@ -218,27 +218,27 @@ export class Pagination {
 				console.error(`未根据配置找到兄弟元素，元素将添加到父元素结尾`);
 				pageContainer.insertAdjacentHTML("beforeend", paginationStr);
 				// @ts-ignore
-				this.#dom = pageContainer.lastElementChild;
+				this.element = pageContainer.lastElementChild;
 			} else {
 				afterElement.insertAdjacentHTML("afterend", paginationStr);
 				// @ts-ignore
-				this.#dom = afterElement.nextElementSibling;
+				this.element = afterElement.nextElementSibling;
 				// @ts-ignore
-				this.#dom.style.position = 'static';
+				this.element.style.position = 'static';
 			}
 		} else {
 			pageContainer.insertAdjacentHTML("beforeend", paginationStr);
 			// @ts-ignore
-			this.#dom = pageContainer.lastElementChild;
+			this.element = pageContainer.lastElementChild;
 		}
 
 		// 在dialog中使用分页，将应用shadowed这个css类名以靠近dialog样式
-		let ele = this.#dom;
+		let ele = this.element;
 		while (ele !== null) {
 			// @ts-ignore
 			if (ele.classList.contains('dialog')) {
 				// @ts-ignore
-				Array.from(this.#dom.children).forEach(item => {
+				Array.from(this.element.children).forEach(item => {
 					if (item.classList.contains("number-ellipsis") || item.classList.contains("ellipsis-tail")) return;
 					item.classList.add("shadowed");
 				});
@@ -284,7 +284,7 @@ export class Pagination {
 	 */
 	selectorEle(selector, all = false) {
 		// return all ? document.querySelectorAll(selector) : document.querySelector(selector);
-		const dom = this.#dom || document;
+		const dom = this.element || document;
 		return all ? dom.querySelectorAll(selector) : dom.querySelector(selector);
 	}
 	/**

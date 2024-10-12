@@ -1111,6 +1111,7 @@ export class Create {
 						this.touchlink.classList.remove("active");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1133,6 +1134,7 @@ export class Create {
 						this.touchlink.classList.add("active");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1162,6 +1164,7 @@ export class Create {
 						this.touchlink.classList.remove("active");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
@@ -1187,6 +1190,7 @@ export class Create {
 						packsource.classList.add("thundertext");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1220,16 +1224,7 @@ export class Create {
 					packsource.classList.remove("thundertext");
 				}
 			}
-			if (dialog.paginationMaxCount.get("character")) {
-				const buttons = dialog.content.querySelector(".buttons");
-				/** @type { Pagination } */
-				const p = dialog.paginationMap.get(buttons);
-				if (p) {
-					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-					p.state.data = array;
-					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-				}
-			}
+			updateFind();
 			if (e) e.stopPropagation();
 		};
 		for (i = 0; i < namecapt.length; i++) {
@@ -1289,6 +1284,7 @@ export class Create {
 					dialog.currentgroupnode = null;
 					node.classList.remove("thundertext");
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1305,6 +1301,7 @@ export class Create {
 					dialog.currentgroupnode = node;
 					node.classList.add("thundertext");
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1324,16 +1321,7 @@ export class Create {
 						}
 					}
 				}
-				if (dialog.paginationMaxCount.get("character")) {
-					const buttons = dialog.content.querySelector(".buttons");
-					/** @type { Pagination } */
-					const p = dialog.paginationMap.get(buttons);
-					if (p) {
-						const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-						p.state.data = array;
-						p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-					}
-				}
+				updateFind();
 			};
 			for (var i = 0; i < groups.length; i++) {
 				var span = ui.create.div(".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin");
@@ -1543,6 +1531,82 @@ export class Create {
 			}
 			return this.currentcapt;
 		};
+		// 搜索框，by Curpond
+		/** @type { Element } */
+		// @ts-ignore
+		const container = dialog.querySelector(".content-container>.content");
+		const Searcher = ui.create.div(".searcher.caption");
+		const input = document.createElement("input").css({
+			textAlign: "center",
+			border: "solid 2px #294510",
+			borderRadius: "6px",
+			fontWeight: "bold",
+			fontSize: "21px"
+		});
+		input.placeholder = "支持正则搜索";
+		const updatePagination = () => {
+			if (dialog.paginationMaxCount.get("character")) {
+				const buttons = dialog.content.querySelector(".buttons");
+				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay") && item.style.display !== 'none');
+				/** @type { Pagination } */
+				// @ts-ignore
+				const p = dialog.paginationMap.get(buttons);
+				if (p) {
+					p.state.data = array;
+					// @ts-ignore
+					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
+				}
+			}
+		};
+		const restoreState = btn => {
+			if (btn.style.display == 'none') {
+				btn.style.display = '';
+			}
+		};
+		const updateFind = () => {
+			const { value } = input;
+			const reg = new RegExp(value, "g");
+			// 搜索结果
+			const data = dialog.buttons.filter(item => {
+				if (value.length > 0) {
+					// @ts-ignore
+					return reg.test(get.translation(item.link)) || reg.test(lib.translate[`${item.link}_ab`]) || get.translation(item.link)?.includes(value) || lib.translate[`${item.link}_ab`]?.includes(value);
+				}
+				return false;
+			});
+			// 搜索结果从筛选条件中选取
+			for (const btn of dialog.buttons) {
+				restoreState(btn);
+				if (value.length > 0) {
+					if (!data.includes(btn)) {
+						btn.style.display = 'none';
+					}
+				}
+			}
+			updatePagination();
+		};
+		
+		// 中文输入选取的兼容
+		let isComposing = false;
+		input.addEventListener('compositionstart', () => {
+			isComposing = true;
+		});
+		
+		input.addEventListener('compositionend', e => {
+			isComposing = false;
+			e.stopPropagation();
+			updateFind();
+		});
+		
+		input.addEventListener('input', e => {
+			if (!isComposing) {
+				e.stopPropagation();
+				updateFind();
+			}
+		});
+		Searcher.appendChild(input);
+		container.prepend(Searcher);
+
 		if (str) {
 			dialog.add(str);
 		}
@@ -1615,7 +1679,7 @@ export class Create {
 			/** @type { HTMLDivElement } */
 			// @ts-ignore
 			const buttons = dialog.content.querySelector(".buttons");
-			const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+			const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay") && item.style.display !== 'none');
 			// 传入初始配置
 			const p = new Pagination({
 				// 数据
@@ -1646,55 +1710,6 @@ export class Create {
 			// 渲染元素
 			p.renderPageDOM();
 		}
-
-		// 搜索框，by Curpond
-		let container = dialog.querySelector(".content-container>.content");
-		let Searcher = ui.create.div(".searcher.caption");
-		let input = document.createElement("input");
-		input.style.textAlign = "center";
-		input.style.border = "solid 2px #294510";
-		input.style.borderRadius = "6px";
-		input.style.fontWeight = "bold";
-		input.style.fontSize = "21px";
-		input.placeholder = "支持正则搜索";
-		let find = ui.create.button(["find", "搜索"], "tdnodes");
-		find.style.display = "inline";
-		let clickfind = function (e) {
-			e.stopPropagation();
-			let value = input.value;
-			if (value == "") {
-				game.alert("搜索不能为空");
-				input.focus();
-				return;
-			}
-			let list = [],
-				reg = new RegExp(value, "g");
-			for (let btn of dialog.buttons) {
-				if (reg.test(get.translation(btn.link)) || reg.test(lib.translate[`${btn.link}_ab`])) {
-					btn.classList.remove("nodisplay");
-				} else {
-					btn.classList.add("nodisplay");
-				}
-			}
-			if (dialog.paginationMaxCount.get("character")) {
-				const buttons = dialog.content.querySelector(".buttons");
-				/** @type { Pagination } */
-				const p = dialog.paginationMap.get(buttons);
-				if (p) {
-					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-					p.state.data = array;
-					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-				}
-			}
-		};
-		input.addEventListener("keydown", e => {
-			if (e.key == "Enter") clickfind(e);
-			e.stopPropagation();
-		});
-		find.listen(clickfind);
-		Searcher.appendChild(input);
-		Searcher.appendChild(find);
-		container.prepend(Searcher);
 
 		return dialog;
 	}
@@ -3302,5 +3317,12 @@ export class Create {
 			_status.cardtag,
 			lib.inpile_nature
 		);
+	}
+	/**
+	 * 创建分页类
+	 * @param {Partial<PaginationState>} options 
+	 */
+	pagination(options) {
+		return new Pagination(options);
 	}
 }
