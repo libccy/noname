@@ -43,6 +43,7 @@ const characterReplaces = {
 	yl_luzhi: ["yl_luzhi", "jsrg_yl_luzhi", "sb_yl_luzhi", "tw_yl_luzhi"],
 	sunliang: ["sunliang", "xin_sunliang"],
 	zhoufei: ["zhoufei", "yue_zhoufei"],
+	lukang: ["lukang", "jsrg_lukang"],
 };
 
 export default characterReplaces;

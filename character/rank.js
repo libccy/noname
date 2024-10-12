@@ -381,6 +381,10 @@ window.noname_character_rank = {
 		"ol_sb_sunjian",
 		"ol_sb_yuanshu",
 		"wangkuang",
+		"jsrg_simaliang",
+		"jsrg_tufashujineng",
+		"jsrg_lukang",
+		"jsrg_malong",
 	],
 	am: [
 		"scl_pangdegong",
@@ -2387,8 +2391,12 @@ window.noname_character_rank = {
 			"ol_sb_yuanshu",
 			"wangkuang",
 			"ol_sb_huaxiong",
+			"jsrg_tufashujineng",
+			"jsrg_lukang",
 		],
 		rare: [
+			"jsrg_simaliang",
+			"jsrg_malong",
 			"re_lvmeng",
 			"re_huaxiong",
 			"xin_quancong",
