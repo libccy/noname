@@ -268,21 +268,21 @@ export default () => {
 			},
 		},
 		aozhanRank: {
-			8: ["gz_panjun"],
+			8: ["gz_ol_lisu", "gz_panjun"],
 			7: ["gz_zhongyan", "gz_yangyan"],
-			6: ["gz_xianglang", "gz_wangyi"],
+			6: ["gz_caoang", "gz_xianglang", "gz_wangyi"],
 			5: ["gz_re_panshu", "gz_lukang", "gz_caoren", "gz_lvfan", "gz_machao", "gz_ganfuren", "gz_madai", "gz_jiling", "gz_pangde", "gz_huangzu"],
 			4: ["gz_caozhen", "gz_re_lidian", "gz_yuejin", "gz_huangzhong", "gz_menghuo", "gz_sunshangxiang", "gz_lvmeng", "gz_lvbu", "gz_xiahouba", "gz_chendao", "gz_tw_tianyu"],
-			3: ["gz_tengyin", "gz_simayi", "gz_luxun", "gz_wuguotai", "gz_caiwenji", "gz_shibao", "gz_xuyou", "gz_zhugeke", "gz_re_nanhualaoxian", "gz_zhouyi"],
-			2: ["gz_maliang", "gz_re_lusu", "gz_zhangzhang", "gz_jin_simashi", "gz_jin_zhangchunhua", "gz_zhugejin"],
+			3: ["gz_mazhong", "gz_tengyin", "gz_simayi", "gz_luxun", "gz_wuguotai", "gz_caiwenji", "gz_shibao", "gz_xuyou", "gz_zhugeke", "gz_re_nanhualaoxian", "gz_zhouyi"],
+			2: ["gz_bulianshi", "gz_maliang", "gz_re_lusu", "gz_zhangzhang", "gz_jin_simashi", "gz_jin_zhangchunhua", "gz_zhugejin"],
 			1: ["gz_caocao", "gz_guojia", "gz_xiahoudun", "gz_xunyu", "gz_caopi", "gz_liubei", "gz_fazheng", "gz_dongzhuo", "gz_yuji", "gz_liqueguosi", "gz_huanggai", "gz_re_xushu", "gz_panjun", "gz_yangxiu"],
 		},
 		guozhanRank: {
 			8: ["gz_xurong", "gz_xunyou", "gz_re_lidian", "gz_caopi", "gz_shamoke", "gz_lifeng", "gz_wangping", "gz_xiaoqiao", "gz_zhoutai", "gz_lvfan", "gz_beimihu", "gz_mateng", "gz_jiaxu", "gz_jin_wangyuanji", "gz_huaxin", "gz_duyu", "gz_zhonghui", "gz_xuyou", "gz_simazhao"],
 			7: ["gz_xianglang", "gz_wangyi", "gz_zhanghe", "gz_jianggan", "gz_simayi", "gz_weiyan", "gz_huangyueying", "gz_zhugeliang", "gz_lingtong", "gz_sunshangxiang", "gz_sunce", "gz_re_yuanshao", "gz_yuanshu", "gz_hetaihou", "gz_jin_simashi", "gz_sp_duyu", "gz_shibao", "gz_gongsunyuan", "gz_panjun", "gz_re_nanhualaoxian", "gz_xin_zhuran", "gz_jin_jiachong", "gz_jin_yanghu"],
-			6: ["gz_tengyin", "gz_wangji", "gz_zhenji", "gz_guojia", "gz_yujin", "gz_jiangwei", "gz_zhangfei", "gz_sp_zhugeliang", "gz_zhouyu", "gz_lingcao", "gz_daqiao", "gz_dingfeng", "gz_yuji", "gz_caiwenji", "gz_diaochan", "gz_zuoci", "gz_key_ushio", "gz_jin_simazhao", "gz_dongzhao", "gz_liuba", "gz_zhouyi", "gz_re_xunchen", "gz_fuwan", "gz_zhugejin", "gz_yangxiu", "gz_yangyan", "gz_tw_tianyu", "gz_yangwan", "gz_wangling"],
-			5: ["gz_re_panshu", "gz_zhangliao", "gz_caocao", "gz_xuhuang", "gz_liushan", "gz_pangtong", "gz_zhaoyun", "gz_re_lusu", "gz_sunquan", "gz_ganning", "gz_zhangxiu", "gz_liqueguosi", "gz_huatuo", "gz_zhanghuyuechen", "gz_re_xushu", "gz_mifangfushiren", "gz_huangzu", "gz_weiguan", "gz_miheng", "gz_wenqin", "gz_zumao", "gz_xuangongzhu", "gz_tw_xiahoushang"],
-			4: ["gz_caozhen", "gz_dianwei", "gz_dengai", "gz_xunyu", "gz_madai", "gz_liubei", "gz_mifuren", "gz_wuguotai", "gz_luxun", "gz_re_taishici", "gz_zhangjiao", "gz_pangde", "gz_liuqi", "gz_jin_zhangchunhua", "gz_zongyu", "gz_shixie", "gz_jin_yanghuiyu", "gz_tangzi", "gz_yanbaihu", "gz_wujing", "gz_zhugeke", "gz_sunchen", "gz_liaohua", "gz_zhongyan", "gz_xinchang", "gz_tw_liufuren"],
+			6: ["gz_caoang", "gz_tengyin", "gz_wangji", "gz_zhenji", "gz_guojia", "gz_yujin", "gz_jiangwei", "gz_zhangfei", "gz_sp_zhugeliang", "gz_zhouyu", "gz_lingcao", "gz_daqiao", "gz_dingfeng", "gz_yuji", "gz_caiwenji", "gz_diaochan", "gz_zuoci", "gz_key_ushio", "gz_jin_simazhao", "gz_dongzhao", "gz_liuba", "gz_zhouyi", "gz_re_xunchen", "gz_fuwan", "gz_zhugejin", "gz_yangxiu", "gz_yangyan", "gz_tw_tianyu", "gz_yangwan", "gz_wangling"],
+			5: ["gz_bulianshi", "gz_re_panshu", "gz_zhangliao", "gz_caocao", "gz_xuhuang", "gz_liushan", "gz_pangtong", "gz_zhaoyun", "gz_re_lusu", "gz_sunquan", "gz_ganning", "gz_zhangxiu", "gz_liqueguosi", "gz_huatuo", "gz_zhanghuyuechen", "gz_re_xushu", "gz_mifangfushiren", "gz_huangzu", "gz_weiguan", "gz_miheng", "gz_wenqin", "gz_zumao", "gz_xuangongzhu", "gz_tw_xiahoushang"],
+			4: ["gz_mazhong", "gz_caozhen", "gz_dianwei", "gz_dengai", "gz_xunyu", "gz_madai", "gz_liubei", "gz_mifuren", "gz_wuguotai", "gz_luxun", "gz_re_taishici", "gz_zhangjiao", "gz_pangde", "gz_liuqi", "gz_jin_zhangchunhua", "gz_zongyu", "gz_shixie", "gz_jin_yanghuiyu", "gz_tangzi", "gz_yanbaihu", "gz_wujing", "gz_zhugeke", "gz_sunchen", "gz_liaohua", "gz_zhongyan", "gz_xinchang", "gz_tw_liufuren"],
 			3: ["gz_maliang", "gz_xiahoudun", "gz_yuejin", "gz_caoren", "gz_machao", "gz_masu", "gz_fazheng", "gz_zhangzhang", "gz_lvmeng", "gz_huanggai", "gz_jiling", "gz_lvbu", "gz_dongzhuo", "gz_jin_xiahouhui", "gz_simazhou", "gz_zhanglu", "gz_chendao", "gz_yangzhi", "gz_old_huaxiong", "gz_gaoshun"],
 			2: ["gz_cuimao", "gz_xiahouyuan", "gz_caohong", "gz_zhurong", "gz_zhurong", "gz_jiangfei", "gz_xusheng", "gz_luyusheng", "gz_sunjian", "gz_zhangren", "gz_kongrong", "gz_yanwen", "gz_jin_simayi", "gz_mengda", "gz_xiahouba"],
 			1: ["gz_zangba", "gz_bianfuren", "gz_xuzhu", "gz_menghuo", "gz_ganfuren", "gz_guanyu", "gz_lukang", "gz_jiangqing", "gz_chendong", "gz_zoushi", "gz_panfeng", "gz_tianfeng", "gz_sufei", "gz_yanyan"],
@@ -311,7 +311,7 @@ export default () => {
 				guozhan_mobile: ["gz_sp_duyu"],
 				guozhan_qunxiong: ["gz_xf_huangquan", "gz_guohuai", "gz_guanqiujian", "gz_zhujun", "gz_chengong", "gz_re_xugong"],
 				guozhan_tw: ["gz_tw_tianyu", "gz_tw_liufuren"],
-				guozhan_others: ["gz_caozhen", "gz_maliang", "gz_re_panshu", "gz_tengyin", "gz_xurong", "gz_xianglang", "gz_zumao", "gz_zhugejin", "gz_zhouyi", "gz_lingcao", "gz_yangxiu", "gz_tw_xiahoushang", "gz_beimihu", "gz_fuwan", "gz_old_huaxiong", "gz_lvlingqi", "gz_yangwan", "gz_chendao", "gz_lifeng", "gz_liaohua", "gz_jianggan", "gz_wangyi", "gz_key_ushio", "gz_re_nanhualaoxian", "gz_re_xusheng"],
+				guozhan_others: ["gz_ol_lisu", "gz_mazhong", "gz_bulianshi", "gz_caoang", "gz_caozhen", "gz_maliang", "gz_re_panshu", "gz_tengyin", "gz_xurong", "gz_xianglang", "gz_zumao", "gz_zhugejin", "gz_zhouyi", "gz_lingcao", "gz_yangxiu", "gz_tw_xiahoushang", "gz_beimihu", "gz_fuwan", "gz_old_huaxiong", "gz_lvlingqi", "gz_yangwan", "gz_chendao", "gz_lifeng", "gz_liaohua", "gz_jianggan", "gz_wangyi", "gz_key_ushio", "gz_re_nanhualaoxian", "gz_re_xusheng"],
 			},
 		},
 		characterPack: {
@@ -333,7 +333,7 @@ export default () => {
 
 				gz_zhonghui: ["male", "ye", 4, ["fakequanji", "fakepaiyi"], ["gzskin"]],
 				gz_simazhao: ["male", "ye", 3, ["gzzhaoxin", "gzsuzhi"], ["gzskin"]],
-				gz_gongsunyuan: ["male", "ye", 4, ["gzrehuaiyi", "gzrezisui"], ["gzskin"]],
+				gz_gongsunyuan: ["male", "ye", 4, ["gzhuaiyi", "gzzisui"], ["gzskin"]], //致敬存活一年的传奇野心家公孙瓒
 				gz_sunchen: ["male", "ye", 4, ["fakeshilu", "fakexiongnve"]],
 				gz_tangzi: ["male", "wu", 4, ["gzxingzhao"], ["doublegroup:wei:wu", "gzskin"]],
 				gz_mengda: ["male", "wei", 4, ["qiuan", "liangfan"], ["doublegroup:wei:shu"]],
@@ -363,6 +363,10 @@ export default () => {
 				gz_re_panshu: ["female", "wu", 3, ["zhiren", "gzyaner"]],
 				gz_maliang: ["male", "shu", 3, ["xiemu", "naman"], ["die:old_maliang"]],
 				gz_caozhen: ["male", "wei", 4, ["gzsidi"]],
+				gz_caoang: ["male", "wei", 4, ["kaikang"]],
+				gz_bulianshi: ["female", "wu", 3, ["old_anxu", "zhuiyi"]],
+				gz_mazhong: ["male", "shu", 4, ["twfuman"]],
+				gz_ol_lisu: ["male", "qun", 3, ["qiaoyan", "xianzhu"]],
 
 				gz_caocao: ["male", "wei", 4, ["rejianxiong_old"]],
 				gz_simayi: ["male", "wei", 3, ["fankui", "guicai"]],
@@ -394,7 +398,7 @@ export default () => {
 				gz_liushan: ["male", "shu", 3, ["xiangle", "fangquan"]],
 				gz_menghuo: ["male", "shu", 4, ["huoshou", "rezaiqi"]],
 				gz_zhurong: ["female", "shu", 4, ["juxiang", "lieren"]],
-				gz_ganfuren: ["female", "shu", 3, ["new_shushen", "shenzhi"], ["gzskin"]],
+				gz_ganfuren: ["female", "shu", 3, ["gzshushen_new", "shenzhi"], ["gzskin"]],
 				gz_yuji: ["male", "qun", 3, ["qianhuan"], ["gzskin"]],
 
 				gz_sunquan: ["male", "wu", 4, ["gzzhiheng"]],
@@ -403,7 +407,7 @@ export default () => {
 				gz_huanggai: ["male", "wu", 4, ["new_kurou"]],
 				gz_zhouyu: ["male", "wu", 3, ["reyingzi", "refanjian"], ["gzskin"]],
 				gz_daqiao: ["female", "wu", 3, ["guose", "liuli"]],
-				gz_luxun: ["male", "wu", 3, ["gzqianxun", "fakeduoshi"], ["gzskin"]],
+				gz_luxun: ["male", "wu", 3, ["gzqianxun", "gzduoshi"], ["gzskin"]],
 				gz_sunshangxiang: ["female", "wu", 3, ["jieyin", "gzxiaoji"], ["gzskin"]],
 				gz_sunjian: ["male", "wu", 5, ["yinghun"], ["gzskin"]],
 				gz_xiaoqiao: ["female", "wu", 3, ["gztianxiang", "gzhongyan"], ["gzskin"]],
@@ -433,14 +437,14 @@ export default () => {
 				gz_caohong: ["male", "wei", 4, ["fakehuyuan", "heyi"], ["gzskin"]],
 				gz_jiangfei: ["male", "shu", 3, ["shengxi", "gzshoucheng"]],
 				gz_jiangwei: ["male", "shu", 4, ["tiaoxin", "yizhi", "tianfu"], ["gzskin"]],
-				gz_xusheng: ["male", "wu", 4, ["fakeyicheng"], ["gzskin"]],
+				gz_xusheng: ["male", "wu", 4, ["gzyicheng_new"], ["gzskin"]],
 				//沟槽线上就使劲薅你的(A+C)/2大宝吧，我没意见（有也没用）
 				gz_re_xusheng: ["male", "wu", 4, ["repojun"]],
 				gz_jiangqing: ["male", "wu", 4, ["gzshangyi", "niaoxiang"]],
 				gz_hetaihou: ["female", "qun", 3, ["zhendu", "qiluan"], ["gzskin"]],
 
 				gz_re_lidian: ["male", "wei", 3, ["xunxun", "wangxi"]],
-				gz_zangba: ["male", "wei", 4, ["rehengjiang"]],
+				gz_zangba: ["male", "wei", 4, ["gzhengjiang"]],
 				gz_madai: ["male", "shu", 4, ["mashu", "qianxi"], ["gzskin"]],
 				gz_mifuren: ["female", "shu", 3, ["gzguixiu", "gzcunsi"]],
 				gz_sunce: ["male", "wu", 4, ["jiang", "yingyang", "baka_hunshang"], ["gzskin"]],
@@ -457,7 +461,7 @@ export default () => {
 				gz_bianfuren: ["female", "wei", 3, ["wanwei", "gzyuejian"], ["die:ol_bianfuren"]],
 				gz_xunyou: ["male", "wei", 3, ["gzqice", "zhiyu"], ["gzskin"]],
 				gz_lingtong: ["male", "wu", 4, ["xuanlve", "yongjin"], ["gzskin"]],
-				gz_lvfan: ["male", "wu", 3, ["gzdiaodu", "gzdiancai"]],
+				gz_lvfan: ["male", "wu", 3, ["xindiaodu", "gzdiancai"]],
 				gz_masu: ["male", "shu", 3, ["gzsanyao", "gzzhiman"], ["gzskin"]],
 				gz_shamoke: ["male", "shu", 4, ["gzjili"], ["gzskin"]],
 
@@ -1238,6 +1242,118 @@ export default () => {
 						charlotte: true,
 						onremove(player, skill) {
 							player.enableSkill(skill);
+						},
+					},
+				},
+			},
+			//甘夫人
+			gzshushen_new: {
+				audio: "shushen",
+				trigger: { player: "recoverEnd" },
+				getIndex: event => event.num || 1,
+				preHidden: true,
+				async cost(event, trigger, player) {
+					event.result = await player
+						.chooseTarget(get.prompt2("gzshushen_new"), lib.filter.notMe)
+						.set("ai", target => {
+							const player = get.player();
+							return get.effect(target, { name: "draw" }, player, player) * (1 + !Boolean(target.countCards("h")));
+						})
+						.setHiddenSkill("gzshushen_new")
+						.forResult();
+				},
+				content() {
+					event.targets[0].draw(Boolean(event.targets[0].countCards("h")) ? 1 : 2);
+				},
+				ai: {
+					threaten: 0.8,
+					expose: 0.1,
+				},
+			},
+			//徐盛
+			gzyicheng_new: {
+				audio: "yicheng",
+				inherit: "yicheng",
+				trigger: { global: ["useCardToPlayered", "useCardToTargeted"] },
+				filter(event, player, name) {
+					const bool = name === "seCardToPlayered";
+					if (bool && !event.isFirstTarget) return false;
+					return event.card.name == "sha" && event[bool ? "player" : "target"].isFriendOf(player);
+				},
+				logTarget(event, player, name) {
+					return event[name === "seCardToPlayered" ? "player" : "target"];
+				},
+			},
+			//陆逊
+			gzduoshi: {
+				audio: "duoshi",
+				trigger: { player: "phaseUseBegin" },
+				filter(event, player) {
+					return player.hasUseTarget(new lib.element.VCard({ name: "yiyi" }));
+				},
+				direct: true,
+				content() {
+					player.chooseUseTarget(get.prompt2(event.name), new lib.element.VCard({ name: "yiyi" }), false).logSkill = event.name;
+				},
+			},
+			//臧霸
+			gzhengjiang: {
+				audio: "hengjiang",
+				trigger: { player: "damageEnd" },
+				preHidden: true,
+				check(event, player) {
+					return get.attitude(player, _status.currentPhase) < 0 || !_status.currentPhase.needsToDiscard(2);
+				},
+				filter(event) {
+					return _status.currentPhase && _status.currentPhase.isIn() && event.num > 0;
+				},
+				logTarget() {
+					return _status.currentPhase;
+				},
+				content() {
+					const source = _status.currentPhase;
+					const num = Math.max(source.countVCards("e"), 1);
+					if (source.hasSkill("gzhengjiang_effect")) {
+						source.storage.gzhengjiang_effect += num;
+						source.storage.gzhengjiang3.add(player);
+						source.updateMarks();
+					} else {
+						source.storage.gzhengjiang3 = [player];
+						source.storage.gzhengjiang_effect = num;
+						source.addTempSkill("gzhengjiang_effect");
+					}
+				},
+				ai: { maixie_defend: true },
+				subSkill: {
+					effect: {
+						mark: true,
+						charlotte: true,
+						intro: { content: "手牌上限-#" },
+						mod: {
+							maxHandcard(player, num) {
+								return num - player.storage.gzhengjiang_effect;
+							},
+						},
+						onremove(player) {
+							delete player.storage.gzhengjiang_effect;
+							delete player.storage.gzhengjiang3;
+						},
+						trigger: { player: "phaseDiscardEnd" },
+						filter(event, player) {
+							if (event.cards?.length) return false;
+							return player.storage.gzhengjiang3.some(target => target?.isIn() && target.countCards("h") < target.maxHp);
+						},
+						forced: true,
+						popup: false,
+						async content(event, trigger, player) {
+							const players = player.storage.gzhengjiang3;
+							for (var i = 0; i < players.length; i++) {
+								const target = players[i];
+								if (target.isIn() && target.countCards("h") < target.maxHp) {
+									target.logSkill("gzhengjiang", player);
+									await target.drawTo(target.maxHp);
+								}
+							}
 						},
 					},
 				},
@@ -18090,9 +18206,9 @@ export default () => {
 				logTarget: "target",
 				content: function () {
 					"step 0";
-					trigger.target.draw();
+					event.targets[0].draw();
 					"step 1";
-					trigger.target.chooseToDiscard("he", true);
+					event.targets[0].chooseToDiscard("he", true);
 				},
 			},
 			gzjixi: {
@@ -21247,6 +21363,15 @@ export default () => {
 			gzyaner_info: "每回合限一次，其他角色于其出牌阶段内失去最后的手牌后，你可以与其各摸一张牌。",
 			gzsidi: "司敌",
 			gzsidi_info: "①一名与你势力相同的角色受到伤害后，你可以将一张与武将牌上的“驭”类别均不同的一张牌称为“驭”置于武将牌上。②与你势力不同的角色的回合开始时，你可以移去至多三张“驭”，然后选择执行等量项：⒈选择移去“驭”中的一个类别，令其本回合无法使用此类别的牌。⒉选择其一个已明置武将牌上的一个技能，令此技能于本回合失效。⒊选择一名与你势力相同的已受伤其他角色，令其回复1点体力。",
+			gz_ol_lisu: "李肃",
+			gzshushen_new: "淑慎",
+			gzshushen_new_info: "当你回复1点体力后，你可令一名其他角色摸一张牌（若其没有手牌则改为摸两张牌）。",
+			gzyicheng_new: "疑城",
+			gzyicheng_new_info: "与你势力相同的角色使用【杀】指定第一个目标后或成为【杀】的目标后，你可以令其摸一张牌，然后其弃置一张牌。",
+			gzduoshi: "度势",
+			gzduoshi_info: "出牌阶段开始时，你可以视为使用【以逸待劳】。",
+			gzhengjiang: "横江",
+			gzhengjiang_info: "当你受到伤害后，你可以令当前回合角色本回合的手牌上限-X（X为其装备区牌数且至少为1）。然后其本回合弃牌阶段结束时，若其未于此阶段弃牌，则你将手牌摸至体力上限。",
 
 			guozhan_default: "国战标准",
 			guozhan_zhen: "君临天下·阵",
