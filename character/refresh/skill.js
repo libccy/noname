@@ -5324,8 +5324,8 @@ const skills = {
 			targets[0].swapHandcards(targets[1]);
 			var num = Math.abs(targets[0].countCards("h") - targets[1].countCards("h"));
 			if (num > 0) {
-				player.addMark("oldimeng_discard", num, false);
 				player.addTempSkill("oldimeng_discard", "phaseUseAfter");
+				player.markAuto("oldimeng_discard", [targets]);
 			}
 		},
 		ai: {
@@ -5355,8 +5355,12 @@ const skills = {
 				filter: function (event, player) {
 					return player.countCards("he") > 0;
 				},
-				content: function () {
-					player.chooseToDiscard("he", true, player.countMark("oldimeng_discard"));
+				async content(event, trigger, player) {
+					for (let targets of player.getStorage("oldimeng_discard")) {
+						if (targets.length < 2) continue;
+						const num = Math.abs(targets[0].countCards("h") - targets[1].countCards("h"));
+						if (num > 0 && player.countCards("he") > 0) await player.chooseToDiscard("he", true, num);
+					}
 				},
 			},
 		},
