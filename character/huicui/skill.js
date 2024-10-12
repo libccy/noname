@@ -6765,6 +6765,7 @@ const skills = {
 		filter: function (event, player) {
 			return event.player != player && (get.type(event.card) == "trick" || event.card.name == "sha") && player.countCards("he") > 1;
 		},
+		preHidden: true,
 		async cost(event, trigger, player) {
 			const str = "，若重铸的牌中没有" + get.translation(get.type2(trigger.card)) + "牌，你于" + get.translation(trigger.cards) + "进入弃牌堆后获得之";
 			event.result = await player

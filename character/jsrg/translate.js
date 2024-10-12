@@ -511,7 +511,7 @@ const translates = {
 	jsrgzhuwei: "筑围",
 	jsrgzhuwei_info: "出牌阶段限一次，你可以移动场上的一张装备牌，然后你可以令一名攻击范围内因此没有角色的角色失去2点体力。",
 	jsrgkuangjian: "匡谏",
-	jsrgkuangjian_info: "你可以将一张装备牌当作任意锦囊牌使用（无次数限制但不可指定自己为目标），然后目标角色使用此装备牌。",
+	jsrgkuangjian_info: "你可以将一张装备牌当作任意基本牌使用（无次数限制但不可指定自己为目标），然后目标角色使用此装备牌。",
 	jsrg_malong: "兴马隆",
 	jsrg_malong_prefix: "兴",
 	jsrgfennan: "奋难",
