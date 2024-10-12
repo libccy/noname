@@ -96,6 +96,9 @@ const characters = {
 	zhangling: ["male", "qun", 3, ["zlhuji", "zlshoufu"]],
 	caiyang: ["male", "qun", 1, ["yinka", "zhuixi"], ["forbidai", "unseen"]],
 	sunshao: ["male", "wu", 3, ["bizheng", "yidian"]],
+	mifuren: ["female", "shu", 3, ["guixiu", "cunsi"], ["name:糜|null", "unseen"]],
+	zoushi: ["female", "qun", 3, ["huoshui", "qincheng"], ["name:邹|null", "unseen"]],
+	zhangren: ["male", "qun", 4, ["chuanxin", "zfengshi"], ["unseen"]],
 
 	huangfusong: ["male", "qun", 4, ["fenyue"], ["name:皇甫|嵩"]],
 	yuantanyuanshang: ["male", "qun", 4, ["neifa"], ["name:袁|谭-袁|尚"]],
@@ -176,7 +179,6 @@ const characters = {
 	dingfeng: ["male", "wu", 4, ["reduanbing", "refenxun"]],
 	shamoke: ["male", "shu", 4, ["gzjili"]],
 
-	//zhangren: ["male", "qun", 4, ["chuanxin", "zfengshi"]],
 
 	wangyun: ["male", "qun", 4, ["xinlianji", "xinmoucheng"], ["clan:太原王氏"]],
 	sunqian: ["male", "shu", 3, ["qianya", "shuimeng"]],

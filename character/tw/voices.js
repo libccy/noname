@@ -283,7 +283,6 @@ export default {
 	"#zhangming2": "从今始学，成为有用之才！",
 	"#shengxi_feiyi1": "利治小之宜，秉居静之理。",
 	"#shengxi_feiyi2": "外却骆谷之师，内保宁缉之实。",
-	"#tw_bianfuren:die": "心肝涂地，惊愕断绝……",
 	"#twzhengjian1": "修建未成，皆因尔等懈怠。",
 	"#twzhengjian2": "哼！何故建田不成！",
 	"#twzhongchi1": "陛下，兴已知错。",

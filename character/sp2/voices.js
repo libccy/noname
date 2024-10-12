@@ -193,7 +193,6 @@ export default {
 	"#rehuoshui2": "别走了，再玩一会儿嘛。",
 	"#reqingcheng1": "我和你们真是投缘呐。",
 	"#reqingcheng2": "哼，眼睛都直了呀。",
-	"#re_zoushi:die": "年老色衰了吗？",
 	"#koulve1": "兵强马壮，时出寇略。",
 	"#koulve2": "饥则寇略，饱则弃馀。",
 	"#qljsuiren1": "就交给你了。",

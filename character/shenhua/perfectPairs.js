@@ -12,4 +12,5 @@ export default {
 	wangping: ["jiangfei"],
 	jiangwei: ["xiahouba"],
 	guanqiujian: ["wenqin"],
+	dongzhuo: ["liru", "dongbai", "xurong"],
 };
