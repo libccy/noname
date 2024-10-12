@@ -58,7 +58,7 @@ const characters = {
 	xin_liru: ["male", "qun", 3, ["xinjuece", "xinmieji", "xinfencheng"]],
 
 	guohuanghou: ["female", "wei", 3, ["jiaozhao", "danxin"], ["name:郭|null"]],
-	liuyu: ["male", "qun", 2, ["xinzhige", "xinzongzuo"]],
+	liuyu: ["male", "qun", 2, ["zhige", "zongzuo", "twchongwang"], ["zhu"]],
 	liyan: ["male", "shu", 3, ["dcduliang", "fulin"]],
 	sundeng: ["male", "wu", 4, ["kuangbi"]],
 
