@@ -18004,7 +18004,7 @@ const skills = {
 							return (
 								current.isIn() &&
 								!current.hasHistory("damage", function (evt) {
-									return evt._dyinged && evt.card == event.card;
+									return evt._dyinged && evt.card == trigger.card;
 								})
 							);
 						})

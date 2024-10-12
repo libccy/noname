@@ -44,7 +44,7 @@ const characters = {
 	re_nanhualaoxian: ["male", "qun", 4, ["gongxiu", "jinghe"], ["name:庄|周"]],
 	dufuren: ["female", "wei", 3, ["yise", "shunshi"], ["name:杜|null"]],
 	caoanmin: ["male", "wei", 4, ["xianwei"]],
-	re_zoushi: ["female", "qun", 3, ["rehuoshui", "reqingcheng"], ["name:邹|null"]],
+	re_zoushi: ["female", "qun", 3, ["rehuoshui", "reqingcheng"], ["name:邹|null", "die:zoushi"]],
 	qiuliju: ["male", "qun", "4/6", ["koulve", "qljsuiren"]],
 	re_hucheer: ["male", "qun", 4, ["redaoji", "fuzhong"]],
 	re_dongcheng: ["male", "qun", 4, ["xuezhao"]],

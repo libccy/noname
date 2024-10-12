@@ -1,5 +1,4 @@
 const characters = {
-	yj_lvbu: ["male", "qun", 4, ["wushuang", "yjqingjiao"], ["zhu"]],
 	yy_quyi: ["male", "qun", 4, ["yyfuqi", "jiaozi"], ["die:quyi"]],
 	yy_gongsunzan: ["male", "qun", 4, ["yyqizhen", "yicong", "yymujun"], ["zhu"]],
 	yy_wenchou: ["male", "qun", 4, ["yyxuezhan", "yyyazhen"]],
