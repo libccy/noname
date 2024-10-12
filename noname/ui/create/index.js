@@ -1561,7 +1561,6 @@ export class Create {
 		const restoreState = btn => {
 			if (btn.style.display == 'none') {
 				btn.style.display = '';
-				// btn.classList.remove("nodisplay");
 			}
 		};
 		const updateFind = () => {
@@ -1580,11 +1579,7 @@ export class Create {
 				restoreState(btn);
 				if (value.length > 0) {
 					if (!data.includes(btn)) {
-						// btn.classList.add("nodisplay");
 						btn.style.display = 'none';
-					}
-					else {
-						// btn.classList.remove("nodisplay");
 					}
 				}
 			}
