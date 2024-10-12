@@ -464,9 +464,16 @@ const characters = {
 	jsrg_simazhao: {
 		sex: "male",
 		group: "wei",
-		groupBorder: "jin",
 		hp: 4,
 		skills: ["jsrgqiantun", "jsrgxiezheng", "jsrgzhaoxiong"],
+		names: "司马|昭",
+	},
+	jin_jsrg_simazhao: {
+		sex: "male",
+		group: "jin",
+		isZhugong: true,
+		hp: 4,
+		skills: ["jsrgweisi", "jsrgxiezheng", "jsrgdangyi"],
 		names: "司马|昭",
 	},
 	jsrg_dengai: {
