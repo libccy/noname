@@ -11842,7 +11842,7 @@ const skills = {
 			}
 			player.chooseTarget("雷击：是否对一名角色造成" + event.num + "点雷电伤害？").set("ai", target => {
 				const player = _status.event.player;
-				let eff = get.damageEffect(target, player, player, "thunder");
+				let eff = get.damageEffect(target, player, target, "thunder");
 				if (get.event("num") > 1 && !target.hasSkillTag("filterDamage", null, {
 					player: player,
 					card: null,
@@ -11851,7 +11851,7 @@ const skills = {
 					if (eff > 0) eff -= 25;
 					else if (eff < 0) eff *= 2;
 				}
-				return eff;
+				return eff * get.attitude(player, target);
 			}).set("num", event.num);
 			"step 1";
 			if (result.bool && result.targets && result.targets.length) {
