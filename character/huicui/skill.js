@@ -6774,6 +6774,7 @@ const skills = {
 					if (get.type2(card) == _status.event.type) val += 0.5;
 					return 6 - val;
 				})
+				.setHiddenSkill("dcqianzhen")
 				.set("type", get.type2(trigger.card))
 				.forResult();
 		},

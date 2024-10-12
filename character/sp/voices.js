@@ -520,7 +520,7 @@ export default {
 	"#zishu2": "身外之物，不要也罢！",
 	"#yingyuan1": "接好嘞！",
 	"#yingyuan2": "好牌只用一次怎么够？",
-	"#maliang:die": "皇叔为何不听我之言？",
+	"#maliang:die": "我的使命……完成了吗……",
 	"#gongao1": "恪尽职守，忠心事主。",
 	"#gongao2": "攻城拔寨，建功立业。",
 	"#juyi1": "司马氏篡权，我当替天伐之！",

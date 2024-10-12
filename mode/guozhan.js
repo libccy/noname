@@ -15,7 +15,7 @@ export default () => {
 				lib.character[i] = lib.characterPack.mode_guozhan[i];
 				if (!lib.translate["#" + i + ":die"] && !lib.character[i].dieAudios?.length) {
 					let list = lib.character?.[i.slice(3)]?.dieAudios;
-					lib.character[i].dieAudios = list?.length? list: [i.slice(3)];
+					lib.character[i].dieAudios = list?.length ? list : [i.slice(3)];
 				}
 				if (!lib.translate[i]) {
 					lib.translate[i] = lib.translate[i.slice(3)];
@@ -33,7 +33,7 @@ export default () => {
 				lib.character[i] = pack[i];
 				if (!lib.translate["#" + i + ":die"] && !lib.character[i].dieAudios?.length) {
 					let list = lib.character?.[i.slice(3)]?.dieAudios;
-					lib.character[i].dieAudios = list?.length? list: [i.slice(3)];
+					lib.character[i].dieAudios = list?.length ? list : [i.slice(3)];
 				}
 				if (!lib.translate[i]) {
 					lib.translate[i] = lib.translate[i.slice(3)];
@@ -83,7 +83,7 @@ export default () => {
 							lib.characterPack.mode_guozhan[i] = pack[i];
 							if (!lib.translate["#" + i + ":die"] && !lib.character[i].dieAudios?.length) {
 								let list = lib.character?.[i.slice(3)]?.dieAudios;
-								lib.character[i].dieAudios = list?.length? list: [i.slice(3)];
+								lib.character[i].dieAudios = list?.length ? list : [i.slice(3)];
 							}
 							if (!lib.translate[i]) lib.translate[i] = lib.translate[i.slice(3)];
 						}
@@ -146,7 +146,7 @@ export default () => {
 							lib.character[i] = pack[i];
 							if (!lib.translate["#" + i + ":die"] && !lib.character[i].dieAudios?.length) {
 								let list = lib.character?.[i.slice(3)]?.dieAudios;
-								lib.character[i].dieAudios = list?.length? list: [i.slice(3)];
+								lib.character[i].dieAudios = list?.length ? list : [i.slice(3)];
 							}
 							if (!lib.translate[i]) {
 								lib.translate[i] = lib.translate[i.slice(3)];
@@ -270,20 +270,20 @@ export default () => {
 		aozhanRank: {
 			8: ["gz_panjun"],
 			7: ["gz_zhongyan", "gz_yangyan"],
-			6: ["gz_wangyi"],
-			5: ["gz_lukang", "gz_caoren", "gz_lvfan", "gz_machao", "gz_ganfuren", "gz_madai", "gz_jiling", "gz_pangde", "gz_huangzu"],
-			4: ["gz_re_lidian", "gz_yuejin", "gz_huangzhong", "gz_menghuo", "gz_sunshangxiang", "gz_lvmeng", "gz_lvbu", "gz_xiahouba", "gz_chendao", "gz_tw_tianyu"],
-			3: ["gz_simayi", "gz_luxun", "gz_wuguotai", "gz_caiwenji", "gz_shibao", "gz_xuyou", "gz_zhugeke", "gz_re_nanhualaoxian", "gz_zhouyi"],
-			2: ["gz_re_lusu", "gz_zhangzhang", "gz_jin_simashi", "gz_jin_zhangchunhua", "gz_zhugejin"],
+			6: ["gz_xianglang", "gz_wangyi"],
+			5: ["gz_re_panshu", "gz_lukang", "gz_caoren", "gz_lvfan", "gz_machao", "gz_ganfuren", "gz_madai", "gz_jiling", "gz_pangde", "gz_huangzu"],
+			4: ["gz_caozhen", "gz_re_lidian", "gz_yuejin", "gz_huangzhong", "gz_menghuo", "gz_sunshangxiang", "gz_lvmeng", "gz_lvbu", "gz_xiahouba", "gz_chendao", "gz_tw_tianyu"],
+			3: ["gz_tengyin", "gz_simayi", "gz_luxun", "gz_wuguotai", "gz_caiwenji", "gz_shibao", "gz_xuyou", "gz_zhugeke", "gz_re_nanhualaoxian", "gz_zhouyi"],
+			2: ["gz_maliang", "gz_re_lusu", "gz_zhangzhang", "gz_jin_simashi", "gz_jin_zhangchunhua", "gz_zhugejin"],
 			1: ["gz_caocao", "gz_guojia", "gz_xiahoudun", "gz_xunyu", "gz_caopi", "gz_liubei", "gz_fazheng", "gz_dongzhuo", "gz_yuji", "gz_liqueguosi", "gz_huanggai", "gz_re_xushu", "gz_panjun", "gz_yangxiu"],
 		},
 		guozhanRank: {
-			8: ["gz_xunyou", "gz_re_lidian", "gz_caopi", "gz_shamoke", "gz_lifeng", "gz_wangping", "gz_xiaoqiao", "gz_zhoutai", "gz_lvfan", "gz_beimihu", "gz_mateng", "gz_jiaxu", "gz_jin_wangyuanji", "gz_huaxin", "gz_duyu", "gz_zhonghui", "gz_xuyou", "gz_simazhao"],
-			7: ["gz_wangyi", "gz_zhanghe", "gz_jianggan", "gz_simayi", "gz_weiyan", "gz_huangyueying", "gz_zhugeliang", "gz_lingtong", "gz_sunshangxiang", "gz_sunce", "gz_re_yuanshao", "gz_yuanshu", "gz_hetaihou", "gz_jin_simashi", "gz_sp_duyu", "gz_shibao", "gz_gongsunyuan", "gz_panjun", "gz_re_nanhualaoxian", "gz_wangji", "gz_xin_zhuran", "gz_jin_jiachong", "gz_jin_yanghu"],
-			6: ["gz_zhenji", "gz_guojia", "gz_yujin", "gz_jiangwei", "gz_zhangfei", "gz_sp_zhugeliang", "gz_zhouyu", "gz_lingcao", "gz_daqiao", "gz_dingfeng", "gz_yuji", "gz_caiwenji", "gz_diaochan", "gz_zuoci", "gz_key_ushio", "gz_jin_simazhao", "gz_dongzhao", "gz_liuba", "gz_zhouyi", "gz_re_xunchen", "gz_fuwan", "gz_zhugejin", "gz_yangxiu", "gz_yangyan", "gz_tw_tianyu", "gz_yangwan", "gz_wangling"],
-			5: ["gz_zhangliao", "gz_caocao", "gz_xuhuang", "gz_liushan", "gz_pangtong", "gz_zhaoyun", "gz_re_lusu", "gz_sunquan", "gz_ganning", "gz_zhangxiu", "gz_liqueguosi", "gz_huatuo", "gz_zhanghuyuechen", "gz_re_xushu", "gz_mifangfushiren", "gz_huangzu", "gz_weiguan", "gz_miheng", "gz_wenqin", "gz_zumao", "gz_xuangongzhu", "gz_tw_xiahoushang"],
-			4: ["gz_dianwei", "gz_dengai", "gz_xunyu", "gz_madai", "gz_liubei", "gz_mifuren", "gz_wuguotai", "gz_luxun", "gz_re_taishici", "gz_zhangjiao", "gz_pangde", "gz_liuqi", "gz_jin_zhangchunhua", "gz_zongyu", "gz_shixie", "gz_jin_yanghuiyu", "gz_tangzi", "gz_yanbaihu", "gz_wujing", "gz_zhugeke", "gz_sunchen", "gz_liaohua", "gz_zhongyan", "gz_xinchang", "gz_tw_liufuren"],
-			3: ["gz_xiahoudun", "gz_yuejin", "gz_caoren", "gz_machao", "gz_masu", "gz_fazheng", "gz_zhangzhang", "gz_lvmeng", "gz_huanggai", "gz_jiling", "gz_lvbu", "gz_dongzhuo", "gz_jin_xiahouhui", "gz_simazhou", "gz_zhanglu", "gz_chendao", "gz_yangzhi", "gz_old_huaxiong", "gz_gaoshun"],
+			8: ["gz_xurong", "gz_xunyou", "gz_re_lidian", "gz_caopi", "gz_shamoke", "gz_lifeng", "gz_wangping", "gz_xiaoqiao", "gz_zhoutai", "gz_lvfan", "gz_beimihu", "gz_mateng", "gz_jiaxu", "gz_jin_wangyuanji", "gz_huaxin", "gz_duyu", "gz_zhonghui", "gz_xuyou", "gz_simazhao"],
+			7: ["gz_xianglang", "gz_wangyi", "gz_zhanghe", "gz_jianggan", "gz_simayi", "gz_weiyan", "gz_huangyueying", "gz_zhugeliang", "gz_lingtong", "gz_sunshangxiang", "gz_sunce", "gz_re_yuanshao", "gz_yuanshu", "gz_hetaihou", "gz_jin_simashi", "gz_sp_duyu", "gz_shibao", "gz_gongsunyuan", "gz_panjun", "gz_re_nanhualaoxian", "gz_xin_zhuran", "gz_jin_jiachong", "gz_jin_yanghu"],
+			6: ["gz_tengyin", "gz_wangji", "gz_zhenji", "gz_guojia", "gz_yujin", "gz_jiangwei", "gz_zhangfei", "gz_sp_zhugeliang", "gz_zhouyu", "gz_lingcao", "gz_daqiao", "gz_dingfeng", "gz_yuji", "gz_caiwenji", "gz_diaochan", "gz_zuoci", "gz_key_ushio", "gz_jin_simazhao", "gz_dongzhao", "gz_liuba", "gz_zhouyi", "gz_re_xunchen", "gz_fuwan", "gz_zhugejin", "gz_yangxiu", "gz_yangyan", "gz_tw_tianyu", "gz_yangwan", "gz_wangling"],
+			5: ["gz_re_panshu", "gz_zhangliao", "gz_caocao", "gz_xuhuang", "gz_liushan", "gz_pangtong", "gz_zhaoyun", "gz_re_lusu", "gz_sunquan", "gz_ganning", "gz_zhangxiu", "gz_liqueguosi", "gz_huatuo", "gz_zhanghuyuechen", "gz_re_xushu", "gz_mifangfushiren", "gz_huangzu", "gz_weiguan", "gz_miheng", "gz_wenqin", "gz_zumao", "gz_xuangongzhu", "gz_tw_xiahoushang"],
+			4: ["gz_caozhen", "gz_dianwei", "gz_dengai", "gz_xunyu", "gz_madai", "gz_liubei", "gz_mifuren", "gz_wuguotai", "gz_luxun", "gz_re_taishici", "gz_zhangjiao", "gz_pangde", "gz_liuqi", "gz_jin_zhangchunhua", "gz_zongyu", "gz_shixie", "gz_jin_yanghuiyu", "gz_tangzi", "gz_yanbaihu", "gz_wujing", "gz_zhugeke", "gz_sunchen", "gz_liaohua", "gz_zhongyan", "gz_xinchang", "gz_tw_liufuren"],
+			3: ["gz_maliang", "gz_xiahoudun", "gz_yuejin", "gz_caoren", "gz_machao", "gz_masu", "gz_fazheng", "gz_zhangzhang", "gz_lvmeng", "gz_huanggai", "gz_jiling", "gz_lvbu", "gz_dongzhuo", "gz_jin_xiahouhui", "gz_simazhou", "gz_zhanglu", "gz_chendao", "gz_yangzhi", "gz_old_huaxiong", "gz_gaoshun"],
 			2: ["gz_cuimao", "gz_xiahouyuan", "gz_caohong", "gz_zhurong", "gz_zhurong", "gz_jiangfei", "gz_xusheng", "gz_luyusheng", "gz_sunjian", "gz_zhangren", "gz_kongrong", "gz_yanwen", "gz_jin_simayi", "gz_mengda", "gz_xiahouba"],
 			1: ["gz_zangba", "gz_bianfuren", "gz_xuzhu", "gz_menghuo", "gz_ganfuren", "gz_guanyu", "gz_lukang", "gz_jiangqing", "gz_chendong", "gz_zoushi", "gz_panfeng", "gz_tianfeng", "gz_sufei", "gz_yanyan"],
 		},
@@ -311,7 +311,7 @@ export default () => {
 				guozhan_mobile: ["gz_sp_duyu"],
 				guozhan_qunxiong: ["gz_xf_huangquan", "gz_guohuai", "gz_guanqiujian", "gz_zhujun", "gz_chengong", "gz_re_xugong"],
 				guozhan_tw: ["gz_tw_tianyu", "gz_tw_liufuren"],
-				guozhan_others: ["gz_zumao", "gz_zhugejin", "gz_zhouyi", "gz_lingcao", "gz_yangxiu", "gz_tw_xiahoushang", "gz_beimihu", "gz_fuwan", "gz_old_huaxiong", "gz_lvlingqi", "gz_yangwan", "gz_chendao", "gz_lifeng", "gz_liaohua", "gz_jianggan", "gz_wangyi", "gz_key_ushio", "gz_re_nanhualaoxian", "gz_re_xusheng"],
+				guozhan_others: ["gz_caozhen", "gz_maliang", "gz_re_panshu", "gz_tengyin", "gz_xurong", "gz_xianglang", "gz_zumao", "gz_zhugejin", "gz_zhouyi", "gz_lingcao", "gz_yangxiu", "gz_tw_xiahoushang", "gz_beimihu", "gz_fuwan", "gz_old_huaxiong", "gz_lvlingqi", "gz_yangwan", "gz_chendao", "gz_lifeng", "gz_liaohua", "gz_jianggan", "gz_wangyi", "gz_key_ushio", "gz_re_nanhualaoxian", "gz_re_xusheng"],
 			},
 		},
 		characterPack: {
@@ -356,6 +356,13 @@ export default () => {
 				gz_pengyang: ["male", "shu", 3, ["gztongling", "gzjinyu"], ["doublegroup:shu:qun", "gzskin"]],
 				gz_zhuling: ["male", "wei", 4, ["gzjuejue", "gzfangyuan"], ["gzskin"]],
 				gz_wangyi: ["male", "wei", 3, ["zhenlie", "miji"]],
+				gz_wangji: ["male", "wei", 3, ["gzqizhi", "gzjinqu"]],
+				gz_xurong: ["male", "qun", 4, ["gzxionghuo"]],
+				gz_xianglang: ["male", "shu", 3, ["gzkanji", "dcqianzheng"]],
+				gz_tengyin: ["male", "wu", 3, ["gzchenjian", "gzxixiu"]],
+				gz_re_panshu: ["female", "wu", 3, ["zhiren", "gzyaner"]],
+				gz_maliang: ["male", "shu", 3, ["xiemu", "naman"], ["die:old_maliang"]],
+				gz_caozhen: ["male", "wei", 4, ["gzsidi"]],
 
 				gz_caocao: ["male", "wei", 4, ["rejianxiong_old"]],
 				gz_simayi: ["male", "wei", 3, ["fankui", "guicai"]],
@@ -465,7 +472,7 @@ export default () => {
 				gz_miheng: ["male", "qun", 3, ["fakekuangcai", "gzshejian"], ["gzskin", "die:re_miheng"]],
 				gz_fengxi: ["male", "wu", 3, ["gzyusui", "gzboyan"], ["gzskin"]],
 				gz_dengzhi: ["male", "shu", 3, ["gzjianliang", "gzweimeng"], ["gzskin"]],
-				gz_re_nanhualaoxian: ["male", "qun", 3, ["gzgongxiu", "gztaidan", "gzrejinghe"]],
+				gz_re_nanhualaoxian: ["male", "qun", 3, ["gzgongxiu", "gztaidan", "gzjinghe_new"]],
 				gz_zhouyi: ["female", "wu", 3, ["gzzhukou", "gzduannian", "gzlianyou"]],
 				gz_re_xunchen: ["male", "qun", 3, ["gzfenglve", "gzanyong"]],
 				gz_lvlingqi: ["female", "qun", 4, ["gzguowu", "gzshenwei", "gzzhuangrong"], ["gzskin"]],
@@ -756,6 +763,481 @@ export default () => {
 						locked: false,
 						content() {
 							player.addMark("xianqu_mark", 1);
+						},
+					},
+				},
+			},
+			//王基
+			gzqizhi: {
+				audio: "qizhi",
+				inherit: "qizhi",
+				usable: 4,
+			},
+			gzjinqu: {
+				audio: "jinqu",
+				trigger: { player: "phaseJieshuBegin" },
+				check(event, player) {
+					return (
+						player.getHistory("custom", evt => {
+							return evt.gzqizhi == true;
+						}).length >= player.countCards("h")
+					);
+				},
+				prompt(event, player) {
+					var num = player.getHistory("custom", evt => {
+						return evt.gzqizhi == true;
+					}).length;
+					return "进趋：是否摸两张牌并将手牌弃置至" + get.cnNumber(num) + "张？";
+				},
+				async content(event, trigger, player) {
+					await player.draw(2);
+					let dh =
+						player.countCards("h") -
+						player.getHistory("custom", evt => {
+							return evt.gzqizhi == true;
+						}).length;
+					if (dh > 0) {
+						await player.chooseToDiscard(dh, true);
+					}
+				},
+				ai: { combo: "gzqizhi" },
+			},
+			//徐荣
+			gzxionghuo: {
+				audio: "xinfu_xionghuo",
+				enable: "phaseUse",
+				filter(event, player) {
+					return player.countMark("gzxionghuo_used") < 3;
+				},
+				filterTarget(card, player, target) {
+					return target.isEnemyOf(player);
+				},
+				usable: 1,
+				content() {
+					player.addSkill("gzxionghuo_used");
+					player.addMark("gzxionghuo_used", 1, false);
+					player.addSkill("gzxionghuo_effect");
+					player.setStorage("gzxionghuo_effect", player.getStorage("gzxionghuo_effect").concat(target));
+				},
+				ai: {
+					order: 9,
+					result: { target: -1 },
+				},
+				subSkill: {
+					used: {
+						charlotte: true,
+						onremove: true,
+						intro: { content: "已发动过#次" },
+					},
+					effect: {
+						charlotte: true,
+						intro: { content: "已指定$" },
+						trigger: {
+							source: "damageBegin1",
+							global: "phaseUseBegin",
+						},
+						filter(event, player) {
+							if (!player.getStorage("gzxionghuo_used").includes(event.player)) return false;
+							return event.name === "phaseUse" || (event.card && !player.hasHistory("sourceDamage", evt => evt.player === event.player));
+						},
+						forced: true,
+						logTarget: "player",
+						async content(event, trigger, player) {
+							let num = player.getStorage("gzxionghuo_used").filter(i => i === trigger.player).length;
+							if (trigger.name === "damage") {
+								trigger.num += num;
+							} else {
+								const target = trigger.player;
+								while (player.getStorage("gzxionghuo_used").includes(target)) {
+									player.unmarkAuto("gzxionghuo_used", [target]);
+								}
+								while (num > 0) {
+									switch (get.rand(1, 3)) {
+										case 1:
+											player.line(target, "fire");
+											await target.damage(1, "fire");
+											target.addTempSkill("xinfu_xionghuo_disable");
+											target.markAuto("xinfu_xionghuo_disable", [player]);
+											break;
+										case 2:
+											player.line(target, "water");
+											await target.loseHp();
+											target.addTempSkill("xinfu_xionghuo_low");
+											target.addMark("xinfu_xionghuo_low", 1, false);
+											break;
+										case 3:
+											player.line(target, "green");
+											for (const pos of ["e", "h"]) {
+												await player.gainPlayerCard(target, pos, true);
+											}
+											break;
+									}
+								}
+							}
+						},
+					},
+				},
+			},
+			//向郎
+			gzkanji: {
+				audio: "dckanji",
+				inherit: "dckanji",
+				usable: 1,
+				async content(event, trigger, player) {
+					await player.showHandcards();
+					const suits = player
+						.getCards("h")
+						.slice()
+						.map(card => get.suit(card, player))
+						.unique();
+					if (suits.length == player.countCards("h")) {
+						event.suitsLength = suits.length;
+						player.addTempSkill("gzkanji_check");
+						await player.draw(2);
+					}
+				},
+				subSkill: {
+					check: {
+						charlotte: true,
+						trigger: { player: "gainAfter" },
+						filter(event, player) {
+							if (event.getParent(2).name != "gzkanji") return false;
+							const len = event.getParent(2).suitsLength;
+							const suits = player
+								.getCards("h")
+								.slice()
+								.map(card => get.suit(card, player))
+								.unique();
+							return suits.length >= 4 && len < 4;
+						},
+						forced: true,
+						popup: false,
+						content() {
+							player.addTempSkill("gzkanji_hand");
+							player.addMark("gzkanji_hand", 4, false);
+						},
+					},
+					hand: {
+						charlotte: true,
+						onremove: true,
+						intro: { content: "手牌上限+#" },
+						mod: {
+							maxHandcard(player, num) {
+								return num + player.countMark("gzkanji_hand");
+							},
+						},
+					},
+				},
+			},
+			//滕胤
+			gzchenjian: {
+				audio: "chenjian",
+				trigger: { player: "phaseZhunbeiBegin" },
+				content() {
+					"step 0";
+					var cards = get.cards(3);
+					event.cards = cards;
+					player.showCards(cards, get.translation(player) + "发动了【陈见】");
+					"step 1";
+					var list = [];
+					if (
+						player.countCards("he", i => {
+							return lib.filter.cardDiscardable(i, player, "gzchenjian");
+						})
+					)
+						list.push("选项一");
+					if (
+						event.cards.some(i => {
+							return player.hasUseTarget(i);
+						})
+					)
+						list.push("选项二");
+					if (list.length === 1) event._result = { control: list[0] };
+					else if (list.length > 1)
+						player
+							.chooseControl(list)
+							.set("choiceList", ["弃置一张牌，然后令一名角色获得与你弃置牌花色相同的牌", "使用" + get.translation(event.cards) + "中的一张牌"])
+							.set("prompt", "陈见：请选择一项")
+							.set("ai", () => {
+								let player = _status.event.player,
+									cards = _status.event.getParent().cards;
+								if (
+									cards.some(i => {
+										return player.getUseValue(i) > 0;
+									})
+								)
+									return "选项二";
+								return "选项一";
+							});
+					else event.finish();
+					"step 2";
+					event.choosed = result.control;
+					if (result.control === "cancel2") event.finish();
+					else if (result.control === "选项二") event.goto(6);
+					"step 3";
+					if (
+						player.countCards("he", i => {
+							return lib.filter.cardDiscardable(i, player, "chenjian");
+						})
+					)
+						player
+							.chooseToDiscard("he", true)
+							.set("ai", function (card) {
+								let evt = _status.event.getParent(),
+									val = evt.player.countMark("chenjian") < 2 ? 0 : -get.value(card),
+									suit = get.suit(card);
+								for (let i of evt.cards) {
+									if (get.suit(i, false) == suit) val += get.value(i, "raw");
+								}
+								return val;
+							})
+							.set("prompt", "陈见：请弃置一张牌，然后令一名角色获得" + get.translation(event.cards) + "中花色与之相同的牌" + (event.goon ? "？" : ""));
+					else if (event.choosed === "选项一") event.goto(6);
+					else event.finish();
+					"step 4";
+					if (result.bool) {
+						var suit = get.suit(result.cards[0], player);
+						var cards2 = event.cards.filter(function (i) {
+							return get.suit(i, false) == suit;
+						});
+						if (cards2.length) {
+							event.cards2 = cards2;
+							player.chooseTarget(true, "选择一名角色获得" + get.translation(cards2)).set("ai", function (target) {
+								var att = get.attitude(_status.event.player, target);
+								if (att > 0) {
+									return att + Math.max(0, 5 - target.countCards("h"));
+								}
+								return att;
+							});
+						} else event.finish();
+					} else event.finish();
+					"step 5";
+					if (result.bool) {
+						var target = result.targets[0];
+						player.line(target, "green");
+						target.gain(event.cards2, "gain2");
+					}
+					event.finish();
+					"step 6";
+					var cards2 = cards.filter(function (i) {
+						return player.hasUseTarget(i);
+					});
+					if (cards2.length)
+						player.chooseButton(["陈见：" + (event.goon ? "是否" : "请") + "使用其中一张牌" + (event.goon ? "？" : ""), cards2], !event.goon).set("ai", function (button) {
+							return player.getUseValue(button.link);
+						});
+					else event.finish();
+					"step 7";
+					if (result.bool) {
+						player.chooseUseTarget(true, result.links[0], false);
+					}
+				},
+			},
+			gzxixiu: {
+				audio: "xixiu",
+				trigger: {
+					player: "loseBegin",
+					target: "useCardToTargeted",
+				},
+				filter(event, player) {
+					if (event.name === "lose") {
+						if (event.type != "discard" || event.getlx === false) return false;
+						if (event.getParent(2).player === player || player.countCards("e") !== 1) return false;
+						return event.cards.includes(player.getCards("e")[0]);
+					}
+					if (player == event.player || !player.countCards("e")) return false;
+					var suit = get.suit(event.card, false);
+					if (suit == "none") return false;
+					return player.hasCard(function (card) {
+						return get.suit(card, player) == suit;
+					}, "e");
+				},
+				forced: true,
+				content() {
+					if (trigger.name === "lose") trigger.cards.remove(player.getCards("e")[0]);
+					else player.draw();
+				},
+				ai: {
+					effect: {
+						target_use(card, player, target) {
+							if (typeof card == "object" && player != target) {
+								var suit = get.suit(card);
+								if (suit == "none") return;
+								if (
+									player.hasCard(function (card) {
+										return get.suit(card, player) == suit;
+									}, "e")
+								)
+									return [1, 0.08];
+							}
+						},
+					},
+				},
+			},
+			//潘淑
+			gzyaner: {
+				audio: "yaner",
+				inherit: "yaner",
+				prompt2: "与该角色各摸一张牌",
+				content() {
+					game.asyncDraw([_status.currentPhase, player]);
+				},
+			},
+			//曹真
+			gzsidi: {
+				audio: "sidi",
+				trigger: { player: "damageEnd" },
+				filter(event, player) {
+					if (
+						!player.hasCard(card => {
+							if (get.position(card) === "h" && _status.connectMode) return true;
+							return !player.getExpansions("gzsidi").some(cardx => get.type2(cardx) === get.type2(card));
+						}, "he")
+					)
+						return false;
+					return player.isFriendOf(event.player);
+				},
+				async cost(event, trigger, player) {
+					event.result = await player
+						.chooseCard(
+							get.prompt("gzsidi"),
+							(card, player) => {
+								return !player.getExpansions("gzsidi").some(cardx => get.type2(cardx) === get.type2(card));
+							},
+							"将一张与武将牌上的“驭”类别均不同的牌置于武将牌上",
+							"he"
+						)
+						.set("ai", card => {
+							return 6 - get.value(card);
+						})
+						.forResult();
+				},
+				content() {
+					player.addToExpansion(event.cards, player, "give").gaintag.add("gzsidi");
+				},
+				intro: {
+					content: "expansion",
+					markcount: "expansion",
+				},
+				marktext: "驭",
+				onremove(player, skill) {
+					const cards = player.getExpansions(skill);
+					if (cards.length) player.loseToDiscardpile(cards);
+				},
+				group: "gzsidi_effect",
+				subSkill: {
+					effect: {
+						audio: "sidi",
+						trigger: { global: "phaseBegin" },
+						filter(event, player) {
+							if (!event.player.isEnemyOf(player)) return false;
+							return player.getExpansions("gzsidi").length;
+						},
+						async cost(event, trigger, player) {
+							event.result = await player
+								.chooseButton(["###" + get.prompt("sidi", trigger.player) + '###<div class="text center">将至多三张“驭”置入弃牌堆，然后执行等量条效果</div>', player.getExpansions("gzsidi")], 2)
+								.set("ai", button => {
+									const player = get.player(),
+										target = get.event().getTrigger().player;
+									if (get.attitude(player, target) >= 0) return 0;
+									return ["equip", "trick", "basic"].indexOf(get.type2(button.link)) + 2;
+								})
+								.forResult();
+							if (event.result?.bool && event.result.links?.length) {
+								event.result.cards = event.result.links;
+							}
+						},
+						logTarget: "player",
+						async content(event, trigger, player) {
+							const cards = event.cards,
+								target = trigger.player;
+							await player.loseToDiscardpile(cards);
+							let num = cards.length,
+								result;
+							let list = cards.slice().map(i => get.type2(i, false));
+							if (num !== 3) list.add("cancel2");
+							result = await player
+								.chooseControl(list)
+								.set("ai", () => {
+									return get.event().controls.randomGet();
+								})
+								.set("prompt", (num === 3 ? "" : "是否") + "封禁其本回合一种类别的牌" + (num === 3 ? "" : "？（还可选择" + num + "次）"))
+								.forResult();
+							if (result.control !== "cancel2") {
+								num--;
+								player.popup(result.control);
+								game.log(player, "选择了", "#g" + get.translation(result.control));
+								target.addTempSkill("gzsidi_ban");
+								target.markAuto("gzsidi_ban", [result.control]);
+								if (!num) return event.finish();
+							}
+							let skills = target.getStockSkills(null, true);
+							if (skills.length) {
+								if (num !== 2) skills.add("cancel2");
+								result = await player
+									.chooseControl(skills)
+									.set("ai", () => {
+										return get.event().controls.randomGet();
+									})
+									.set("prompt", (num === 2 ? "" : "是否") + "封禁其明置武将牌上的一个技能" + (num === 3 ? "" : "？（还可选择" + num + "次）"))
+									.forResult();
+								if (result.control !== "cancel2") {
+									num--;
+									player.popup(result.control);
+									game.log(player, "选择了", "#g" + get.translation(result.control));
+									target.addTempSkill("gzsidi_disable");
+									target.disableSkill("gzsidi_disable", result.control);
+									if (!num) return event.finish();
+								}
+							}
+							if (game.hasPlayer(target => target !== player && target.isDamaged() && target.isFriendOf(player))) {
+								result = await player
+									.chooseTarget("是否令一名与你势力相同的其他角色回复1点体力？", (card, player, target) => {
+										return target !== player && target.isDamaged() && target.isFriendOf(player);
+									})
+									.set("ai", target => {
+										const player = get.player();
+										return get.recoverEffect(target, player, player);
+									})
+									.forResult();
+								if (result.bool) {
+									player.line(result.targets[0]);
+									await result.targets[0].recover();
+								}
+							}
+						},
+					},
+					ban: {
+						charlotte: true,
+						onremove: true,
+						intro: { content: "不能使用$牌" },
+						mod: {
+							cardEnabled(card, player) {
+								if (player.getStorage("gzsidi_ban").includes(get.type2(card))) {
+									var hs = player.getCards("h"),
+										cards = [card];
+									if (Array.isArray(card.cards)) cards.addArray(card.cards);
+									for (var i of cards) {
+										if (hs.includes(i)) return false;
+									}
+								}
+							},
+							cardSavable(card, player) {
+								if (player.getStorage("gzsidi_ban").includes(get.type2(card))) {
+									var hs = player.getCards("h"),
+										cards = [card];
+									if (Array.isArray(card.cards)) cards.addArray(card.cards);
+									for (var i of cards) {
+										if (hs.includes(i)) return false;
+									}
+								}
+							},
+						},
+					},
+					disable: {
+						charlotte: true,
+						onremove(player, skill) {
+							player.enableSkill(skill);
 						},
 					},
 				},
@@ -2422,7 +2904,7 @@ export default () => {
 							if (get.attitude(get.event("player"), get.event().getTrigger().player) <= 0) return 0;
 							return 1 + Math.random();
 						})
-						.set("hiddenSkill", "fakeshuliang");
+						.setHiddenSkill("fakeshuliang");
 					event.result = { bool: bool, cost_data: links };
 				},
 				preHidden: true,
@@ -2909,7 +3391,6 @@ export default () => {
 			},
 			fakeqizhi: {
 				audio: "qizhi",
-				inherit: "qizhi",
 				trigger: { player: "useCard1" },
 				filter(event, player) {
 					if (!event.targets || !event.targets.length) return false;
@@ -3769,7 +4250,7 @@ export default () => {
 						})
 						.set("sourcex", target)
 						.set("addCount", false)
-						.set("hiddenSkill", "fakeqingleng")
+						.setHiddenSkill("fakeqingleng")
 						.backup("fakeqingleng_backup")
 						.set("logSkill", ["fakeqingleng", target]);
 					if (
@@ -4927,7 +5408,7 @@ export default () => {
 								return get.attitude(_status.event.player, target) - 3;
 							},
 						})
-						.set("hiddenSkill", "fakehuyuan")
+						.setHiddenSkill("fakehuyuan")
 						.forResult();
 				},
 				preHidden: true,
@@ -4959,7 +5440,7 @@ export default () => {
 									const player = get.event("player");
 									return get.effect(target, { name: "guohe" }, player, player);
 								})
-								.set("hiddenSkill", "fakehuyuan")
+								.setHiddenSkill("fakehuyuan")
 								.forResult();
 						},
 						popup: false,
@@ -6545,7 +7026,7 @@ export default () => {
 							return "选项一";
 						})
 						.set("list", list)
-						.set("hiddenSkill", "gzzhenxi");
+						.setHiddenSkill("gzzhenxi");
 					"step 1";
 					if (result.control == "cancel2") {
 						event.finish();
@@ -20750,6 +21231,22 @@ export default () => {
 			gzjinghe_new_info: "出牌阶段限一次，你可以选择一名角色，令其随机获得“写满技能的天书”中的一个技能直到你的下个回合开始。",
 			gzdujin: "独进",
 			gzdujin_info: "①摸牌阶段，你可以额外摸X+1张牌（X为你装备区的牌数的一半，向下取整）。②当你首次明置此武将牌时，若你为你们势力第一个明置武将牌的角色，则你获得1个“先驱”标记。",
+			gzqizhi: "奇制",
+			gzqizhi_info: "每回合限四次，当你于回合内使用基本牌或锦囊牌指定首个目标后，你可以弃置不为此牌目标的一名角色的一张牌，然后其摸一张牌。",
+			gzjinqu: "进趋",
+			gzjinqu_info: "结束阶段，你可以摸两张牌，若如此做，你将手牌弃置至X张。（X为你于此回合发动过〖奇制〗的次数）",
+			gzxionghuo: "凶镬",
+			gzxionghuo_info: "每局游戏限三次，出牌阶段限一次，你可以选择一名角色，然后你获得以下效果：①当你于每回合首次对其造成伤害时，你令此伤害+1；②其出牌阶段开始时，你移去此效果，然后随机执行以下一项：⒈对其造成1点火属性伤害，其本回合不能对你使用【杀】。⒉令其失去1点体力，其本回合手牌上限-1。⒊获得其装备区一张牌，然后获得其一张手牌。",
+			gzkanji: "勘集",
+			gzkanji_info: "出牌阶段限一次，你可以展示所有手牌，若花色均不同，你摸两张牌。然后若你的手牌因此包含了四种花色，你本回合手牌上限+4。",
+			gzchenjian: "陈见",
+			gzchenjian_info: "准备阶段，你可亮出牌堆顶的三张牌，然后可以选择执行其中一项：⒈弃置一张牌，然后令一名角色获得其中与你弃置牌花色相同的牌。⒉使用其中一张牌。",
+			gzxixiu: "皙秀",
+			gzxixiu_info: "锁定技。①当你成为其他角色使用牌的目标时，若你的装备区内有和此牌花色相同的牌，则你摸一张牌。②若你装备区内的牌数为1，其他角色弃置此牌时，取消之。",
+			gzyaner: "燕尔",
+			gzyaner_info: "每回合限一次，其他角色于其出牌阶段内失去最后的手牌后，你可以与其各摸一张牌。",
+			gzsidi: "司敌",
+			gzsidi_info: "①一名与你势力相同的角色受到伤害后，你可以将一张与武将牌上的“驭”类别均不同的一张牌称为“驭”置于武将牌上。②与你势力不同的角色的回合开始时，你可以移去至多三张“驭”，然后选择执行等量项：⒈选择移去“驭”中的一个类别，令其本回合无法使用此类别的牌。⒉选择其一个已明置武将牌上的一个技能，令此技能于本回合失效。⒊选择一名与你势力相同的已受伤其他角色，令其回复1点体力。",
 
 			guozhan_default: "国战标准",
 			guozhan_zhen: "君临天下·阵",
@@ -20925,7 +21422,6 @@ export default () => {
 			"#yinghun_sunce2": "孙氏英烈，庇佑江东！",
 			"#baoling1": "待吾大开杀戒，哈哈哈哈！",
 			"#baoling2": "大丈夫，岂能妇人之仁？",
-			"#gz_zhangren:die": "老臣，绝不事二主！",
 			"#zhangwu1": "遁剑归一，有凤来仪。",
 			"#zhangwu2": "剑气化龙，听朕雷动！",
 			"#jizhao1": "仇未报，汉未兴，朕志犹在！",

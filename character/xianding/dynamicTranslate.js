@@ -37,7 +37,7 @@ const dynamicTranslates = {
 		return '转换技，出牌阶段限一次，<span class="bluetext">阴：你可以将至多两张手牌交给一名其他角色。</span>阳：你可以获得一名其他角色的至多两张手牌。若以此法移动的牌包含【酒】或♥牌，则你可令得到此牌的角色执行一项：①回复1点体力。②复原武将牌。';
 	},
 	zhiren(player) {
-		return "当你于" + (player.hasSkill("yaner_zhiren") ? "一" : "你的") + "回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）";
+		return "当你于" + (player.hasSkill("yaner_zhiren") ? "一" : "你的") + "回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张" + (get.mode() == "guozhan" ? "牌" : "装备牌和延时锦囊牌") + "。③回复1点体力。④摸" + (get.mode() == "guozhan" ? "两" : "三") + "张牌。（X为此牌的名称的字数）";
 	},
 	yuqi(player) {
 		var info = lib.skill.yuqi.getInfo(player);
