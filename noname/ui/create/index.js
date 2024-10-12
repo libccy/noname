@@ -1547,7 +1547,7 @@ export class Create {
 		const updatePagination = () => {
 			if (dialog.paginationMaxCount.get("character")) {
 				const buttons = dialog.content.querySelector(".buttons");
-				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay") && item.style.display !== 'none');
 				/** @type { Pagination } */
 				// @ts-ignore
 				const p = dialog.paginationMap.get(buttons);
@@ -1558,15 +1558,10 @@ export class Create {
 				}
 			}
 		};
-		const restoreState = item => {
-			// 还原状态
-			if (item.classList.contains("privateFindTag-show")) {
-				item.classList.remove("privateFindTag-show");
-				item.classList.remove("nodisplay");
-			}
-			if (item.classList.contains("privateFindTag-hidden")) {
-				item.classList.remove("privateFindTag-hidden");
-				item.classList.add("nodisplay");
+		const restoreState = btn => {
+			if (btn.style.display == 'none') {
+				btn.style.display = '';
+				// btn.classList.remove("nodisplay");
 			}
 		};
 		const updateFind = () => {
@@ -1583,19 +1578,15 @@ export class Create {
 			// 搜索结果从筛选条件中选取
 			for (const btn of dialog.buttons) {
 				restoreState(btn);
-				// 原状态
-				const state = btn.classList.contains("nodisplay");
-				let show = !state;
 				if (value.length > 0) {
 					if (!data.includes(btn)) {
-						// 修改标识
-						if (!state) {
-							btn.classList.add("privateFindTag-show");
-						}
-						show = false;
+						// btn.classList.add("nodisplay");
+						btn.style.display = 'none';
+					}
+					else {
+						// btn.classList.remove("nodisplay");
 					}
 				}
-				btn.classList[show ? "remove" : "add"]("nodisplay");
 			}
 			updatePagination();
 		};
@@ -1693,7 +1684,7 @@ export class Create {
 			/** @type { HTMLDivElement } */
 			// @ts-ignore
 			const buttons = dialog.content.querySelector(".buttons");
-			const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+			const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay") && item.style.display !== 'none');
 			// 传入初始配置
 			const p = new Pagination({
 				// 数据
