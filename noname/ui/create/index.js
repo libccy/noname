@@ -1220,16 +1220,7 @@ export class Create {
 					packsource.classList.remove("thundertext");
 				}
 			}
-			if (dialog.paginationMaxCount.get("character")) {
-				const buttons = dialog.content.querySelector(".buttons");
-				/** @type { Pagination } */
-				const p = dialog.paginationMap.get(buttons);
-				if (p) {
-					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-					p.state.data = array;
-					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-				}
-			}
+			updateFind();
 			if (e) e.stopPropagation();
 		};
 		for (i = 0; i < namecapt.length; i++) {
@@ -1324,16 +1315,7 @@ export class Create {
 						}
 					}
 				}
-				if (dialog.paginationMaxCount.get("character")) {
-					const buttons = dialog.content.querySelector(".buttons");
-					/** @type { Pagination } */
-					const p = dialog.paginationMap.get(buttons);
-					if (p) {
-						const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-						p.state.data = array;
-						p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-					}
-				}
+				updateFind();
 			};
 			for (var i = 0; i < groups.length; i++) {
 				var span = ui.create.div(".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin");
@@ -1543,6 +1525,71 @@ export class Create {
 			}
 			return this.currentcapt;
 		};
+		// 搜索框，by Curpond
+		/** @type { Element } */
+		// @ts-ignore
+		const container = dialog.querySelector(".content-container>.content");
+		const Searcher = ui.create.div(".searcher.caption");
+		const input = document.createElement("input").css({
+			textAlign: "center",
+			border: "solid 2px #294510",
+			borderRadius: "6px",
+			fontWeight: "bold",
+			fontSize: "21px"
+		});
+		input.placeholder = "支持正则搜索";
+		let inputData;
+		const updatePagination = () => {
+			if (dialog.paginationMaxCount.get("character")) {
+				const buttons = dialog.content.querySelector(".buttons");
+				const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
+				/** @type { Pagination } */
+				// @ts-ignore
+				const p = dialog.paginationMap.get(buttons);
+				if (p) {
+					p.state.data = array;
+					// @ts-ignore
+					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
+				}
+			}
+		};
+		const updateFind = () => {
+			let value = input.value;
+			const list = [], reg = new RegExp(value, "g");
+			// 搜索结果从筛选条件中选取
+			inputData = dialog.buttons;
+			for (let btn of inputData.filter(item => !item.classList.contains("nodisplay"))) {
+				// @ts-ignore
+				if (reg.test(get.translation(btn.link)) || reg.test(lib.translate[`${btn.link}_ab`])) {
+					btn.classList.remove("nodisplay");
+				} else {
+					btn.classList.add("nodisplay");
+				}
+			}
+			updatePagination();
+		};
+		
+		// 中文输入选取的兼容
+		let isComposing = false;
+		input.addEventListener('compositionstart', () => {
+			isComposing = true;
+		});
+		
+		input.addEventListener('compositionend', e => {
+			isComposing = false;
+			e.stopPropagation();
+			updateFind();
+		});
+		
+		input.addEventListener('input', e => {
+			if (!isComposing) {
+				e.stopPropagation();
+				updateFind();
+			}
+		});
+		Searcher.appendChild(input);
+		container.prepend(Searcher);
+
 		if (str) {
 			dialog.add(str);
 		}
@@ -1646,55 +1693,6 @@ export class Create {
 			// 渲染元素
 			p.renderPageDOM();
 		}
-
-		// 搜索框，by Curpond
-		let container = dialog.querySelector(".content-container>.content");
-		let Searcher = ui.create.div(".searcher.caption");
-		let input = document.createElement("input");
-		input.style.textAlign = "center";
-		input.style.border = "solid 2px #294510";
-		input.style.borderRadius = "6px";
-		input.style.fontWeight = "bold";
-		input.style.fontSize = "21px";
-		input.placeholder = "支持正则搜索";
-		let find = ui.create.button(["find", "搜索"], "tdnodes");
-		find.style.display = "inline";
-		let clickfind = function (e) {
-			e.stopPropagation();
-			let value = input.value;
-			if (value == "") {
-				game.alert("搜索不能为空");
-				input.focus();
-				return;
-			}
-			let list = [],
-				reg = new RegExp(value, "g");
-			for (let btn of dialog.buttons) {
-				if (reg.test(get.translation(btn.link)) || reg.test(lib.translate[`${btn.link}_ab`])) {
-					btn.classList.remove("nodisplay");
-				} else {
-					btn.classList.add("nodisplay");
-				}
-			}
-			if (dialog.paginationMaxCount.get("character")) {
-				const buttons = dialog.content.querySelector(".buttons");
-				/** @type { Pagination } */
-				const p = dialog.paginationMap.get(buttons);
-				if (p) {
-					const array = dialog.buttons.filter(item => !item.classList.contains("nodisplay"));
-					p.state.data = array;
-					p.setTotalPageCount(Math.ceil(array.length / dialog.paginationMaxCount.get("character")));
-				}
-			}
-		};
-		input.addEventListener("keydown", e => {
-			if (e.key == "Enter") clickfind(e);
-			e.stopPropagation();
-		});
-		find.listen(clickfind);
-		Searcher.appendChild(input);
-		Searcher.appendChild(find);
-		container.prepend(Searcher);
 
 		return dialog;
 	}
