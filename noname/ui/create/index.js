@@ -1111,6 +1111,7 @@ export class Create {
 						this.touchlink.classList.remove("active");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1133,6 +1134,7 @@ export class Create {
 						this.touchlink.classList.add("active");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1162,6 +1164,7 @@ export class Create {
 						this.touchlink.classList.remove("active");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentgroup && dialog.buttons[i].group != dialog.currentgroup) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
@@ -1187,6 +1190,7 @@ export class Create {
 						packsource.classList.add("thundertext");
 					}
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1280,6 +1284,7 @@ export class Create {
 					dialog.currentgroupnode = null;
 					node.classList.remove("thundertext");
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1296,6 +1301,7 @@ export class Create {
 					dialog.currentgroupnode = node;
 					node.classList.add("thundertext");
 					for (var i = 0; i < dialog.buttons.length; i++) {
+						restoreState(dialog.buttons[i]);
 						if (dialog.currentcapt && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt)) {
 							dialog.buttons[i].classList.add("nodisplay");
 						} else if (dialog.currentcapt2 && dialog.buttons[i].capt != dialog.getCurrentCapt(dialog.buttons[i].link, dialog.buttons[i].capt, true)) {
@@ -1538,7 +1544,6 @@ export class Create {
 			fontSize: "21px"
 		});
 		input.placeholder = "支持正则搜索";
-		let inputData;
 		const updatePagination = () => {
 			if (dialog.paginationMaxCount.get("character")) {
 				const buttons = dialog.content.querySelector(".buttons");
@@ -1553,18 +1558,44 @@ export class Create {
 				}
 			}
 		};
+		const restoreState = item => {
+			// 还原状态
+			if (item.classList.contains("privateFindTag-show")) {
+				item.classList.remove("privateFindTag-show");
+				item.classList.remove("nodisplay");
+			}
+			if (item.classList.contains("privateFindTag-hidden")) {
+				item.classList.remove("privateFindTag-hidden");
+				item.classList.add("nodisplay");
+			}
+		};
 		const updateFind = () => {
-			let value = input.value;
-			const list = [], reg = new RegExp(value, "g");
-			// 搜索结果从筛选条件中选取
-			inputData = dialog.buttons;
-			for (let btn of inputData.filter(item => !item.classList.contains("nodisplay"))) {
-				// @ts-ignore
-				if (reg.test(get.translation(btn.link)) || reg.test(lib.translate[`${btn.link}_ab`])) {
-					btn.classList.remove("nodisplay");
-				} else {
-					btn.classList.add("nodisplay");
+			const { value } = input;
+			const reg = new RegExp(value, "g");
+			// 搜索结果
+			const data = dialog.buttons.filter(item => {
+				if (value.length > 0) {
+					// @ts-ignore
+					return reg.test(get.translation(item.link)) || reg.test(lib.translate[`${item.link}_ab`]) || get.translation(item.link)?.includes(value) || lib.translate[`${item.link}_ab`]?.includes(value);
 				}
+				return false;
+			});
+			// 搜索结果从筛选条件中选取
+			for (const btn of dialog.buttons) {
+				restoreState(btn);
+				// 原状态
+				const state = btn.classList.contains("nodisplay");
+				let show = !state;
+				if (value.length > 0) {
+					if (!data.includes(btn)) {
+						// 修改标识
+						if (!state) {
+							btn.classList.add("privateFindTag-show");
+						}
+						show = false;
+					}
+				}
+				btn.classList[show ? "remove" : "add"]("nodisplay");
 			}
 			updatePagination();
 		};
