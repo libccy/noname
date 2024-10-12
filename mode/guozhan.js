@@ -21584,6 +21584,7 @@ export default () => {
 			"#jixi_gz_dengai1": "哪里走！！",
 			"#jixi_gz_dengai2": "谁占到先机，谁就胜了。",
 			"#gz_dengai:die": "君不知臣，臣不知君，罢了……罢了……",
+			"#gz_jiangwei:die": "臣等正欲死战，陛下何故先降！",
 			"#tiaoxin_gz_jiangwei1": "小小娃娃，乳臭未干。",
 			"#tiaoxin_gz_jiangwei2": "快滚回去，叫你主将出来！",
 			"#yizhi1": "天文地理，丞相所教，维铭记于心。",
