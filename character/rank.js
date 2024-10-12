@@ -2489,7 +2489,6 @@ window.noname_character_rank = {
 			"ol_lingtong",
 			"luoxian",
 			"ol_mengda",
-			"tw_menghuo",
 			"hejin",
 			"hansui",
 			"clan_xunshu",

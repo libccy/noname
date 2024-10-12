@@ -70,7 +70,7 @@ const characters = {
 	xin_zhoucang: ["male", "shu", 4, ["mobilezhongyong"]],
 	ol_yujin: ["male", "wei", 4, ["rejieyue"], ["die:yujin_yujin.mp3"]],
 	zhouqun: ["male", "shu", 3, ["tiansuan"]],
-	re_zhurong: ["female", "shu", 4, ["juxiang", "relieren"]],
+	re_zhurong: ["female", "shu", 4, ["juxiang", "relieren"], ["doublegroup:shu:qun"]],
 	re_jiangwei: ["male", "shu", 4, ["retiaoxin", "zhiji"]],
 	nanhualaoxian: ["male", "qun", 3, ["yufeng", "tianshu"], ["name:庄|周"]],
 	re_handang: ["male", "wu", 4, ["regongji", "jiefan"]],

@@ -7,7 +7,7 @@ const characterSort = {
 	old_yijiang3: ["liru", "old_zhuran", "old_fuhuanghou", "old_caochong"],
 	old_yijiang4: ["old_caozhen", "old_chenqun", "old_zhuhuan", "old_caorui"],
 	old_yijiang5: ["old_caoxiu", "old_zhuzhi"],
-	old_yijiang67: ["ol_zhangrang", "old_huanghao", "old_liyan"],
+	old_yijiang67: ["old_huanghao", "old_liyan"],
 	old_sp: ["old_shixie", "panfeng", "old_wanglang", "old_maliang", "old_zhangxingcai", "old_wangyun", "old_dingfeng", "old_guanyinping"],
 	old_yingbian: ["junk_simayi", "old_yangyan", "old_yangzhi"],
 	old_mobile: ["old_caochun"],

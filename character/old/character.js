@@ -56,7 +56,6 @@ const characters = {
 	old_zhuzhi: ["male", "wu", 4, ["anguo"]],
 
 	old_zhugezhan: ["male", "shu", 3, ["old_zuilun", "old_fuyin"], ["name:诸葛|瞻"]],
-	ol_zhangrang: ["male", "qun", 3, ["xintaoluan"], ["sex:male_castrated"]],
 	//ol_manchong:['male','wei',3,['yuce','junxing']],
 	old_guanqiujian: ["male", "wei", 4, ["drlt_zhenrong", "drlt_hongju"], ["name:毌丘|俭"]],
 	old_wanglang: ["male", "wei", 3, ["gushe", "jici"]],
