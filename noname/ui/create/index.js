@@ -3303,4 +3303,11 @@ export class Create {
 			lib.inpile_nature
 		);
 	}
+	/**
+	 * 创建分页类
+	 * @param {Partial<PaginationState>} options 
+	 */
+	pagination(options) {
+		return new Pagination(options);
+	}
 }

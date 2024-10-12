@@ -29,7 +29,7 @@ export class Dialog extends HTMLDivElement {
 	supportsPagination;
 	/**
 	 * dialog中储存的分页元素(用来兼容一个dialog中多个分页的情况)
-	 * @type { Map<HTMLElement, typeof import("../../util/pagination.js").Pagination> }
+	 * @type { Map<HTMLElement, InstanceType<typeof import("../../util/pagination.js").Pagination>> }
 	 */
 	paginationMap;
 	/** 
