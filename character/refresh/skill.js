@@ -5322,11 +5322,8 @@ const skills = {
 		multiline: true,
 		content: function () {
 			targets[0].swapHandcards(targets[1]);
-			var num = Math.abs(targets[0].countCards("h") - targets[1].countCards("h"));
-			if (num > 0) {
-				player.addTempSkill("oldimeng_discard", "phaseUseAfter");
-				player.markAuto("oldimeng_discard", [targets]);
-			}
+			player.addTempSkill("oldimeng_discard", "phaseUseAfter");
+			player.markAuto("oldimeng_discard", [targets]);
 		},
 		ai: {
 			threaten: 4.5,
