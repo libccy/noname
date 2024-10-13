@@ -10,7 +10,7 @@ const skills = {
 		intro: {
 			content(storage) {
 				if (!storage) return "出牌阶段开始时，你可以摸X张牌，然后本回合的弃牌阶段开始时，你弃置所有非基本牌（X为你已损失的体力值，至少为1，至多为3）";
-				return "其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有非基本牌（X为你已损失的体力值，至少为1，至多为3）";
+				return "其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有基本牌（X为你已损失的体力值，至少为1，至多为3）";
 			},
 		},
 		audio: 2,
@@ -20,24 +20,37 @@ const skills = {
 		},
 		logTarget: "player",
 		prompt2(event, player) {
-			return "令其摸" + get.cnNumber(Math.min(3, Math.max(1, player.getDamagedHp()))) + "张牌，然后本回合的弃牌阶段开始时，" + (event.player === player ? "" : "其") + "弃置所有非基本牌";
+			const goon = event.player === player;
+			return (goon ? "" : "令其") + "摸" + get.cnNumber(Math.min(3, Math.max(1, player.getDamagedHp()))) + "张牌，本回合的弃牌阶段开始时，" + (goon ? "弃置所有非基本牌" : "其弃置所有基本牌");
 		},
 		content() {
 			player.changeZhuanhuanji("xiongjin");
 			const target = trigger.player;
 			target.addTempSkill("xiongjin_effect");
+			target.markAuto("xiongjin_effect", [target === player ? "nobasic" : "basic"]);
 			target.draw(Math.min(3, Math.max(1, player.getDamagedHp())));
 		},
 		subSkill: {
 			effect: {
 				charlotte: true,
 				mark: true,
-				intro: { content: "弃牌阶段开始时，弃置所有非基本牌" },
+				intro: {
+					markcount: () => 0,
+					content(storage) {
+						if (storage.length > 1) return "弃牌阶段开始时，弃置所有牌";
+						return "弃牌阶段开始时，弃置所有" + (storage[0] === "basic" ? "基本" : "非基本") + "牌";
+					},
+				},
 				trigger: { player: "phaseDiscardBegin" },
 				forced: true,
 				popup: false,
 				content() {
-					const cards = player.getCards("he", card => lib.filter.cardDiscardable(card, player) && get.type(card) !== "basic");
+					const storage = player.getStorage("xiongjin_effect");
+					const cards = player.getCards("he", card => {
+						if (!lib.filter.cardDiscardable(card, player)) return false;
+						const type = get.type(card);
+						return (type === "basic" && storage.includes("basic")) || (type !== "basic" && storage.includes("nobasic"));
+					});
 					if (cards.length) player.discard(cards);
 				},
 			},

@@ -44,7 +44,7 @@ const dynamicTranslates = {
 		if (!storage) str += "</span>";
 		str += "；";
 		if (storage) str += '<span class="bluetext">';
-		str += "阴，其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有非基本牌";
+		str += "阴，其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有基本牌";
 		if (storage) str += "</span>";
 		return str+="（X为你已损失的体力值，至少为1，至多为3）。";
 	},
