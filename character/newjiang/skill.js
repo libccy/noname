@@ -96,7 +96,7 @@ const skills = {
 			player.addTempSkill("baoxi_used");
 			player.markAuto("baoxi_used", ["juedou"]);
 			await player.loseMaxHp();
-			await player.useCard(new lib.element.VCard({ name: "juedou" }), event.targets[0]);
+			await player.useCard(new lib.element.VCard({ name: "juedou" }), event.targets[0], false);
 		},
 		group: "baoxi_sha",
 		subSkill: {
@@ -128,7 +128,7 @@ const skills = {
 					player.addTempSkill("baoxi_used");
 					player.markAuto("baoxi_used", ["sha"]);
 					await player.loseMaxHp();
-					await player.useCard(new lib.element.VCard({ name: "sha" }), event.targets[0]);
+					await player.useCard(new lib.element.VCard({ name: "sha" }), event.targets[0], false);
 				},
 			},
 		},
