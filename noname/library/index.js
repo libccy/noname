@@ -6648,6 +6648,21 @@ export class Library {
 					frequent: true,
 					intro: "读取剪贴板以解析邀请链接自动加入联机房间",
 				},
+				reset_banBlacklist: {
+					name: "重置黑名单",
+					onclick() {
+						if (this.firstChild.innerHTML != "已重置") {
+							this.firstChild.innerHTML = "已重置";
+							var banBlacklist = [];
+							game.saveConfig("banBlacklist", banBlacklist);
+							var that = this;
+							setTimeout(function () {
+								that.firstChild.innerHTML = "重置黑名单";
+							}, 1000);
+						}
+					},
+					clear: true,
+				},
 			},
 		},
 		boss: {
@@ -12271,7 +12286,9 @@ export class Library {
 			 * @this {import("./element/client.js").Client}
 			 */
 			init(version, config, banned_info) {
-				if (lib.node.banned.includes(banned_info)) {
+				this.onlineKey = config.onlineKey;
+				var banBlacklist = lib.config.banBlacklist === undefined ? [] : lib.config.banBlacklist;
+				if (lib.node.banned.includes(banned_info) || banBlacklist.includes(config.onlineKey)) {
 					this.send("denied", "banned");
 				} else if (config.id && lib.playerOL && lib.playerOL[config.id]) {
 					var player = lib.playerOL[config.id];
@@ -12595,6 +12612,7 @@ export class Library {
 					lib.versionOL,
 					{
 						id: game.onlineID,
+						onlineKey: game.onlineKey,
 						avatar: lib.config.connect_avatar,
 						nickname: get.connectNickname(),
 					},
