@@ -1,4 +1,13 @@
 export default {
+	"#dckengqiang1": "女子着征袍，战意越关山。",
+	"#dckengqiang2": "兴武效妇好，挥钺断苍穹！",
+	"#dckuichi1": "久战沙场，遗伤无数。",
+	"#dckuichi2": "人无完人，千虑亦有一失。",
+	"#dckunli1": "回首万重山，难阻轻舟一叶。",
+	"#dckunli2": "已过山穷水尽，前有柳暗花明。",
+	"#dcshangjue1": "伯约，奈何桥畔，再等我片刻。",
+	"#dcshangjue2": "与君同生共死，岂可空待黄泉！",
+	"#wenyuan:die": "伯约，回家了。",
 	"#jiangqin:die": "竟……破我阵法……",
 	"#dcyanzuo1": "提笔欲续出师表，何日重登蜀道？",
 	"#dcyanzuo2": "我族以诗书传家，苑中未绝琅琅。",
