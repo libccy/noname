@@ -58,7 +58,7 @@ const skills = {
 				"xiawei",
 				trigger.cards.reduce((list, card) => list.add(get.suit(card, false)), [])
 			);
-			player.storage.xiawei.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
+			player.storage.xiawei.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
 			player.addTip("xiawei", get.translation("xiawei") + player.getStorage("xiawei").reduce((str, suit) => str + get.translation(suit), " "));
 			if (player.getStorage("xiawei").length >= 4 && player.maxHp < 9) {
 				delete player.storage.xiawei;
