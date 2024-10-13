@@ -42,6 +42,15 @@ const characters = {
 	std_caorui: ["male", "wei", 3, ["stdhuituo", "stdmingjian", "xingshuai"], ["zhu"]],
 	std_liuye: ["male", "wei", 3, ["stdpolu", "stdchoulve"]],
 	std_guohuanghou: ["female", "wei", 3, ["stdjiaozhao", "stddanxin"], ["name:郭|null"]],
+	std_lvfan: ["male", "wu", 3, ["mbdiaodu", "stddianfeng"]],
+	std_dingfeng: ["male", "wu", 4, ["stdduanbing", "stdfenxun"]],
+	std_sunluban: ["female", "wu", 3, ["stdzenhui", "stdchuyi"]],
+	std_liuzan: ["male", "wu", 4, ["stdfenyin"]],
+	std_sunyi: ["male", "wu", 4, ["stdzaoli"]],
+	std_taoqian: ["male", "qun", 4, ["stdyirang"]],
+	std_jiling: ["male", "qun", 4, ["stdshuangdao"]],
+	std_liru: ["male", "qun", 3, ["stdmieji", "stdjuece"]],
+	std_wangyun: ["male", "qun", 3, ["stdyunji", "stdlianji"]],
 };
 
 export default characters;
