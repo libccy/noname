@@ -6578,7 +6578,7 @@ const skills = {
 				if ((type == "basic" || type == "trick") && get.tag(card, "damage") > 0) gains.push(card);
 				if (!red && get.color(card, target) == "red") red = true;
 			}
-			if (gains.length) player.gain(gains, "gain2");
+			if (gains.length) player.gain(gains, "give");
 			if (!red) event.finish();
 			"step 3";
 			player[player.isDamaged() ? "loseMaxHp" : "loseHp"]();

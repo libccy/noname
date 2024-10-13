@@ -2448,7 +2448,11 @@ const skills = {
 			}
 			for (const target of game.filterPlayer()) {
 				const sishis = target.getCards("hej", filter);
-				if (sishis.length) await target.lose(sishis);
+				if (sishis.length) {
+					target.$throw(sishis);
+					game.log(sishis, "被移出了游戏");
+					await target.lose(sishis, ui.special);
+				}
 			}
 		},
 		ai: {
