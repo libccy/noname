@@ -15969,6 +15969,11 @@ const skills = {
 		ai: {
 			threaten: 8.8,
 		},
+		init(player, skill) {
+			const list = lib.skill.yuqi.getInfo(player);
+			player.addTip(skill, get.translation(skill) + " " + list.slice().join(" "));
+		},
+		onremove: (player, skill) => player.removeTip(skill),
 	},
 	shanshen: {
 		audio: 2,
@@ -16012,6 +16017,7 @@ const skills = {
 				list[result.index] = Math.min(5, list[result.index] + 2);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
 				player.markSkill("yuqi");
+				lib.skill.yuqi.init(player, "yuqi");
 				if (event.goon) player.recover();
 			}
 		},
@@ -16058,6 +16064,7 @@ const skills = {
 				list[result.index] = Math.min(5, list[result.index] + 1);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
 				player.markSkill("yuqi");
+				lib.skill.yuqi.init(player, "yuqi");
 				if (player.isDamaged()) event.finish();
 			} else event.finish();
 			"step 2";
@@ -16092,6 +16099,7 @@ const skills = {
 				list[result.index] = Math.min(5, list[result.index] + 1);
 				game.log(player, "将", result.control, "数字改为", "#y" + list[result.index]);
 				player.markSkill("yuqi");
+				lib.skill.yuqi.init(player, "yuqi");
 			}
 		},
 		ai: {
