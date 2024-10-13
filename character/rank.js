@@ -81,6 +81,7 @@ window.noname_character_rank = {
 		"key_kiyu",
 		"jsrg_pangtong",
 		"star_dongzhuo",
+		"new_yj_dongzhuo",
 		"star_xunyu",
 		"clan_xunyou",
 		"caoxian",
@@ -385,6 +386,8 @@ window.noname_character_rank = {
 		"jsrg_tufashujineng",
 		"jsrg_lukang",
 		"jsrg_malong",
+		"xin_simayi",
+		"new_simayi",
 	],
 	am: [
 		"scl_pangdegong",
@@ -726,8 +729,7 @@ window.noname_character_rank = {
 		"sb_handang",
 		"sb_gongsunzan",
 		"yue_zoushi",
-		"xin_simayi",
-		"new_simayi",
+		"yue_diaochan",
 	],
 	bp: [
 		"scl_zhenji",
@@ -2359,6 +2361,7 @@ window.noname_character_rank = {
 			"db_key_liyingxia",
 			"key_iriya",
 			"star_dongzhuo",
+			"new_yj_dongzhuo",
 			"star_xunyu",
 			"star_yuanshu",
 			"clan_xunyou",
@@ -2411,6 +2414,7 @@ window.noname_character_rank = {
 			"jsrg_lukang",
 		],
 		rare: [
+			"yue_diaochan",
 			"jsrg_simaliang",
 			"jsrg_malong",
 			"re_lvmeng",

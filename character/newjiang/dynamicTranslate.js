@@ -36,6 +36,18 @@ const dynamicTranslates = {
 		if (storage) str += "</span>";
 		return str+="（X为你本回合失去牌数）";
 	},
+	xiongjin(player){
+		const storage = player.storage.xiongjin;
+		var str = "转换技。";
+		if (!storage) str += '<span class="bluetext">';
+		str += "阳：出牌阶段开始时，你可以摸X张牌，然后本回合的弃牌阶段开始时，你弃置所有非基本牌";
+		if (!storage) str += "</span>";
+		str += "；";
+		if (storage) str += '<span class="bluetext">';
+		str += "阴，其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有非基本牌";
+		if (storage) str += "</span>";
+		return str+="（X为你已损失的体力值，至少为1，至多为3）。";
+	},
 };
 
 export default dynamicTranslates;

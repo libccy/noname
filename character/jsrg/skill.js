@@ -10676,8 +10676,8 @@ const skills = {
 				};
 			},
 			prompt(links, player) {
-				const num = _status.event.ciyin_suits;
-				return "将至少" + num + "张牌当做" + (get.translation(links[0][3]) || "") + get.translation(links[0][2]) + "使用或打出";
+				const num = Math.max(4 - _status.event.ciyin_suits.length, 1);
+				return "将至少" + get.cnNumber(num) + "张牌当作" + (get.translation(links[0][3]) || "") + "【" + get.translation(links[0][2]) + "】使用或打出";
 			},
 		},
 		hiddenCard(player, name) {

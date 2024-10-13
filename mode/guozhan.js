@@ -821,7 +821,8 @@ export default () => {
 					player.addSkill("gzxionghuo_used");
 					player.addMark("gzxionghuo_used", 1, false);
 					player.addSkill("gzxionghuo_effect");
-					player.setStorage("gzxionghuo_effect", player.getStorage("gzxionghuo_effect").concat(target));
+					const targets = player.getStorage("gzxionghuo_effect").slice().concat([target]);
+					player.setStorage("gzxionghuo_effect",targets,true);
 				},
 				ai: {
 					order: 9,
@@ -841,19 +842,19 @@ export default () => {
 							global: "phaseUseBegin",
 						},
 						filter(event, player) {
-							if (!player.getStorage("gzxionghuo_used").includes(event.player)) return false;
+							if (!player.getStorage("gzxionghuo_effect").includes(event.player)) return false;
 							return event.name === "phaseUse" || (event.card && !player.hasHistory("sourceDamage", evt => evt.player === event.player));
 						},
 						forced: true,
 						logTarget: "player",
 						async content(event, trigger, player) {
-							let num = player.getStorage("gzxionghuo_used").filter(i => i === trigger.player).length;
+							let num = player.getStorage("gzxionghuo_effect").filter(i => i === trigger.player).length;
 							if (trigger.name === "damage") {
 								trigger.num += num;
 							} else {
 								const target = trigger.player;
-								while (player.getStorage("gzxionghuo_used").includes(target)) {
-									player.unmarkAuto("gzxionghuo_used", [target]);
+								while (player.getStorage("gzxionghuo_effect").includes(target)) {
+									player.unmarkAuto("gzxionghuo_effect", [target]);
 								}
 								while (num > 0) {
 									switch (get.rand(1, 3)) {
