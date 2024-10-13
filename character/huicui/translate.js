@@ -566,6 +566,12 @@ const translates = {
 	dcshouxing_info: "你可以将X张牌当作一张不计入次数限制的【杀】对一名攻击范围外的角色使用（X为你计算与其的距离）。",
 	dcshaxue: "铩雪",
 	dcshaxue_info: "你对其他角色造成伤害后，可以摸两张牌并弃置X张牌（X为你计算与其的距离）。",
+	yue_diaochan: "乐貂蝉",
+	yue_diaochan_prefix: "乐",
+	dctanban: "檀板",
+	dctanban_info: "锁定技。①游戏开始时，你将所有手牌标记为“檀板”。②你的“檀板”牌不计入手牌上限。③摸牌阶段结束时，若你手牌中的“檀板”牌数小于非“檀板”牌数，则你交换两种牌的“檀板”标记。",
+	dcdiou: "低讴",
+	dcdiou_info: "当你使用实体牌含“檀板”牌结算完毕后，你可以展示一张非“檀板”手牌，然后视为使用之，若此牌为本回合首次被展示，则你摸一张牌。",
 };
 
 export default translates;

@@ -2,6 +2,88 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//乐貂蝉
+	dctanban: {
+		audio: 2,
+		trigger: {
+			global: "phaseBefore",
+			player: "enterGame",
+		},
+		filter(event, player) {
+			return event.name != "phase" || game.phaseNumber == 0;
+		},
+		forced: true,
+		content() {
+			const cards = player.getCards("h");
+			player.addGaintag(cards, "dctanban");
+		},
+		mod: {
+			ignoredHandcard(card) {
+				if (card.hasGaintag("dctanban")) return true;
+			},
+			cardDiscardable(card, _, name) {
+				if (name == "phaseDiscard" && card.hasGaintag("dctanban")) return false;
+			},
+		},
+		group: "dctanban_change",
+		subSkill: {
+			change: {
+				audio: "dctanban",
+				trigger: { player: "phaseDrawEnd" },
+				filter(event, player) {
+					return player.countCards("h", card => !card.hasGaintag("dctanban")) > player.countCards("h", card => card.hasGaintag("dctanban"));
+				},
+				forced: true,
+				content() {
+					const cards = player.getCards("h", card => !card.hasGaintag("dctanban"));
+					player.removeGaintag("dctanban");
+					player.addGaintag(cards, "dctanban");
+				},
+			},
+		},
+	},
+	dcdiou: {
+		audio: 2,
+		trigger: { player: "useCardAfter" },
+		filter(event, player) {
+			if (!player.hasCard(card => _status.connectMode || !card.hasGaintag("dctanban"), "h")) return false;
+			return player.hasHistory("lose", evt => {
+				if (evt.getParent() != event) return false;
+				return Object.keys(evt.gaintag_map).some(i => evt.gaintag_map[i].includes("dctanban"));
+			});
+		},
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseCard(get.prompt2("dcdiou"), (card, player) => {
+					return !card.hasGaintag("dctanban");
+				})
+				.set("ai", card => {
+					const player = get.player();
+					const shown = game
+						.getGlobalHistory("everything", evt => {
+							return evt.name === "showCards";
+						})
+						.reduce((list, evt) => list.addArray(evt.cards), []);
+					return player.getUseValue(card) + (shown.includes(card) ? 0 : get.effect(player, { name: "draw" }, player, player));
+				})
+				.forResult();
+		},
+		async content(event, trigger, player) {
+			const next = player.showCards(event.cards, get.translation(player) + "发动了【低讴】");
+			await next;
+			if (get.type(event.cards[0]) !== "equip" && get.type(event.cards[0]) !== "delay" && player.hasUseTarget(event.cards[0])) await player.chooseUseTarget(event.cards[0], false);
+			if (
+				!game.getGlobalHistory(
+					"everything",
+					evt => {
+						return evt.name === "showCards" && evt !== next;
+					},
+					next
+				).length
+			)
+				await player.draw();
+		},
+	},
 	//黄舞蝶
 	dcshuangrui: {
 		audio: 2,

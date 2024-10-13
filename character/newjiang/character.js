@@ -28,6 +28,7 @@ const characters = {
 	mp_liuling: ["male", "jin", 3, ["mpjiusong", "mpmaotao", "mpbishi"], ["doublegroup:wei:qun:jin"]],
 	mp_xiangxiu: ["male", "jin", 3, ["mpmiaoxi", "mpsijiu"], ["doublegroup:wei:jin"]],
 	yj_majun: ["male", "wei", 3, ["yjgongqiao", "yjjingyi"]],
+	new_yj_dongzhuo: ["male", "qun", "4/5", ["xiongjin", "xiawei", "baoxi"]],
 };
 
 export default characters;

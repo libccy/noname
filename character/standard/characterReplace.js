@@ -27,7 +27,7 @@ const characterReplaces = {
 	ganning: ["ganning", "re_ganning", "sb_ganning", "yongjian_ganning", "jd_sb_ganning", "ty_ganning"],
 	yj_ganning: ["yj_ganning", "sp_ganning"],
 	lvbu: ["lvbu", "re_lvbu", "jsrg_lvbu", "ps_lvbu"],
-	diaochan: ["diaochan", "re_diaochan", "sb_diaochan", "sp_diaochan"],
+	diaochan: ["diaochan", "re_diaochan", "sb_diaochan", "sp_diaochan", "yue_diaochan"],
 	huatuo: ["huatuo", "re_huatuo", "old_huatuo"],
 	huaxiong: ["huaxiong", "re_huaxiong", "old_huaxiong", "sb_huaxiong", "ol_huaxiong", "ol_sb_huaxiong"],
 	yuanshu: ["yuanshu", "re_yuanshu", "yl_yuanshu", "old_yuanshu", "ol_yuanshu", "star_yuanshu"],
