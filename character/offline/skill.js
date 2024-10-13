@@ -7386,7 +7386,7 @@ const skills = {
 				const suits = event.cards
 					.reduce((list, card) => list.add(get.suit(card, player)), [])
 					.sort((a, b) => {
-						return lib.suit.indexOf(a) - lib.suit.indexOf(b);
+						return lib.suit.indexOf(b) - lib.suit.indexOf(a);
 					});
 				player.line(targets);
 				for (const i of targets) {

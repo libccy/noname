@@ -3345,7 +3345,7 @@ const skills = {
 						.reduce((list, evt) => {
 							return list.add(get.suit(evt.card));
 						}, [])
-						.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
+						.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
 					if (!player.storage.clandianzhan) {
 						player.when({ global: "roundStart" }).then(() => {
 							delete player.storage.clandianzhan;
@@ -3365,7 +3365,7 @@ const skills = {
 				.reduce((list, evt) => {
 					return list.add(get.suit(evt.card));
 				}, [])
-				.sort((a, b) => lib.suits.indexOf(a) - lib.suits.indexOf(b));
+				.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
 			if (suits.length) {
 				if (!player.storage.clandianzhan) {
 					player.when({ global: "roundStart" }).then(() => {

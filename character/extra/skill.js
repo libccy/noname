@@ -1000,9 +1000,7 @@ const skills = {
 	},
 	yingtian: {
 		audio: 2,
-		trigger: {
-			global: "dieAfter",
-		},
+		trigger: { global: "dieAfter" },
 		filter(event, player) {
 			return game.countGroup() < 3;
 		},
@@ -1028,7 +1026,7 @@ const skills = {
 	//手杀神司马？
 	//极略神司马！
 	xinrenjie: {
-		audio: "renjie2",
+		audio: 2,
 		trigger: {
 			player: ["chooseToUseAfter", "chooseToRespondAfter"],
 		},
@@ -1064,7 +1062,7 @@ const skills = {
 		},
 	},
 	xinbaiyin: {
-		audio: "sbaiyin",
+		audio: 2,
 		inherit: "sbaiyin",
 		filter(event, player) {
 			return player.countMark("xinrenjie") >= 4;
@@ -1081,9 +1079,8 @@ const skills = {
 	},
 	xinlianpo: {
 		audio: "lianpo",
-		trigger: {
-			source: "dieAfter",
-		},
+		audioname: ["new_simayi"],
+		trigger: {source: "dieAfter"},
 		async cost(event, trigger, player) {
 			const skills = get
 				.info("xinbaiyin")
@@ -7685,10 +7682,9 @@ const skills = {
 	},
 	jilue: {
 		unique: true,
+		audio:2,
 		group: ["jilue_guicai", "jilue_fangzhu", "jilue_wansha", "jilue_zhiheng", "jilue_jizhi"],
-		ai: {
-			combo: "renjie",
-		},
+		ai: {combo: "renjie"},
 	},
 	jilue_guicai: {
 		audio: 1,

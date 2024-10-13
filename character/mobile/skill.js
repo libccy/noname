@@ -2311,6 +2311,7 @@ const skills = {
 							case 1:
 								target.addTempSkill("mbcmfangzhu_ban", { player: "phaseEnd" });
 								target.markAuto("mbcmfangzhu_ban", ["trick"]);
+								lib.skill.mbcmfangzhu_ban.init(target, "mbcmfangzhu_ban");
 								break;
 							case 2:
 								target.addTempSkill("mbcmfangzhu_baiban", { player: "phaseEnd" });
@@ -2366,11 +2367,15 @@ const skills = {
 				marktext: "逐",
 			},
 			ban: {
-				init: function (player, skill) {
-					player.addTip(skill, "放逐 限锦");
+				init(player, skill) {
+					let storage = player.getStorage(skill);
+					if (storage.length) {
+						player.addTip(skill, "放逐 限" + (storage.length === 1 ? get.translation(storage[0])[0] : "手牌"));
+					}
 				},
 				onremove(player, skill) {
 					player.removeTip(skill);
+					delete player.storage[skill];
 				},
 				charlotte: true,
 				mark: true,
@@ -2443,7 +2448,11 @@ const skills = {
 			}
 			for (const target of game.filterPlayer()) {
 				const sishis = target.getCards("hej", filter);
-				if (sishis.length) await target.lose(sishis);
+				if (sishis.length) {
+					target.$throw(sishis);
+					game.log(sishis, "被移出了游戏");
+					await target.lose(sishis, ui.special);
+				}
 			}
 		},
 		ai: {

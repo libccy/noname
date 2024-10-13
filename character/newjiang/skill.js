@@ -20,10 +20,7 @@ const skills = {
 		},
 		logTarget: "player",
 		prompt2(event, player) {
-			return "令其摸" + get.cnNumber(Math.min(3, Math.max(1, player.getDamagedHp()))) + "X张牌，然后本回合的弃牌阶段开始时，" + (event.player === player ? "" : "其") + "弃置所有非基本牌";
-		},
-		check(event, player) {
-			return get.attitude(player, event.player) > 0;
+			return "令其摸" + get.cnNumber(Math.min(3, Math.max(1, player.getDamagedHp()))) + "张牌，然后本回合的弃牌阶段开始时，" + (event.player === player ? "" : "其") + "弃置所有非基本牌";
 		},
 		content() {
 			player.changeZhuanhuanji("xiongjin");
@@ -61,7 +58,8 @@ const skills = {
 				"xiawei",
 				trigger.cards.reduce((list, card) => list.add(get.suit(card, false)), [])
 			);
-			player.addTip("xiawei", get.translation("xiawei") + player.getStorage("xiawei").reduce((str, suit) => str + get.translation(suit), ""));
+			player.storage.xiawei.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
+			player.addTip("xiawei", get.translation("xiawei") + player.getStorage("xiawei").reduce((str, suit) => str + get.translation(suit), " "));
 			if (player.getStorage("xiawei").length >= 4 && player.maxHp < 9) {
 				delete player.storage.xiawei;
 				player.unmarkSkill("xiawei");
@@ -98,7 +96,7 @@ const skills = {
 			player.addTempSkill("baoxi_used");
 			player.markAuto("baoxi_used", ["juedou"]);
 			await player.loseMaxHp();
-			await player.useCard(new lib.element.VCard({ name: "juedou" }), event.targets[0]);
+			await player.useCard(new lib.element.VCard({ name: "juedou" }), event.targets[0], false);
 		},
 		group: "baoxi_sha",
 		subSkill: {
@@ -130,7 +128,7 @@ const skills = {
 					player.addTempSkill("baoxi_used");
 					player.markAuto("baoxi_used", ["sha"]);
 					await player.loseMaxHp();
-					await player.useCard(new lib.element.VCard({ name: "sha" }), event.targets[0]);
+					await player.useCard(new lib.element.VCard({ name: "sha" }), event.targets[0], false);
 				},
 			},
 		},
