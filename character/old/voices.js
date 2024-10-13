@@ -3,6 +3,7 @@ export default {
 	"#xiemu2": "休要再起战事！",
 	"#naman1": "慢着，让我来！",
 	"#naman2": "弃暗投明，光耀门楣。",
+	"#old_maliang:die": "皇叔为何不听我之言？",
 	"#youdi1": "无名小卒，可敢再前进一步！",
 	"#youdi2": "予以小利，必有大获。",
 	"#old_zhuhuan:die": "这巍巍巨城，吾竟无力撼动……",

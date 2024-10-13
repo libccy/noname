@@ -520,7 +520,7 @@ export default {
 	"#zishu2": "身外之物，不要也罢！",
 	"#yingyuan1": "接好嘞！",
 	"#yingyuan2": "好牌只用一次怎么够？",
-	"#maliang:die": "皇叔为何不听我之言？",
+	"#maliang:die": "我的使命……完成了吗……",
 	"#gongao1": "恪尽职守，忠心事主。",
 	"#gongao2": "攻城拔寨，建功立业。",
 	"#juyi1": "司马氏篡权，我当替天伐之！",
@@ -860,4 +860,6 @@ export default {
 	"#liuyan:die": "背疮难治，世子难继……",
 	"#xinfu_zhanji1": "公瑾安全至吴，心安之。",
 	"#xinfu_zhanji2": "功曹之恩，吾必有展骥之机。",
+	"#mifuren:die": "阿斗被救，妾身再无牵挂……",
+	"#zoushi:die": "年老色衰了吗？",
 };

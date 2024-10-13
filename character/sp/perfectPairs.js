@@ -20,7 +20,6 @@ export default {
 	mateng: ["machao", "madai", "mayunlu"],
 	chengpu: ["zhouyu"],
 	hanba: ["swd_muyun"],
-	dongbai: ["dongzhuo"],
 	cuimao: ["caopi"],
 	simazhao: ["wangyuanji"],
 	lijue: ["guosi", "jiaxu"],

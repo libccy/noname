@@ -897,8 +897,6 @@ const translates = {
 	yy_quancong_prefix: "燕幽",
 	yyyaoming: "邀名",
 	yyyaoming_info: "出牌阶段各限一次，或当你受到伤害后，你可以：①弃置一名手牌数大于等于你的其他角色的一张牌；②令一名手牌数小于等于你的角色摸一张牌。",
-	yj_lvbu: "幻吕布",
-	yj_lvbu_prefix: "幻",
 	yjqingjiao: "轻狡",
 	yjqingjiao_info: "主公技，锁定技。结束阶段，若你本回合对其他群势力角色造成过伤害，你摸一张牌。",
 };

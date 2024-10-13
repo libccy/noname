@@ -5322,11 +5322,8 @@ const skills = {
 		multiline: true,
 		content: function () {
 			targets[0].swapHandcards(targets[1]);
-			var num = Math.abs(targets[0].countCards("h") - targets[1].countCards("h"));
-			if (num > 0) {
-				player.addMark("oldimeng_discard", num, false);
-				player.addTempSkill("oldimeng_discard", "phaseUseAfter");
-			}
+			player.addTempSkill("oldimeng_discard", "phaseUseAfter");
+			player.markAuto("oldimeng_discard", [targets]);
 		},
 		ai: {
 			threaten: 4.5,
@@ -5355,8 +5352,12 @@ const skills = {
 				filter: function (event, player) {
 					return player.countCards("he") > 0;
 				},
-				content: function () {
-					player.chooseToDiscard("he", true, player.countMark("oldimeng_discard"));
+				async content(event, trigger, player) {
+					for (let targets of player.getStorage("oldimeng_discard")) {
+						if (targets.length < 2) continue;
+						const num = Math.abs(targets[0].countCards("h") - targets[1].countCards("h"));
+						if (num > 0 && player.countCards("he") > 0) await player.chooseToDiscard("he", true, num);
+					}
 				},
 			},
 		},
@@ -11841,7 +11842,7 @@ const skills = {
 			}
 			player.chooseTarget("雷击：是否对一名角色造成" + event.num + "点雷电伤害？").set("ai", target => {
 				const player = _status.event.player;
-				let eff = get.damageEffect(target, player, player, "thunder");
+				let eff = get.damageEffect(target, player, target, "thunder");
 				if (get.event("num") > 1 && !target.hasSkillTag("filterDamage", null, {
 					player: player,
 					card: null,
@@ -11850,7 +11851,7 @@ const skills = {
 					if (eff > 0) eff -= 25;
 					else if (eff < 0) eff *= 2;
 				}
-				return eff;
+				return eff * get.attitude(player, target);
 			}).set("num", event.num);
 			"step 1";
 			if (result.bool && result.targets && result.targets.length) {
