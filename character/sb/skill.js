@@ -2126,7 +2126,7 @@ const skills = {
 				init(player, skill) {
 					let storage = player.getStorage(skill);
 					if (storage.length) {
-						player.addTip(skill, "放逐 限" + (storage.length === 1 ? get.translation(i)[0] : "手牌"));
+						player.addTip(skill, "放逐 限" + (storage.length === 1 ? get.translation(storage[0])[0] : "手牌"));
 					}
 				},
 				onremove(player, skill) {
