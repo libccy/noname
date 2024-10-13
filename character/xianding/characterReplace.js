@@ -3,7 +3,7 @@ const characterReplaces = {
 	gexuan: ["gexuan", "tw_gexuan"],
 	panshu: ["panshu", "re_panshu"],
 	yangwan: ["yangwan", "sp_yangwan", "jd_sp_yangwan"],
-	sunyi: ["re_sunyi", "sunyi", "tw_sunyi"],
+	sunyi: ["re_sunyi", "sunyi", "tw_sunyi", "std_sunyi"],
 	fengfangnv: ["fengfangnv", "re_fengfangnv"],
 	luotong: ["dc_luotong", "luotong", "std_dc_luotong"],
 	dc_wangchang: ["dc_wangchang", "tw_wangchang"],

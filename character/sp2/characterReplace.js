@@ -9,7 +9,7 @@ const characterReplaces = {
 	hansui: ["hansui", "re_hansui", "xin_hansui", "jsrg_hansui"],
 	jin_simashi: ["dc_simashi", "jin_simashi", "simashi", "std_simashi", "jd_jin_simashi"],
 	jin_yanghuiyu: ["jin_yanghuiyu", "yanghuiyu"],
-	taoqian: ["re_taoqian", "taoqian"],
+	taoqian: ["re_taoqian", "taoqian", "std_taoqian"],
 	jsp_liubei: ["jsrg_liubei", "jsp_liubei"],
 	dongcheng: ["re_dongcheng", "dongcheng"],
 	hucheer: ["re_hucheer", "hucheer", "tw_hucheer", "dc_sb_hucheer"],
