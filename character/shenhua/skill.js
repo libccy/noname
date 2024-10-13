@@ -4681,9 +4681,7 @@ const skills = {
 	},
 	fangzhu: {
 		audio: 2,
-		audioname2: {
-			xin_simayi: "jilue_fangzhu",
-		},
+		audioname2: { new_simayi: "fangzhu_new_simayi" },
 		trigger: { player: "damageEnd" },
 		preHidden: true,
 		async cost(event, trigger, player) {
@@ -4749,6 +4747,7 @@ const skills = {
 			},
 		},
 	},
+	fangzhu_new_simayi: { audio: 1 },
 	songwei: {
 		unique: true,
 		group: "songwei2",
@@ -5391,8 +5390,8 @@ const skills = {
 	wansha: {
 		locked: true,
 		audio: 2,
-		audioname: ["boss_lvbu3"],
-		audioname2: { shen_simayi: "jilue_wansha", xin_simayi: "jilue_wansha" },
+		audioname: ["re_jiaxu", "boss_lvbu3", "new_simayi"],
+		audioname2: { shen_simayi: "jilue_wansha" },
 		global: "wansha2",
 		trigger: { global: "dying" },
 		priority: 15,
