@@ -50,7 +50,7 @@ const characters = {
 	std_taoqian: ["male", "qun", 4, ["stdyirang"]],
 	std_jiling: ["male", "qun", 4, ["stdshuangdao"]],
 	std_liru: ["male", "qun", 3, ["stdmieji", "stdjuece"]],
-	std_wangyun: ["male", "qun", 3, ["stdyunji", "stdlianji"]],
+	std_wangyun: ["male", "qun", 3, ["stdyunji", "stdzongji"]],
 };
 
 export default characters;
