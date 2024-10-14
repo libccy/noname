@@ -294,7 +294,7 @@ const skills = {
 				if (num == 1) {
 					await player.recover();
 					player.tempBanSkill("dcchaozhen");
-				} else await player.loseMaxHp();
+				}
 			}
 		},
 	},
@@ -306,11 +306,13 @@ const skills = {
 		locked: false,
 		filter(event, player) {
 			if (
+				!game.hasPlayer(current => {
+					return current.countCards("h");
+				}) ||
 				!player.hasHistory("lose", evt => {
 					if (evt.getParent() != event.getParent()) return false;
 					return event.cards.some(card => (evt.hs || []).includes(card));
-				}) ||
-				player.countCards("h") >= player.maxHp
+				})
 			)
 				return false;
 			const num = get.number(event.card, player) || 0;
@@ -323,30 +325,45 @@ const skills = {
 				return false;
 			return !player.getStorage("dclianjie_used").includes(num);
 		},
-		check(event, player) {
-			if (player.countCards("h") < 2 || !player.isPhaseUsing()) return true;
-			if (
-				player.countCards(
-					"h",
-					card =>
-						player.hasValueTarget(card) &&
-						!player.countCards("h", cardx => {
-							return get.number(cardx, player) < get.number(card, player);
-						}) &&
-						!player.getStorage("dclianjie_used").includes(get.number(card, player))
-				)
-			)
-				return false;
-			return true;
+		async cost(event, trigger, player) {
+			event.result = await player
+				.chooseTarget(get.prompt2(event.name.slice(0, -5)), (card, player, target) => {
+					return target.countCards("h");
+				})
+				.set("ai", target => {
+					const player = get.player();
+					const eff1 = get.effect(target, { name: "guohe_copy2" }, player, player);
+					const eff2 = get.effect(target, { name: "draw" }, player, player);
+					if (player == target) return eff2 * (1 + player.maxHp - player.countCards("h"));
+					return eff1;
+				})
+				.forResult();
 		},
 		async content(event, trigger, player) {
+			const target = event.targets[0];
 			player.addTempSkill("dclianjie_used");
 			player.markAuto("dclianjie_used", [get.number(trigger.card) || 0]);
+			const cards = target.getCards("h"),
+				minNumber = cards.map(card => get.number(card)).sort((a, b) => a - b)[0];
+			const toLose = cards
+				.filter(card => {
+					return get.number(card) === minNumber;
+				})
+				.randomSort();
+			await target.lose(toLose[0], ui.cardPile);
+			game.broadcastAll(function (player) {
+				var cardx = ui.create.card();
+				cardx.classList.add("infohidden");
+				cardx.classList.add("infoflip");
+				player.$throw(cardx, 1000, "nobroadcast");
+			}, target);
+			await game.delayx();
+			if (player.countCards("h") >= player.maxHp) return;
 			const result = await player.drawTo(player.maxHp).forResult();
 			if (result) player.addGaintag(result, "dclianjie");
 		},
 		mod: {
-			aiOrder: function (player, card, num) {
+			aiOrder(player, card, num) {
 				var number = get.number(card, player);
 				if (player.countCards("h") < player.maxHp) {
 					return num + number / 10;
@@ -388,70 +405,51 @@ const skills = {
 		audio: 2,
 		enable: "phaseUse",
 		limited: true,
-		skillAnimation: false,
-		chooseButton: {
-			dialog(event, player) {
-				const dialog = ui.create.dialog("将贤：你可以选择一项", "hidden");
-				dialog.add([
-					[
-						["dcchaozhen", "失去〖朝镇〗，将体力上限和手牌上限增加至5"],
-						["dclianjie", "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗"],
-					],
-					"textbutton",
-				]);
-				return dialog;
-			},
-			check(button) {
-				const player = get.player();
-				if (button.link == "dcchaozhen") return 5 - player.maxHp;
-				if (button.link == "dclianjie") return 3;
-				return 0.1;
-			},
-			backup(links) {
-				return {
-					audio: "dcjiangxian",
-					filterCard: () => false,
-					selectCard: -1,
-					str: links[0],
-					filterTarget: () => false,
-					selectTarget: -1,
-					skillAnimation: true,
-					animationColor: "metal",
-					async content(event, trigger, player) {
-						player.awakenSkill("dcjiangxian");
-						const str = lib.skill.dcjiangxian_backup.str;
-						if (str == "dcchaozhen") {
-							player.removeSkills("dcchaozhen");
-							if (player.maxHp < 5) await player.gainMaxHp(5 - player.maxHp);
-							player.addSkill("dcjiangxian_" + str);
-						} else player.addTempSkill("dcjiangxian_" + str);
-					},
-				};
-			},
-			prompt(links) {
-				return `点击“确定”，${links[0] === "dcchaozhen" ? "失去〖朝镇〗，将体力上限和手牌上限增加至5" : "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗"}`;
-			},
+		skillAnimation: true,
+		animationColor: "metal",
+		async content(event, trigger, player) {
+			player.awakenSkill(event.name);
+			player.addTempSkill(event.name + "_effect");
+			const evtx = event.getParent("phase", true, true);
+			player
+				.when({ global: "phaseAfter" })
+				.filter((evt, player) => {
+					return evt == evtx && ["dcchaozhen", "dclianjie"].some(skill => player.hasSkill(skill, null, null, false));
+				})
+				.step(async () => {
+					const {
+						result: { bool, links },
+					} = await player
+						.chooseButton(
+							[
+								"将贤：请选择一项",
+								[
+									[
+										["dcchaozhen", "失去〖朝镇〗"],
+										["dclianjie", "失去〖连捷〗"],
+									],
+									"textbutton",
+								],
+							],
+							true
+						)
+						.set("filterButton", button => {
+							const player = get.player();
+							return player.hasSkill(button.link, null, null, false);
+						})
+						.set("ai", button => {
+							if (button.link == "dcchaozhen" && player.getHp() > 2) return 1.1;
+							return 1;
+						});
+					if (bool) await player.removeSkills(links);
+				});
 		},
 		subSkill: {
-			backup: {},
-			dcchaozhen: {
+			effect: {
 				charlotte: true,
 				mark: true,
 				intro: {
-					content: "手牌上限增至5",
-				},
-				mod: {
-					maxHandcard: (player, num) => Math.max(5, num),
-				},
-			},
-			dclianjie: {
-				charlotte: true,
-				mark: true,
-				intro: {
-					content: "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗",
-				},
-				onremove(player) {
-					player.removeSkills("dclianjie");
+					content: "本回合因使用〖连捷〗摸的牌造成的伤害+X（X为你本回合造成伤害的次数且至多为5），回合结束后失去〖连捷〗或〖朝镇〗",
 				},
 				trigger: {
 					source: "damageBegin1",
@@ -478,22 +476,15 @@ const skills = {
 			},
 		},
 		ai: {
-			order: 10,
+			order: 9,
 			threaten: 2.9,
 			result: {
 				player(player) {
-					const enemies = game.filterPlayer(current => {
-							return (!get.rawAttitude || get.rawAttitude(player, current) < 0) && get.attitude(player, current) >= 0;
-						}),
-						knownEnemies = game.filterPlayer(current => {
-							return get.attitude(player, current) < 0;
-						});
-					if ((!knownEnemies.length && player.countCards("e") > 1) || (player.getHp() > 3 && enemies.length > 0 && knownEnemies.length < 2 && knownEnemies.length < enemies.length && !knownEnemies.some(enemy => get.attitude(player, enemy) <= -9))) return 0;
-					const val1 = 5 - player.maxHp;
-					const val2 = 3;
-					return Math.max(val1, val2) > 20 ? 4 : 0;
+					if (!game.hasPlayer(current => get.attitude(player, current) < 0)) return 0;
+					return player.countCards("h", card => card.hasGaintag("dclianjie") && player.hasUseTarget(card)) > 2 ? 4 : 0;
 				},
 			},
+			combo: "dclianjie",
 		},
 	},
 	//文鸳
