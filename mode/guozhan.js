@@ -695,6 +695,8 @@ export default () => {
 				filterCard: () => false,
 				selectCard: -1,
 				filterTarget: true,
+				selectTarget: 1,
+				usable: 1,
 				async content(event, trigger, player) {
 					const target = event.targets[0];
 					const skill = get.info(event.name).derivation?.randomGet();
