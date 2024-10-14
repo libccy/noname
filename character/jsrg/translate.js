@@ -481,6 +481,7 @@ const translates = {
 	jsrg_dengai_prefix: "兴",
 	jsrgqiantun: "谦吞",
 	jsrgqiantun_info: "出牌阶段限一次，你可以令一名其他角色展示至少一张手牌，然后与其拼点，其本次拼点只能从展示牌中选择。若你赢，你获得其展示的手牌；若你没赢，你获得其未展示的手牌。然后你展示手牌。",
+	jsrgqiantun_tag: "invisible",
 	jsrgxiezheng: "挟征",
 	jsrgxiezheng_info: "结束阶段，你可以令至多三名角色依次将一张手牌置于牌堆顶，然后视为你使用一张【兵临城下】；此牌结算完成后若未造成伤害，你失去1点体力。",
 	jsrgzhaoxiong: "昭凶",
