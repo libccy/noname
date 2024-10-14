@@ -177,7 +177,7 @@ export class Library {
 		xiaosha_emotion: 20,
 		xiaotao_emotion: 20,
 		xiaojiu_emotion: 20,
-		biexiao_emotion: 19,
+		biexiao_emotion: 18,
 	};
 	animate = {
 		skill: {},
