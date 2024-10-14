@@ -479,7 +479,7 @@ export default () => {
 				gz_re_nanhualaoxian: ["male", "qun", 3, ["gzgongxiu", "gztaidan", "gzjinghe_new"]],
 				gz_zhouyi: ["female", "wu", 3, ["gzzhukou", "gzduannian", "gzlianyou"]],
 				gz_re_xunchen: ["male", "qun", 3, ["gzfenglve", "gzanyong"]],
-				gz_lvlingqi: ["female", "qun", 4, ["gzguowu", "gzshenwei", "gzzhuangrong"], ["gzskin"]],
+				gz_lvlingqi: ["female", "qun", 4, ["guowu", "gzshenwei", "gzzhuangrong"], ["gzskin"]],
 				gz_dc_yanghu: ["male", "wei", 3, ["gzdeshao", "gzmingfa"]],
 
 				gz_cuimao: ["male", "wei", 3, ["gzzhengbi", "gzfengying"], []],
