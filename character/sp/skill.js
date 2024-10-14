@@ -3109,26 +3109,29 @@ const skills = {
 			for (let current of [player, target]) {
 				switch (list[result[current == player ? 0 : 1]]) {
 					case "重铸": {
-						let result2 = yield current.chooseCard("he", "请重铸一张牌", (card, player) => player.canRecast(card), true);
-						if (result2.bool) current.recast(result2.cards);
+						if (current.countCards("he", card => current.canRecast(card))) {
+							let result2 = yield current.chooseCard("he", "请重铸一张牌", (card, player) => player.canRecast(card), true);
+							if (result2.bool) current.recast(result2.cards);
+						}
 						break;
 					}
 					case "出杀": {
-						current.chooseToUse({
-							prompt: "请使用一张【杀】",
-							filterCard: function (card, player) {
-								if (card.name != "sha") return false;
-								return lib.filter.filterCard.apply(this, arguments);
-							},
-							forced: true,
-							ai1: function (card) {
-								return _status.event.player.getUseValue(card);
-							},
-						});
+						if (current.hasUsableCard("sha"))
+							current.chooseToUse({
+								prompt: "请使用一张【杀】",
+								filterCard: function (card, player) {
+									if (card.name != "sha") return false;
+									return lib.filter.filterCard.apply(this, arguments);
+								},
+								forced: true,
+								ai1: function (card) {
+									return _status.event.player.getUseValue(card);
+								},
+							});
 						break;
 					}
 					case "弃牌": {
-						current.chooseToDiscard("he", 2, true);
+						if (current.countCards("he", card => lib.filter.cardDiscardable(card, current))) current.chooseToDiscard("he", 2, true);
 						break;
 					}
 				}

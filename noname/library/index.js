@@ -177,6 +177,7 @@ export class Library {
 		xiaosha_emotion: 20,
 		xiaotao_emotion: 20,
 		xiaojiu_emotion: 20,
+		biexiao_emotion: 18,
 	};
 	animate = {
 		skill: {},
@@ -9628,6 +9629,7 @@ export class Library {
 		xiaotao_emotion: "小桃表情",
 		xiaojiu_emotion: "小酒表情",
 		xiaokuo_emotion: "小扩表情",
+		biexiao_emotion: "憋笑表情",
 
 		pause: "暂停",
 		config: "选项",

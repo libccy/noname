@@ -97,7 +97,7 @@ const characters = {
 	caiyang: ["male", "qun", 1, ["yinka", "zhuixi"], ["forbidai", "unseen"]],
 	sunshao: ["male", "wu", 3, ["bizheng", "yidian"]],
 	mifuren: ["female", "shu", 3, ["guixiu", "cunsi"], ["name:糜|null", "unseen"]],
-	zoushi: ["female", "qun", 3, ["huoshui", "qincheng"], ["name:邹|null", "unseen"]],
+	zoushi: ["female", "qun", 3, [], ["name:邹|null", "unseen"]],
 	zhangren: ["male", "qun", 4, ["chuanxin", "zfengshi"], ["unseen"]],
 
 	huangfusong: ["male", "qun", 4, ["fenyue"], ["name:皇甫|嵩"]],
