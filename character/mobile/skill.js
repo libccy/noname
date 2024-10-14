@@ -16084,19 +16084,15 @@ const skills = {
 					return get.subtype(card) == "equip1" && target.canUse(card, target);
 				});
 			}
-			if (!equip1) {
-				player.popup("连计失败");
-				game.log("牌堆中无装备");
-				event.finish();
-				return;
+			if (equip1) {
+				if (equip1.name == "qinggang" && !lib.inpile.includes("qibaodao")) {
+					game.broadcastAll(function (card) {
+						card.init([card.suit, card.number, "qibaodao"]);
+					}, equip1);
+				}
+				target.$draw(equip1);
+				target.chooseUseTarget(equip1, "noanimate", "nopopup", true);
 			}
-			if (equip1.name == "qinggang" && !lib.inpile.includes("qibaodao")) {
-				game.broadcastAll(function (card) {
-					card.init([card.suit, card.number, "qibaodao"]);
-				}, equip1);
-			}
-			target.$draw(equip1);
-			target.chooseUseTarget(equip1, "noanimate", "nopopup", true);
 			"step 2";
 			game.updateRoundNumber();
 			var list = ["nanman", "wanjian", "huogong", "juedou", "sha"];

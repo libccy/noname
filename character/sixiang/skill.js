@@ -970,7 +970,7 @@ const skills = {
 			return 5 - val;
 		},
 	},
-	stdlianji: {
+	stdzongji: {
 		audio: "wylianji",
 		trigger: {
 			global: "damageEnd",

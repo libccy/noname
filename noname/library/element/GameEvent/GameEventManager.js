@@ -11,8 +11,8 @@ export default class GameEventManager{
 		return this.getStatusEvent();
 	}
     getStartedEvent(){
-        return this.tempEvent || this.eventStack.at(-1);
-    }
+		return this.tempEvent || this.eventStack.at(-1);
+	}
 	getStatusEvent() {
 		return this.tempEvent || this.eventStack.at(-1) || this.rootEvent;
 	}
