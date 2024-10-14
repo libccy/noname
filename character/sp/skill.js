@@ -26310,15 +26310,10 @@ const skills = {
 		},
 		content() {
 			"step 0";
-			var list = lib.group
-				.slice()
-				.concat(
-					game.filterPlayer(target => {
-						const group = target[get.mode() === "guozhan" ? "identity" : "group"];
-						return group !== "unkonwn";
-					})
-				)
-				.filter(group => current[get.mode() === "guozhan" ? "identity" : "group"] == group);
+			let list = game.filterPlayer(target => {
+				const group = target[get.mode() === "guozhan" ? "identity" : "group"];
+				return group !== "unkonwn";
+			}).map(current => current[get.mode() === "guozhan" ? "identity" : "group"]).unique();
 			if (player.storage.xiemu2) list.removeArray(player.storage.xiemu2);
 			var list2 = list.slice(0);
 			list2.sort(function (a, b) {

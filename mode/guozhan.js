@@ -859,6 +859,7 @@ export default () => {
 									player.unmarkAuto("gzxionghuo_effect", [target]);
 								}
 								while (num > 0) {
+									num --;
 									switch (get.rand(1, 3)) {
 										case 1:
 											player.line(target, "fire");
@@ -1142,7 +1143,7 @@ export default () => {
 						},
 						async cost(event, trigger, player) {
 							event.result = await player
-								.chooseButton(["###" + get.prompt("sidi", trigger.player) + '###<div class="text center">将至多三张“驭”置入弃牌堆，然后执行等量条效果</div>', player.getExpansions("gzsidi")], 2)
+								.chooseButton(["###" + get.prompt("sidi", trigger.player) + '###<div class="text center">将至多三张“驭”置入弃牌堆，然后执行等量条效果</div>', player.getExpansions("gzsidi")], [1, 3])
 								.set("ai", button => {
 									const player = get.player(),
 										target = get.event().getTrigger().player;
@@ -17080,7 +17081,7 @@ export default () => {
 					if (event.num >= 1 && !(player.hasSkill("reyingzi") || player.hasSkill("jiahe_reyingzi"))) list.push("reyingzi");
 					if (event.num >= 2 && !(player.hasSkill("haoshi") || player.hasSkill("jiahe_haoshi"))) list.push("haoshi");
 					if (event.num >= 3 && !(player.hasSkill("shelie") || player.hasSkill("jiahe_shelie"))) list.push("shelie");
-					if (event.num >= 4 && !player.hasSkill("fakeduoshi")) list.push("fakeduoshi");
+					if (event.num >= 4 && !(player.hasSkill("gzduoshi") || player.hasSkill("jiahe_duoshi"))) list.push("gzduoshi");
 					if (!list.length) {
 						event.finish();
 						return;
@@ -17115,8 +17116,8 @@ export default () => {
 							if (controls.includes("reyingzi")) {
 								return "reyingzi";
 							}
-							if (controls.includes("fakeduoshi")) {
-								return "fakeduoshi";
+							if (controls.includes("gzduoshi")) {
+								return "gzduoshi";
 							}
 							return controls.randomGet();
 						});
@@ -17126,25 +17127,26 @@ export default () => {
 							reyingzi: "jiahe_reyingzi",
 							haoshi: "jiahe_haoshi",
 							shelie: "jiahe_shelie",
-							fakeduoshi: "fakeduoshi",
+							gzduoshi: "jiahe_duoshi",
 						};
 						var skills = map[result.control];
 						player.addTempSkills(skills);
 
-						// 语音修复
-						if (skills == "fakeduoshi") {
-							var mapSkills = "jiahe_duoshi";
-							game.broadcastAll(function () {
-								var info = lib.skill[skills];
+						/* 语音修复
+						if (skills == "gzduoshi") {
+							game.broadcastAll(function (player) {
+								let info = lib.skill["gzduoshi"];
 								if (!info.audioname2) info.audioname2 = {};
-								info.audioname2[player.name1] = mapSkills;
-								info.audioname2[player.name2] = mapSkills;
-								var subSkillInfo = info.subSkill.global;
-								if (!subSkillInfo.audioname2) subSkillInfo.audioname2 = {};
-								subSkillInfo.audioname2[player.name1] = mapSkills;
-								subSkillInfo.audioname2[player.name2] = mapSkills;
-							}, skills);
-						}
+								info.audioname2[player.name1] = "jiahe_duoshi";
+								info.audioname2[player.name2] = "jiahe_duoshi";
+								let subSkillInfo = info?.subSkill?.global;
+								if (subSkillInfo) {
+									if (!subSkillInfo.audioname2) subSkillInfo.audioname2 = {};
+									subSkillInfo.audioname2[player.name1] = "jiahe_duoshi";
+									subSkillInfo.audioname2[player.name2] = "jiahe_duoshi";
+								}
+							}, player);
+						}*/
 
 						if (!event.done) player.logSkill("jiahe_put");
 						// game.log(player,'获得了技能','【'+get.translation(skill)+'】');
@@ -17169,7 +17171,7 @@ export default () => {
 			},
 			jiahe_duoshi: {
 				audio: 2,
-				inherit: "fakeduoshi",
+				inherit: "gzduoshi",
 			},
 			yuanjiangfenghuotu: {
 				audio: 4,
@@ -21405,7 +21407,7 @@ export default () => {
 			gzjinqu: "进趋",
 			gzjinqu_info: "结束阶段，你可以摸两张牌，若如此做，你将手牌弃置至X张。（X为你于此回合发动过〖奇制〗的次数）",
 			gzxionghuo: "凶镬",
-			gzxionghuo_info: "每局游戏限三次，出牌阶段限一次，你可以选择一名角色，然后你获得以下效果：①当你于每回合首次对其造成伤害时，你令此伤害+1；②其出牌阶段开始时，你移去此效果，然后随机执行以下一项：⒈对其造成1点火属性伤害，其本回合不能对你使用【杀】。⒉令其失去1点体力，其本回合手牌上限-1。⒊获得其装备区一张牌，然后获得其一张手牌。",
+			gzxionghuo_info: "每局游戏限三次，出牌阶段限一次，你可以选择一名角色，然后你获得以下效果：①当你于每回合首次对其使用牌造成伤害时，你令此伤害+1；②其出牌阶段开始时，你移去此效果，然后随机执行以下一项：⒈对其造成1点火属性伤害，其本回合不能对你使用【杀】。⒉令其失去1点体力，其本回合手牌上限-1。⒊获得其装备区一张牌，然后获得其一张手牌。",
 			gzkanji: "勘集",
 			gzkanji_info: "出牌阶段限一次，你可以展示所有手牌，若花色均不同，你摸两张牌。然后若你的手牌因此包含了四种花色，你本回合手牌上限+4。",
 			gzchenjian: "陈见",
