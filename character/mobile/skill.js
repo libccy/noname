@@ -9960,10 +9960,10 @@ const skills = {
 	xingbu: {
 		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
-		prompt2: "展示牌堆顶的三张牌，并可以根据其中红色牌的数量，令一名其他角色获得一种效果",
+		prompt2: "亮出牌堆顶的三张牌，并可以根据其中红色牌的数量，令一名其他角色获得一种效果",
 		content: function () {
 			"step 0";
-			var cards = get.cards(3, true);
+			var cards = game.cardsGotoOrdering(get.cards(3)).cards;
 			event.cards = cards;
 			player.showCards(cards, get.translation(player) + "发动了【星卜】");
 			"step 1";

@@ -59,7 +59,7 @@ export default {
 	"#manjuan": "漫卷纵酒，白首狂歌。",
 	"#zuixiang": "懵懵醉乡中，天下心中藏。",
 	"#sp_pangtong:die": "纵有治世才，难遇治世主……",
-	"#zyshilu": "以杀立威，谁敢反我？",
+	"#zyshilu1": "以杀立威，谁敢反我？",
 	"#zyshilu2": "将这些乱臣贼子，尽皆诛之！",
 	"#zyxiongnve1": "当今天子乃我所立，他敢怎样？",
 	"#zyxiongnve2": "我兄弟三人同掌禁军，有何所惧？",

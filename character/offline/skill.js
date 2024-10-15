@@ -4958,7 +4958,7 @@ const skills = {
 		trigger: { global: "useCardToPlayered" },
 		filter(event, player) {
 			if (!event.isFirstTarget || get.type(event.card) != "trick") return false;
-			return event.targets.length <= 2;
+			return event.targets.length >= 2;
 		},
 		direct: true,
 		skillAnimation: true,
@@ -4979,7 +4979,7 @@ const skills = {
 				player.logSkill("jdfenwei", result.targets);
 				player.awakenSkill("jdfenwei");
 				trigger.getParent().excluded.addArray(result.targets);
-				if (result.targets.includes(player)) player.addSkill("jdfenwei_qixi");
+				if (result.targets.includes(player)) player.addTempSkill("jdfenwei_qixi");
 			}
 		},
 		ai: { expose: 0.2 },
