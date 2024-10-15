@@ -6568,9 +6568,10 @@ export default () => {
 							}, "是否对" + get.translation(event.target) + "使用一张【杀】？")
 							.set("targetRequired", true)
 							.set("complexSelect", true)
+							.set("addCount", false)
 							.set("filterTarget", function (card, player, target) {
 								if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
-								return lib.filter.filterTarget.apply(this, arguments);
+								return lib.filter.targetEnabled.apply(this, arguments);
 							})
 							.set("sourcex", event.target);
 					}
@@ -21211,7 +21212,7 @@ export default () => {
 			gzkuimang: "溃蟒",
 			gzkuimang_info: "锁定技。当你杀死与你势力不同且处于队列的角色时，你摸两张牌。",
 			gzyinpan: "引叛",
-			gzyinpan_info: "出牌阶段限一次。你可以选择一名其他角色，令所有与其势力不同的角色依次选择是否对其使用一张【杀】。然后其下回合使用【杀】的次数上限+X（X为其以此法受到的伤害次数），若其以此法进入过濒死状态，其回复1点体力。",
+			gzyinpan_info: "出牌阶段限一次。你可以选择一名其他角色，令所有与其势力不同的角色依次选择是否对其使用一张无距离次数限制的【杀】。然后其下回合使用【杀】的次数上限+X（X为其以此法受到的伤害次数），若其以此法进入过濒死状态，其回复1点体力。",
 			gzxingmou: "兴谋",
 			gzxingmou_info: "锁定技。①你杀死其他角色或其他角色杀死你均不执行奖惩。②其他角色因执行奖惩而摸牌时，你摸一张牌。",
 			//官正「十年踪迹十年心」

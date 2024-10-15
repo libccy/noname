@@ -23828,6 +23828,30 @@ const skills = {
 	},
 	linglong: {
 		audio: 2,
+		trigger: {
+			player: ["loseAfter", "disableEquipAfter", "enableEquipAfter"],
+			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter", "phaseBefore"],
+		},
+		forced: true,
+		onremove: true,
+		derivation: "reqicai",
+		filter: function (event, player) {
+			if (event.name == "disableEquip" || event.name == "enableEquip") {
+				if (!event.slots.includes("equip5")) return false;
+			} else if (event.name != "phase" && (event.name != "equip" || event.player != player)) {
+				var evt = event.getl(player);
+				if (!evt || !evt.es || !evt.es.some(i => get.subtypes(i).includes("equip5"))) return false;
+			}
+			let skills = player.additionalSkills["linglong"];
+			return (skills && skills.length > 0) != player.hasEmptySlot(5);
+		},
+		direct: true,
+		content: function () {
+			player.removeAdditionalSkill("linglong");
+			if (player.hasEmptySlot(5)) {
+				player.addAdditionalSkill("linglong", ["reqicai"]);
+			}
+		},
 		group: "linglong_bagua",
 		mod: {
 			cardUsable: function (card, player, num) {
@@ -23837,7 +23861,7 @@ const skills = {
 				if (!player.hasEmptySlot(3) || !player.hasEmptySlot(4)) return;
 				return num + 1;
 			},
-			targetInRange: function (card, player, target, now) {
+			/*targetInRange: function (card, player, target, now) {
 				if (!player.hasEmptySlot(5)) return;
 				var type = get.type(card);
 				if (type == "trick" || type == "delay") return true;
@@ -23846,7 +23870,7 @@ const skills = {
 				if (!player.hasEmptySlot(5)) return;
 				if (get.position(card) == "e" && get.subtypes(card).some(slot => slot == "equip2" || slot == "equip5")) return false;
 			},
-			/*cardDiscardable:function (card,player){
+			cardDiscardable:function (card,player){
 				if(player.getEquip(5)) return;
 				if(get.position(card)=='e') return false;
 			},*/
