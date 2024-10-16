@@ -13296,7 +13296,7 @@ const skills = {
 				if (type == "trick" || type == "delay") return true;
 			},
 			canBeDiscarded: function (card) {
-				if (get.position(card) == "e" && ["equip2", "equip5"].includes(get.subtype(card))) return false;
+				if (get.position(card) == "e" && get.subtypes(card).some(slot => slot == "equip2" || slot == "equip5")) return false;
 			},
 		},
 	},
