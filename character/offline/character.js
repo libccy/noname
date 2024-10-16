@@ -76,7 +76,7 @@ const characters = {
 	ty_shamoke: ["male", "shu", 4, ["gzjili", "tymanyong"]],
 	ty_guanxing: ["male", "shu", 4, ["tyconglong", "tyzhaowu"]],
 	ty_shicong: ["male", "shu", 4, ["tyjinzhong"]],
-	ty_wuban: ["male", "shu", 4, ["tyyoujun", "tyjicheng"], ["character:wuban", "clan:陈留吴氏"]],
+	ty_wuban: ["male", "shu", 4, ["tyyoujun", "tyjicheng"], ["clan:陈留吴氏"]],
 	ty_huangzhong: ["male", "shu", 4, ["xinliegong", "tyyizhuang"]],
 	ty_liaohua: ["male", "shu", 4, ["tydangxian", "tyfuli"]],
 	ty_fengxí: ["male", "shu", 4, ["tyqingkou"], ["character:tw_fengxí"]],
