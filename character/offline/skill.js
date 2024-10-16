@@ -2,6 +2,80 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//e系列纪灵
+	yjshuangren: {
+		audio: "shuangren",
+		enable: "phaseUse",
+		filterTarget(card, player, target) {
+			return player.canCompare(target);
+		},
+		filter(event, player) {
+			return player.countCards("h") > 0;
+		},
+		async content(event, trigger, player) {
+			const bool = await player.chooseToCompare(event.target).forResultBool();
+			if (bool) {
+				player.addTempSkill("yjshuangren_count");
+				player.addMark("yjshuangren_count", 1, false);
+				let num = 0;
+				while(num < player.countMark("yjshuangren_count")) {
+					num++;
+					const card = { name: "sha", isCard: true };
+					if (player.hasUseTarget(card)) {
+						const result = await player.chooseUseTarget(card, false).forResult();
+						if (!result.bool) break;
+					}
+					else break;
+				}
+			} else {
+				player.addTempSkill("yjshuangren_viewas");
+			}
+		},
+		ai: {
+			order(name, player) {
+				const cards = player.getCards("h");
+				for (let i = 0; i < cards.length; i++) {
+					if (get.number(cards[i]) > 11 && get.value(cards[i]) < 7) {
+						return 9;
+					}
+				}
+				return get.order({ name: "sha" }) - 0.1;
+			},
+			result: {
+				player(player) {
+					const num = player.countCards("h");
+					if (num > player.hp) return 0;
+					if (num == 1) return -1;
+					if (num == 2) return -0.7;
+					return -0.5;
+				},
+				target(player, target) {
+					const num = target.countCards("h");
+					if (num == 1) return -2;
+					if (num == 2) return -1;
+					return -0.7;
+				},
+			},
+			threaten: 1.3,
+		},
+		subSkill: {
+			count: {
+				charlotte: true,
+				onremove: true,
+			},
+			viewas: {
+				charlotte: true,
+				mod: {
+					cardname(card, player) {
+						if (card.name == "sha") return "shan";
+					},
+					cardnumber(card) {
+						if (card.name == "sha") return 13;
+					},
+				},
+			},
+		},
+	},
 	//线下幻系列
 	yjqingjiao: {
 		trigger: { player: "phaseJieshuBegin" },
