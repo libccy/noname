@@ -237,7 +237,11 @@ const skills = {
 		async content(event, trigger, player) {
 			const target = trigger.player,
 				position = player.storage.sbwansha ? "hej" : "h";
-			let cards = await player.choosePlayerCard(target, position, [0, 2], true).set("visible", true).forResultCards();
+			const bool1 = player.storage.sbwansha,
+				bool2 = get.mode() == "identity",
+				num = bool1 ? (bool2 ? 2 : 3) : (bool2 ? 1 : 2),
+				prompt = `选择至多${get.cnNumber(num)}张牌`;
+			let cards = await player.choosePlayerCard(target, position, [1, num], true, prompt).set("visible", true).forResultCards();
 			if (cards.length) {
 				let result;
 				if (target.getCards(position).some(card => !cards.includes(card)))
@@ -267,7 +271,7 @@ const skills = {
 						}
 						const gives = result.links;
 						const result2 = await player
-							.chooseTarget("选择获得" + get.translation(gives) + "的角色", cards.length == 1, (card, player, target) => {
+							.chooseTarget("选择获得" + get.translation(gives) + "的角色", true, (card, player, target) => {
 								return target != get.event().getTrigger().player;
 							})
 							.set("ai", target => {
@@ -370,6 +374,12 @@ const skills = {
 		},
 		derivation: ["sbwansha_rewrite", "sbweimu_rewrite"],
 	},
+	sbwansha_rewrite: {
+		nopop: true,
+	},
+	sbweimu_rewrite: {
+		nopop: true,
+	},
 	sbweimu: {
 		audio: 4,
 		trigger: {
@@ -387,7 +397,7 @@ const skills = {
 				if (player == current) return false;
 				num += current.getRoundHistory("useCard", evt => evt.targets?.includes(player), 1).length;
 			});
-			return num <= 2 && Array.from(ui.discardPile.childNodes).some(card => get.info("sbweimu").filterCardx(card));
+			return num <= (get.mode == "identity" ? 1 : 2) && Array.from(ui.discardPile.childNodes).some(card => get.info("sbweimu").filterCardx(card));
 		},
 		filterCardx(card) {
 			return get.subtype(card) == "equip2" || (get.type(card) == "trick" && get.color(card) == "black");
