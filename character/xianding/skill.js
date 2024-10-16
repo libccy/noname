@@ -245,7 +245,7 @@ const skills = {
 						}, [])
 						.sort((a, b) => get.number(a, false) - get.number(b, false));
 					if (!cards.length) return "牌堆";
-					if ((player.maxHp < 2 || player.hp < 1) && get.number(cards[0], false) > 1) return "牌堆";
+					if (player.hp < 1 && get.number(cards[0], false) > 1) return "牌堆";
 					cards = cards.filter(card => get.number(card, false) == get.number(cards[0], false));
 					let valueCards = cards.filter(card => {
 						let owner = get.owner(card);
@@ -319,38 +319,42 @@ const skills = {
 			if (
 				player.countCards("h", card => {
 					return get.number(card, player) < num;
-				}) ||
-				!player.countCards("h")
+				})
 			)
 				return false;
-			return !player.getStorage("dclianjie_used").includes(num);
+			return true;//return !player.getStorage("dclianjie_used").includes(num);
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
 				.chooseTarget(get.prompt2(event.name.slice(0, -5)), (card, player, target) => {
 					return target.countCards("h");
 				})
+				.set("drawed", player.getStorage("dclianjie_used").includes(get.number(trigger.card, player) || 0))
 				.set("ai", target => {
 					const player = get.player();
 					const eff1 = get.effect(target, { name: "guohe_copy2" }, player, player);
 					const eff2 = get.effect(target, { name: "draw" }, player, player);
-					if (player == target) return eff2 * (1 + player.maxHp - player.countCards("h"));
+					if (player == target && !get.event("drawed")) return eff2 * (1 + player.maxHp - player.countCards("h"));
 					return eff1;
 				})
 				.forResult();
 		},
 		async content(event, trigger, player) {
 			const target = event.targets[0];
-			player.addTempSkill("dclianjie_used");
-			player.markAuto("dclianjie_used", [get.number(trigger.card) || 0]);
 			const cards = target.getCards("h"),
 				minNumber = cards.map(card => get.number(card)).sort((a, b) => a - b)[0];
-			const toLose = cards
-				.filter(card => {
-					return get.number(card) === minNumber;
-				})
-				.randomSort();
-			await target.lose(toLose[0], ui.cardPile);
+			const toLose = cards.filter(card => get.number(card) === minNumber);
+			if (target != player || toLose.length <= 1) {
+				await target.lose(toLose.randomGet(), ui.cardPile);
+			}
+			else {
+				const result = await player
+					.chooseCard("h", card => get.event("toLose")?.includes(card), true)
+					.set("toLose", toLose)
+					.set("ai", card => 10 - get.value(card))
+					.forResult();
+				if (result.bool) await player.lose(result.cards[0], ui.cardPile);
+			}
 			game.broadcastAll(function (player) {
 				var cardx = ui.create.card();
 				cardx.classList.add("infohidden");
@@ -358,7 +362,10 @@ const skills = {
 				player.$throw(cardx, 1000, "nobroadcast");
 			}, target);
 			await game.delayx();
-			if (player.countCards("h") >= player.maxHp) return;
+			const num = get.number(trigger.card, player) || 0;
+			if (player.countCards("h") >= player.maxHp || player.getStorage("dclianjie_used").includes(num)) return;
+			player.addTempSkill("dclianjie_used");
+			player.markAuto("dclianjie_used", num);
 			const result = await player.drawTo(player.maxHp).forResult();
 			if (result) player.addGaintag(result, "dclianjie");
 		},
