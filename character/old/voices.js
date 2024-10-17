@@ -48,6 +48,8 @@ export default {
 	"#yuji:die": "竟然……被猜到了……",
 	"#old_fuhun1": "呐喊破敌，锐不可挡！",
 	"#old_fuhun2": "匹夫之勇，插标卖首！",
+	"#wusheng_old_guanzhang": "武圣之名，威震华夏！",
+	"#paoxiao_old_guanzhang": "杀呀！",
 	"#old_guanzhang:die": "父亲，我来了……",
 	"#huangzhong:die": "不得不服老啦~",
 };

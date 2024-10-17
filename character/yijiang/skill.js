@@ -450,6 +450,8 @@ const skills = {
 		},
 		derivation: ["wusheng", "paoxiao"],
 	},
+	wusheng_old_guanzhang: { audio: true },
+	paoxiao_old_guanzhang: { audio: true },
 	shiyong: {
 		audio: 2,
 		trigger: { player: "damageEnd" },
@@ -1639,7 +1641,7 @@ const skills = {
 		},
 	},
 	zhenjun: {
-		audio: "jieyue",
+		audio: ["jieyue", 2],
 		trigger: {
 			player: "phaseZhunbeiBegin",
 		},
@@ -1690,7 +1692,7 @@ const skills = {
 		},
 	},
 	rezhenjun: {
-		audio: "jieyue",
+		audio: ["jieyue", 2],
 		trigger: {
 			player: "phaseZhunbeiBegin",
 		},
@@ -5233,9 +5235,10 @@ const skills = {
 		},
 	},
 	jieyue: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
+		logAudio: () => 2,
 		content: function () {
 			"step 0";
 			player.chooseCardTarget({
@@ -5295,7 +5298,7 @@ const skills = {
 		group: ["jieyue_wuxie", "jieyue_shan", "jieyue_gain"],
 		subSkill: {
 			wuxie: {
-				audio: true,
+				audio: "jieyue3.mp3",
 				enable: "chooseToUse",
 				filterCard: function (card) {
 					return get.color(card) == "black";
@@ -5311,7 +5314,7 @@ const skills = {
 				},
 			},
 			shan: {
-				audio: true,
+				audio: "jieyue4.mp3",
 				enable: ["chooseToRespond", "chooseToUse"],
 				filterCard: function (card) {
 					return get.color(card) == "red";
@@ -5337,6 +5340,7 @@ const skills = {
 			},
 			gain: {
 				audio: "jieyue",
+				logAudio: () => 2,
 				trigger: { player: "phaseZhunbeiBegin" },
 				filter: function (event, player) {
 					return player.getExpansions("jieyue").length;
