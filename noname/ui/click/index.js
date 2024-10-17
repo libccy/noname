@@ -2773,6 +2773,14 @@ export class Click {
 			if (this.playerid) {
 				if (this.ws) {
 					if (confirm("是否踢出" + this.nickname + "？")) {
+						var onlineKey = this.ws.onlineKey;
+						if (onlineKey) {
+							if (confirm("是否永久踢出(加入黑名单)？")) {
+								var banBlacklist = lib.config.banBlacklist === undefined ? [] : lib.config.banBlacklist;
+								banBlacklist.push(onlineKey);
+								game.saveConfig("banBlacklist", banBlacklist);
+							}
+						}
 						var id = get.id();
 						this.ws.send(function (id) {
 							if (game.ws) {
