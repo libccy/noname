@@ -184,13 +184,21 @@ const skills = {
 					if (get.owner(cardb)) await get.owner(cardb).give(cardb, player);
 					else await player.gain(cardb, "gain2");
 				}
-				if (get.number(carda) == get.number(cardb)) player.getStat("skill").mpmiaoxi--;
+				if (get.number(carda) == get.number(cardb) && !player.hasSkill("mpmiaoxi_fresh")) {
+					player.addTempSkill("mpmiaoxi_fresh");
+					player.getStat("skill").mpmiaoxi--;
+				}
 			}
 		},
 		ai: {
 			order: 5,
 			result: {
 				target: -1,
+			},
+		},
+		subSkill: {
+			fresh: {
+				charlotte: true,
 			},
 		},
 	},

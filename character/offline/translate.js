@@ -1,4 +1,7 @@
 const translates = {
+	yj_jiling: "纪灵",
+	yjshuangren: "双刃",
+	yjshuangren_info: "出牌阶段，你可以与一名角色拼点。若你赢，你可以依次视为使用X张【杀】；若你没赢，你的【杀】本回合均视为K点的【闪】（X为你本回合〖双刃〗拼赢的次数）。",
 	scl_pangdegong: "SCL庞德公",
 	scl_pangdegong_prefix: "SCL",
 	scl_sunhanhua: "SCL孙寒华",

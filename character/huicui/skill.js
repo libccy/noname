@@ -653,7 +653,7 @@ const skills = {
 					player: "dieAfter",
 				},
 				filter(event, player) {
-					return !game.hasPlayer(cur => !cur.hasSkill("dcyunzheng", null, null, false), true);
+					return !game.hasPlayer(cur => cur.hasSkill("dcyunzheng", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -6884,13 +6884,14 @@ const skills = {
 				filter: function (event, player) {
 					var evt = event.getParent();
 					if (evt.name != "orderingDiscard") return false;
-					return evt.relatedEvent.dcqianzheng && event.cards.filterInD("d").length;
+					return evt.relatedEvent.dcqianzheng && evt.relatedEvent.cards.filterInD("d").length;
 				},
 				charlotte: true,
 				forced: true,
 				popup: false,
 				content: function () {
-					player.gain(trigger.cards.filterInD("d"), "gain2");
+					const evt = trigger.getParent().relatedEvent;
+					player.gain(evt.cards.filterInD("d"), "gain2");
 				},
 			},
 		},

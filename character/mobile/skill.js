@@ -81,9 +81,23 @@ const skills = {
 		getNum(event, player) {
 			let num = 0;
 			if (game.countPlayer2(current => current.hasHistory("lose")) >= 1) num++;
-			if (game.countPlayer2(current => current.hasHistory("damage")) >= 1) num++;
+			if (game.countPlayer2(current => current.hasHistory("damage")) >= 1) {
+				switch(get.mode()) {
+					case "doudizhu": {
+						num +=2;
+						break;
+					}
+					case "identity": break;
+					default: {
+						num++;
+						break;
+					}
+				}
+			}
 			if (event.name == "phase") return num;
-			return Math.max(game.countPlayer(), player.getHp());
+			if (get.mode() == "identity") return Math.max(game.countPlayer(), player.getHp());
+			if (game.hasPlayer2(current => !current.isAlive())) return 114514;
+			return 5;
 		},
 		trigger: {
 			player: "phaseZhunbeiBegin",

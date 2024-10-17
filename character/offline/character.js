@@ -200,6 +200,7 @@ const characters = {
 	yj_caoang: ["male", "wei", 4, ["yjxuepin"]],
 	ns_caoanmin: ["male", "wei", 4, ["nskuishe"]],
 	jsp_liubei: ["male", "qun", 4, ["jsprende"]],
+	yj_jiling: ["male", "qun", 4, ["yjshuangren"]],
 };
 
 export default characters;
