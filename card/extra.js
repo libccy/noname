@@ -1076,7 +1076,8 @@ game.import("card", function () {
 								"addToExpansionAfter",
 							],
 						},
-						filter: (event, player) => {
+						filter: (event, player, name, card) => {
+							if (!card || card.name != "baiyin") return false;
 							return (player.isDamaged() && !player.hasSkillTag("unequip2"))
 						},
 						getIndex(event, player){
@@ -1086,7 +1087,7 @@ game.import("card", function () {
 								const VEquip = evt.vcard_map.get(card);
 								if(VEquip.name === "baiyin") lostCards.add(VEquip);
 							});
-							return lostCards.length;
+							return lostCards;
 						},
 						async content(event, trigger, player) {
 							await player.recover();
