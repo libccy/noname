@@ -136,7 +136,7 @@ const skills = {
 				)
 				.set("ai", target => {
 					const player = get.player();
-					return get.effect(target, { name: "yyyaoming" }, player, player);
+					return get.effect(target, "yyyaoming", player, player);
 				})
 				.forResult();
 		},
