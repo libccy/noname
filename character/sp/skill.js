@@ -1131,7 +1131,7 @@ const skills = {
 			locals.removeArray(humans);
 			const eventId = get.id();
 			const send = (question, current, eventId) => {
-				lib.skill.dclisao.chooseControl(question, current, eventId);
+				lib.skill.olhunjiang.chooseControl(question, current, eventId);
 				game.resume();
 			};
 			event._global_waiting = true;

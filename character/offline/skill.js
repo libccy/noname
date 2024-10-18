@@ -497,15 +497,18 @@ const skills = {
 	yyzuifu: {
 		trigger: { global: ["gainAfter", "loseAsyncAfter"] },
 		filter(event, player, name, target) {
-			if (!event.getg || _status.dying) return false;
+			if (!event.getg || _status.dying.length) return false;
 			return target?.isIn();
 		},
 		getIndex(event, player) {
 			if (!event.getg) return false;
-			if (event.name == "gain") {
-				if (event.getParent().name == "draw" && event.getParent("phaseDraw").player == event.player) return false;
-			}
-			return game.filterPlayer(target => event.getg(target).length > 0);
+			return game
+				.filterPlayer(current => {
+					const evt = event.getParent("phaseDraw");
+					if (evt?.player == current) return false;
+					return event.getg(current).length;
+				})
+				.sortBySeat();
 		},
 		usable: 1,
 		logTarget: (event, player, name, target) => target,
