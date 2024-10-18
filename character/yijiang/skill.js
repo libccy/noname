@@ -11902,12 +11902,13 @@ const skills = {
 	},
 	enyuan: {
 		audio: 4,
+		audioname2: { boss_songdiwang: "boss_songdiwang_enyuan", },
 		locked: true,
 		group: ["enyuan1", "enyuan2"],
 	},
 	enyuan1: {
-		audio: "enyuan",
-		logAudio: () => ["enyuan3.mp3", "enyuan4.mp3"],
+		audio: ["enyuan3.mp3", "enyuan4.mp3"],
+		audioname2: { boss_songdiwang: "boss_songdiwang_enyuan", },
 		trigger: { player: "damageEnd" },
 		forced: true,
 		sourceSkill: "enyuan",
@@ -11947,8 +11948,8 @@ const skills = {
 		},
 	},
 	enyuan2: {
-		audio: "enyuan",
-		logAudio: () => ["enyuan1.mp3", "enyuan2.mp3"],
+		audio: ["enyuan1.mp3", "enyuan2.mp3"],
+		audioname2: { boss_songdiwang: "boss_songdiwang_enyuan", },
 		trigger: { player: "recoverEnd" },
 		forced: true,
 		logTarget: "source",
