@@ -13714,6 +13714,7 @@ const skills = {
 	},
 	refankui: {
 		audio: 2,
+		audioname2: { boss_chujiangwang: "boss_chujiangwang_fankui" },
 		trigger: { player: "damageEnd" },
 		filter: function (event, player) {
 			return event.source && event.source.countGainableCards(player, event.source != player ? "he" : "e") && event.num > 0;

@@ -1756,6 +1756,7 @@ const skills = {
 		derivation: ["mashu", "shenji"],
 	},
 	shenji: {
+		audio: 2,
 		mod: {
 			selectTarget(card, player, range) {
 				if (range[1] == -1) return;
