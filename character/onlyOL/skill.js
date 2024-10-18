@@ -938,9 +938,13 @@ const skills = {
 		subSkill: {
 			gain: {
 				audio: "olsbliwen",
-				trigger: { player: "useCard" },
+				trigger: {
+					global: "phaseBefore",
+					player: ["useCard", "enterGame"],
+				},
 				filter(event, player) {
 					if (player.countMark("olsbliwen") >= 5) return false;
+					if (event.name !== "useCard") return event.name !== "phase" || game.phaseNumber === 0;
 					let history = player.getAllHistory("useCard");
 					if (history.length <= 1) return false;
 					const evt = history[history.length - 2];
@@ -950,7 +954,7 @@ const skills = {
 				forced: true,
 				locked: false,
 				content() {
-					player.addMark("olsbliwen", 1);
+					player.addMark("olsbliwen", trigger.name === "useCard" ? 1 : Math.min(3, 5 - player.countMark("olsbliwen")));
 				},
 				mod: {
 					aiOrder(player, card, num) {
