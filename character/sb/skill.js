@@ -7874,7 +7874,7 @@ const skills = {
 				content: function () {
 					player.markAuto("sbliegong", [get.suit(trigger.card)]);
 					player.storage.sbliegong.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-					player.addTip("sbliegong", get.translation("sbliegong") + player.getStorage("sbliegong").reduce((str, suit) => str + get.translation(suit), " "));
+					player.addTip("sbliegong", get.translation("sbliegong") + player.getStorage("sbliegong").reduce((str, suit) => str + get.translation(suit), ""));
 				},
 			},
 		},
