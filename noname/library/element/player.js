@@ -2784,52 +2784,58 @@ export class Player extends HTMLDivElement {
 				this.serving = true;
 			}
 		} else {
-			var config = info[2];
-			this.key = info[4];
-			this.roomempty = false;
-			str += get.modetrans(config);
-			str += " 模式　";
-			for (var i = str.length; i < 11; i++) str += "　";
-			this.version = config.version;
-			if (config.gameStarted) {
-				str += '<span class="firetext">游戏中</span>　';
-				if (config.observe && config.observeReady && this.version == lib.versionOL) {
-					this.classList.remove("exclude");
+			if (info.length) {
+				var config = info[2];
+				this.key = info[4];
+				this.roomempty = false;
+				str += get.modetrans(config);
+				str += " 模式　";
+				for (var i = str.length; i < 11; i++) str += "　";
+				this.version = config.version;
+				if (config.gameStarted) {
+					str += '<span class="firetext">游戏中</span>　';
+					if (config.observe && config.observeReady && this.version == lib.versionOL) {
+						this.classList.remove("exclude");
+					} else {
+						this.classList.add("exclude");
+					}
 				} else {
-					this.classList.add("exclude");
+					str += '<span class="greentext">等待中</span>　';
+					if (this.version != lib.versionOL) {
+						this.classList.add("exclude");
+					} else {
+						this.classList.remove("exclude");
+					}
 				}
-			} else {
-				str += '<span class="greentext">等待中</span>　';
-				if (this.version != lib.versionOL) {
-					this.classList.add("exclude");
-				} else {
-					this.classList.remove("exclude");
-				}
-			}
-			this.maxHp = parseInt(config.number);
-			this.hp = Math.min(this.maxHp, info[3]);
-			if (this.hp < this.maxHp || config.gameStarted) str += "人数：" + this.hp + "/" + this.maxHp;
-			else str += '人数：<span class="firetext">' + this.hp + "/" + this.maxHp + "</span>";
+				this.maxHp = parseInt(config.number);
+				this.hp = Math.min(this.maxHp, info[3]);
+				if (this.hp < this.maxHp || config.gameStarted) str += "人数：" + this.hp + "/" + this.maxHp;
+				else str += '人数：<span class="firetext">' + this.hp + "/" + this.maxHp + "</span>";
 
-			str += "　(" + info[0].slice(0, 12) + " 的房间)";
-			if (config.mode != "guozhan" && (config.mode != "doudizhu" || config.doudizhu_mode != "online")) {
-				str += "【";
-				for (var i = 0; i < config.cardPack.length; i++) {
-					str += get.translation(config.cardPack[i] + "_card_config").slice(0, 2);
-					if (i < config.cardPack.length - 1) str += "+";
+				str += "　(" + info[0].slice(0, 12) + " 的房间)";
+				if (config.mode != "guozhan" && (config.mode != "doudizhu" || config.doudizhu_mode != "online")) {
+					str += "【";
+					for (var i = 0; i < config.cardPack.length; i++) {
+						str += get.translation(config.cardPack[i] + "_card_config").slice(0, 2);
+						if (i < config.cardPack.length - 1) str += "+";
+					}
+					str += "】";
 				}
-				str += "】";
-			}
-			this.config = config;
-			if (this.hp == this.maxHp && !config.gameStarted) {
+				this.config = config;
+				if (this.hp == this.maxHp && !config.gameStarted) {
+					this.roomfull = true;
+				} else {
+					this.roomfull = false;
+				}
+				if (config.gameStarted && (!config.observe || !config.observeReady)) {
+					this.roomgaming = true;
+				} else {
+					this.roomgaming = false;
+				}
+			} else {
+				str = "异常房间";
 				this.roomfull = true;
-			} else {
-				this.roomfull = false;
-			}
-			if (config.gameStarted && (!config.observe || !config.observeReady)) {
-				this.roomgaming = true;
-			} else {
-				this.roomgaming = false;
+				this.classList.add("exclude");
 			}
 		}
 		this.firstChild.innerHTML = str;
