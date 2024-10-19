@@ -11225,7 +11225,6 @@ const skills = {
 	jsrgpiqi: {
 		audio: 2,
 		enable: "phaseUse",
-		usable: 2,
 		viewAs: {
 			name: "shunshou",
 			isCard: true,
@@ -11235,20 +11234,32 @@ const skills = {
 		},
 		filterCard: () => false,
 		selectCard: -1,
+		filter(event, player) {
+			const card = { name: "shunshou", isCard: true, storage: { jsrgpiqi: true }};
+			return player.countMark("jsrgpiqi_used") < 2 && game.hasPlayer(current => {
+				return lib.skill.jsrgpiqi.filterTarget(card, player, current);
+			});
+		},
 		filterTarget(card, player, target) {
-			if (player.getStorage("jsrgpiqi_used").includes(target)) return false;
+			if (player.getStorage("jsrgpiqi_targets").includes(target)) return false;
 			return lib.filter.targetEnabled2(card, player, target);
 		},
 		precontent() {
 			player.addTempSkill("jsrgpiqi_used", "phaseUseAfter");
-			var targets = event.result.targets;
-			player.markAuto("jsrgpiqi_used", targets[0]);
-			for (var target of game.players) {
+			player.addMark("jsrgpiqi_used", 1, false);
+			player.addTempSkill("jsrgpiqi_targets", "phaseUseAfter");
+			let targets = event.result.targets;
+			player.markAuto("jsrgpiqi_targets", targets);
+			for (let target of game.players) {
 				if (targets.some(current => get.distance(target, current) <= 1)) target.addTempSkill("jsrgpiqi_kanpo");
 			}
 		},
 		subSkill: {
 			used: {
+				charlotte: true,
+				onremove: true,
+			},
+			targets: {
 				charlotte: true,
 				onremove: true,
 			},

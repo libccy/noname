@@ -2082,7 +2082,7 @@ const skills = {
 					target.isIn() &&
 					player.hasCard(card => lib.skill.olliantao_backup.filterCard(card, player)) &&
 					!game.getGlobalHistory("everything", evt => {
-						return evt.name == "dying" && [player, target].includes(evt.player) && evt.getParent("olliantao") == event;
+						return evt.name == "dying" && [player, target].includes(evt.player) && evt.getParent(event.name) == event;
 					}).length
 				) {
 					await player
