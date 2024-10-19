@@ -498,6 +498,7 @@ export async function boot() {
 	// 无名杀更新日志
 	if (window.noname_update) {
 		Reflect.set(lib, "version", window.noname_update.version);
+		Reflect.set(lib, "versionCode", window.noname_update.versionCode);
 		// 更全面的更新内容
 		if (config.get(`version_description_v${window.noname_update.version}`)) {
 			try {
