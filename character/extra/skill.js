@@ -612,9 +612,9 @@ const skills = {
 		},
 		async content(event, trigger, player) {
 			const { target, position } = event.cost_data;
-			game.broadcastAll(function () {
+			game.broadcastAll(function (position) {
 				if (lib.config.background_speak) game.playAudio("skill", "dclieqiong_" + position);
-			});
+			}, position);
 			const positionObj = lib.skill[event.name].positions[position];
 			let next = game.createEvent(event.name + "effect", false);
 			next.setContent(positionObj.content);
