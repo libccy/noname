@@ -326,6 +326,8 @@ export default {
 	"#old_huaxiong:die": "皮厚，不挡刀啊……",
 	"#jieyue1": "安营驻寨，严守城防。",
 	"#jieyue2": "诸军严整，敌军自乱。",
+	"#jieyue3": "纪法严明，无懈可击！",
+	"#jieyue4": "不动如泰山！",
 	"#yujin:die": "我，无颜面对丞相了……",
 	"#reqiaoshui1": "慧心妙舌，难题可解。",
 	"#reqiaoshui2": "巧言善辩，应对自如。",

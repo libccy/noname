@@ -1,4 +1,7 @@
 export default {
+	"#olrenxia1": "俊毅如风，任胸中长虹惊云。",
+	"#olrenxia2": "侠之大者，为国为民。",
+	"#wangkuang:die": "人心不古，世态炎凉。",
 	"#olpingduan1": "草原儿郎，张弓善射，勇不可当。",
 	"#olpingduan2": "策马逐雄鹰，孤当与尔等共分天下。",
 	"#ol_kebineng:die": "未驱青马饮于黄河，死难瞑目。",

@@ -4,6 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//王匡
 	olrenxia: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		chooseButton: {
