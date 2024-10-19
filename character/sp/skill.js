@@ -4,6 +4,7 @@ import { lib, game, ui, get, ai, _status } from "../../noname.js";
 const skills = {
 	//王匡
 	olrenxia: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		chooseButton: {
@@ -1131,7 +1132,7 @@ const skills = {
 			locals.removeArray(humans);
 			const eventId = get.id();
 			const send = (question, current, eventId) => {
-				lib.skill.dclisao.chooseControl(question, current, eventId);
+				lib.skill.olhunjiang.chooseControl(question, current, eventId);
 				game.resume();
 			};
 			event._global_waiting = true;
@@ -3109,26 +3110,29 @@ const skills = {
 			for (let current of [player, target]) {
 				switch (list[result[current == player ? 0 : 1]]) {
 					case "重铸": {
-						let result2 = yield current.chooseCard("he", "请重铸一张牌", (card, player) => player.canRecast(card), true);
-						if (result2.bool) current.recast(result2.cards);
+						if (current.countCards("he", card => current.canRecast(card))) {
+							let result2 = yield current.chooseCard("he", "请重铸一张牌", (card, player) => player.canRecast(card), true);
+							if (result2.bool) current.recast(result2.cards);
+						}
 						break;
 					}
 					case "出杀": {
-						current.chooseToUse({
-							prompt: "请使用一张【杀】",
-							filterCard: function (card, player) {
-								if (card.name != "sha") return false;
-								return lib.filter.filterCard.apply(this, arguments);
-							},
-							forced: true,
-							ai1: function (card) {
-								return _status.event.player.getUseValue(card);
-							},
-						});
+						if (current.hasUsableCard("sha"))
+							current.chooseToUse({
+								prompt: "请使用一张【杀】",
+								filterCard: function (card, player) {
+									if (card.name != "sha") return false;
+									return lib.filter.filterCard.apply(this, arguments);
+								},
+								forced: true,
+								ai1: function (card) {
+									return _status.event.player.getUseValue(card);
+								},
+							});
 						break;
 					}
 					case "弃牌": {
-						current.chooseToDiscard("he", 2, true);
+						if (current.countCards("he", card => lib.filter.cardDiscardable(card, current))) current.chooseToDiscard("he", 2, true);
 						break;
 					}
 				}
@@ -23825,6 +23829,30 @@ const skills = {
 	},
 	linglong: {
 		audio: 2,
+		trigger: {
+			player: ["loseAfter", "disableEquipAfter", "enableEquipAfter"],
+			global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter", "phaseBefore"],
+		},
+		forced: true,
+		onremove: true,
+		derivation: "reqicai",
+		filter: function (event, player) {
+			if (event.name == "disableEquip" || event.name == "enableEquip") {
+				if (!event.slots.includes("equip5")) return false;
+			} else if (event.name != "phase" && (event.name != "equip" || event.player != player)) {
+				var evt = event.getl(player);
+				if (!evt || !evt.es || !evt.es.some(i => get.subtypes(i).includes("equip5"))) return false;
+			}
+			let skills = player.additionalSkills["linglong"];
+			return (skills && skills.length > 0) != player.hasEmptySlot(5);
+		},
+		direct: true,
+		content: function () {
+			player.removeAdditionalSkill("linglong");
+			if (player.hasEmptySlot(5)) {
+				player.addAdditionalSkill("linglong", ["reqicai"]);
+			}
+		},
 		group: "linglong_bagua",
 		mod: {
 			cardUsable: function (card, player, num) {
@@ -23834,7 +23862,7 @@ const skills = {
 				if (!player.hasEmptySlot(3) || !player.hasEmptySlot(4)) return;
 				return num + 1;
 			},
-			targetInRange: function (card, player, target, now) {
+			/*targetInRange: function (card, player, target, now) {
 				if (!player.hasEmptySlot(5)) return;
 				var type = get.type(card);
 				if (type == "trick" || type == "delay") return true;
@@ -23843,7 +23871,7 @@ const skills = {
 				if (!player.hasEmptySlot(5)) return;
 				if (get.position(card) == "e" && get.subtypes(card).some(slot => slot == "equip2" || slot == "equip5")) return false;
 			},
-			/*cardDiscardable:function (card,player){
+			cardDiscardable:function (card,player){
 				if(player.getEquip(5)) return;
 				if(get.position(card)=='e') return false;
 			},*/
@@ -26307,15 +26335,10 @@ const skills = {
 		},
 		content() {
 			"step 0";
-			var list = lib.group
-				.slice()
-				.concat(
-					game.filterPlayer(target => {
-						const group = target[get.mode() === "guozhan" ? "identity" : "group"];
-						return group !== "unkonwn";
-					})
-				)
-				.filter(group => current[get.mode() === "guozhan" ? "identity" : "group"] == group);
+			let list = game.filterPlayer(target => {
+				const group = target[get.mode() === "guozhan" ? "identity" : "group"];
+				return group !== "unkonwn";
+			}).map(current => current[get.mode() === "guozhan" ? "identity" : "group"]).unique();
 			if (player.storage.xiemu2) list.removeArray(player.storage.xiemu2);
 			var list2 = list.slice(0);
 			list2.sort(function (a, b) {

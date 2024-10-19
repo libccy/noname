@@ -10,7 +10,7 @@ const skills = {
 		intro: {
 			content(storage) {
 				if (!storage) return "出牌阶段开始时，你可以摸X张牌，然后本回合的弃牌阶段开始时，你弃置所有非基本牌（X为你已损失的体力值，至少为1，至多为3）";
-				return "其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有非基本牌（X为你已损失的体力值，至少为1，至多为3）";
+				return "其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有基本牌（X为你已损失的体力值，至少为1，至多为3）";
 			},
 		},
 		audio: 2,
@@ -20,24 +20,37 @@ const skills = {
 		},
 		logTarget: "player",
 		prompt2(event, player) {
-			return "令其摸" + get.cnNumber(Math.min(3, Math.max(1, player.getDamagedHp()))) + "张牌，然后本回合的弃牌阶段开始时，" + (event.player === player ? "" : "其") + "弃置所有非基本牌";
+			const goon = event.player === player;
+			return (goon ? "" : "令其") + "摸" + get.cnNumber(Math.min(3, Math.max(1, player.getDamagedHp()))) + "张牌，本回合的弃牌阶段开始时，" + (goon ? "弃置所有非基本牌" : "其弃置所有基本牌");
 		},
 		content() {
 			player.changeZhuanhuanji("xiongjin");
 			const target = trigger.player;
 			target.addTempSkill("xiongjin_effect");
+			target.markAuto("xiongjin_effect", [target === player ? "nobasic" : "basic"]);
 			target.draw(Math.min(3, Math.max(1, player.getDamagedHp())));
 		},
 		subSkill: {
 			effect: {
 				charlotte: true,
 				mark: true,
-				intro: { content: "弃牌阶段开始时，弃置所有非基本牌" },
+				intro: {
+					markcount: () => 0,
+					content(storage) {
+						if (storage.length > 1) return "弃牌阶段开始时，弃置所有牌";
+						return "弃牌阶段开始时，弃置所有" + (storage[0] === "basic" ? "基本" : "非基本") + "牌";
+					},
+				},
 				trigger: { player: "phaseDiscardBegin" },
 				forced: true,
 				popup: false,
 				content() {
-					const cards = player.getCards("he", card => lib.filter.cardDiscardable(card, player) && get.type(card) !== "basic");
+					const storage = player.getStorage("xiongjin_effect");
+					const cards = player.getCards("he", card => {
+						if (!lib.filter.cardDiscardable(card, player)) return false;
+						const type = get.type(card);
+						return (type === "basic" && storage.includes("basic")) || (type !== "basic" && storage.includes("nobasic"));
+					});
 					if (cards.length) player.discard(cards);
 				},
 			},
@@ -59,7 +72,7 @@ const skills = {
 				trigger.cards.reduce((list, card) => list.add(get.suit(card, false)), [])
 			);
 			player.storage.xiawei.sort((a, b) => lib.suit.indexOf(b) - lib.suit.indexOf(a));
-			player.addTip("xiawei", get.translation("xiawei") + player.getStorage("xiawei").reduce((str, suit) => str + get.translation(suit), " "));
+			player.addTip("xiawei", get.translation("xiawei") + player.getStorage("xiawei").reduce((str, suit) => str + get.translation(suit), ""));
 			if (player.getStorage("xiawei").length >= 4 && player.maxHp < 9) {
 				delete player.storage.xiawei;
 				player.unmarkSkill("xiawei");
@@ -171,13 +184,21 @@ const skills = {
 					if (get.owner(cardb)) await get.owner(cardb).give(cardb, player);
 					else await player.gain(cardb, "gain2");
 				}
-				if (get.number(carda) == get.number(cardb)) player.getStat("skill").mpmiaoxi--;
+				if (get.number(carda) == get.number(cardb) && !player.hasSkill("mpmiaoxi_fresh")) {
+					player.addTempSkill("mpmiaoxi_fresh");
+					player.getStat("skill").mpmiaoxi--;
+				}
 			}
 		},
 		ai: {
 			order: 5,
 			result: {
 				target: -1,
+			},
+		},
+		subSkill: {
+			fresh: {
+				charlotte: true,
 			},
 		},
 	},
@@ -2394,15 +2415,18 @@ const skills = {
 	//陆凯
 	lkbushi: {
 		audio: 2,
-		getBushi: function (player) {
+		getBushi(player) {
 			if (!player.storage.lkbushi) return ["spade", "heart", "club", "diamond"];
 			return player.storage.lkbushi;
+		},
+		init(player, skill) {
+			player.addTip(skill, get.translation(skill) + lib.skill.lkbushi.getBushi(player).reduce((str, i) => str + get.translation(i), ""));
 		},
 		onremove: true,
 		trigger: { player: "phaseZhunbeiBegin" },
 		direct: true,
 		locked: false,
-		content: function () {
+		content() {
 			"step 0";
 			var list = lib.skill.lkbushi.getBushi(player);
 			list = list.map(function (i) {
@@ -2451,6 +2475,7 @@ const skills = {
 					if (list[i] != list2[i]) {
 						player.logSkill("lkbushi");
 						player.storage.lkbushi = list2;
+						player.addTip("lkbushi", get.translation("lkbushi") + lib.skill.lkbushi.getBushi(player).reduce((str, i) => str + get.translation(i), ""));
 						var str = "#g";
 						for (var j = 0; j < 4; j++) {
 							str += get.translation(list2[j]);
@@ -2466,7 +2491,7 @@ const skills = {
 		mark: true,
 		marktext: "筮",
 		intro: {
-			content: function (storage, player) {
+			content(storage, player) {
 				var list = lib.skill.lkbushi.getBushi(player).map(i => get.translation(i));
 				return "①你使用" + list[0] + "牌无次数限制。②当你使用或打出" + list[1] + "牌后，你摸一张牌。③当你成为" + list[2] + "牌的目标后，你可以弃置一张牌，令此牌对你无效。④结束阶段开始时，你从牌堆或弃牌堆获得一张" + list[3] + "牌。⑤准备阶段开始时，你可调整此技能中四种花色的对应顺序。";
 			},
@@ -2475,7 +2500,7 @@ const skills = {
 		subSkill: {
 			unlimit: {
 				mod: {
-					cardUsable: function (card, player) {
+					cardUsable(card, player) {
 						const list = lib.skill.lkbushi.getBushi(player),
 							suit = get.suit(card);
 						if (suit === "unsure" || list[0] === suit) return Infinity;
@@ -2486,12 +2511,12 @@ const skills = {
 				popup: false,
 				silent: true,
 				firstDo: true,
-				filter: function (event, player) {
+				filter(event, player) {
 					if (event.addCount === false) return true;
 					var list = lib.skill.lkbushi.getBushi(player);
 					return list[0] == get.suit(event.card);
 				},
-				content: function () {
+				content() {
 					trigger.addCount = false;
 					var stat = player.getStat().card,
 						name = trigger.card.name;
@@ -2500,14 +2525,14 @@ const skills = {
 			},
 			draw: {
 				audio: "lkbushi",
-				trigger: { player: ["useCard", "respond"] },
+				trigger: { player: ["useCardAfter", "respondAfter"] },
 				forced: true,
 				locked: false,
-				filter: function (event, player) {
+				filter(event, player) {
 					var list = lib.skill.lkbushi.getBushi(player);
 					return list[1] == get.suit(event.card);
 				},
-				content: function () {
+				content() {
 					player.draw();
 				},
 			},
@@ -2515,11 +2540,11 @@ const skills = {
 				audio: "lkbushi",
 				trigger: { target: "useCardToTargeted" },
 				direct: true,
-				filter: function (event, player) {
+				filter(event, player) {
 					var list = lib.skill.lkbushi.getBushi(player);
 					return list[2] == get.suit(event.card) && !event.excluded.includes(player) && player.countCards("he") > 0;
 				},
-				content: function () {
+				content() {
 					"step 0";
 					player
 						.chooseToDiscard("he", get.prompt("lkbushi"), "弃置一张牌，令" + get.translation(trigger.card) + "对你无效")
@@ -2539,7 +2564,7 @@ const skills = {
 				trigger: { player: "phaseJieshuBegin" },
 				forced: true,
 				locked: false,
-				content: function () {
+				content() {
 					var list = lib.skill.lkbushi.getBushi(player);
 					var card = get.cardPile(function (card) {
 						return get.suit(card, false) == list[3];
@@ -2553,13 +2578,13 @@ const skills = {
 		audio: 2,
 		trigger: { source: ["damageBegin1", "damageBegin4"] },
 		forced: true,
-		filter: function (event, player, name) {
+		filter(event, player, name) {
 			if (!event.card || event.card.name != "sha" || event.getParent().type != "card") return false;
 			var range = player.getAttackRange();
 			if (name == "damageBegin1") return range > 3;
 			return range < 3 && event.num > 1;
 		},
-		content: function () {
+		content() {
 			if (event.triggername == "damageBegin1") trigger.num++;
 			else trigger.num = 1;
 		},
@@ -2568,7 +2593,7 @@ const skills = {
 			ai: {
 				ai: {
 					filterDamage: true,
-					skillTagFilter: function (player, tag, arg) {
+					skillTagFilter(player, tag, arg) {
 						if (arg && arg.card && arg.card.name == "sha") {
 							if (arg.player && arg.player.hasSkill("lkzhongzhuang") && arg.player.getAttackRange() < 3) return true;
 						}

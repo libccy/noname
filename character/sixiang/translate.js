@@ -265,8 +265,8 @@ const translates = {
 	stdmieji_info: "出牌阶段限一次，你可以交给一名其他角色一张黑色锦囊牌，然后可以弃置其至多两张牌。",
 	stdyunji: "运机",
 	stdyunji_info: "你可以将一张装备牌当【借刀杀人】使用。",
-	stdlianji: "连计",
-	stdlianji_info: "当一名角色受到【杀】或【决斗】造成的伤害后，你可以弃置其与伤害来源的各一张牌。",
+	stdzongji: "纵计",
+	stdzongji_info: "当一名角色受到【杀】或【决斗】造成的伤害后，你可以弃置其与伤害来源的各一张牌。",
 };
 
 export default translates;

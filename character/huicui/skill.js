@@ -64,19 +64,29 @@ const skills = {
 							return evt.name === "showCards";
 						})
 						.reduce((list, evt) => list.addArray(evt.cards), []);
-					return player.getUseValue(card) + (shown.includes(card) ? 0 : get.effect(player, { name: "draw" }, player, player));
+					const cardx = {
+						name: get.name(card, player),
+						nature: get.nature(card, player),
+						isCard: true,
+					};
+					return player.getUseValue(cardx) + (shown.includes(card) ? 0 : get.effect(player, { name: "draw" }, player, player));
 				})
 				.forResult();
 		},
 		async content(event, trigger, player) {
 			const next = player.showCards(event.cards, get.translation(player) + "发动了【低讴】");
 			await next;
-			if (get.type(event.cards[0]) !== "equip" && get.type(event.cards[0]) !== "delay" && player.hasUseTarget(event.cards[0])) await player.chooseUseTarget(event.cards[0], false);
+			const cardx = {
+				name: get.name(event.cards[0], player),
+				nature: get.nature(event.cards[0], player),
+				isCard: true,
+			};
+			if (get.type(cardx) !== "equip" && get.type(cardx) !== "delay" && player.hasUseTarget(cardx)) await player.chooseUseTarget(cardx, true, false);
 			if (
 				!game.getGlobalHistory(
 					"everything",
 					evt => {
-						return evt.name === "showCards" && evt !== next;
+						return evt.name === "showCards" && evt !== next && evt.cards.includes(event.cards[0]);
 					},
 					next
 				).length
@@ -643,7 +653,7 @@ const skills = {
 					player: "dieAfter",
 				},
 				filter(event, player) {
-					return !game.hasPlayer(cur => !cur.hasSkill("dcyunzheng", null, null, false), true);
+					return !game.hasPlayer(cur => cur.hasSkill("dcyunzheng", null, null, false), true);
 				},
 				silent: true,
 				forceDie: true,
@@ -6874,13 +6884,14 @@ const skills = {
 				filter: function (event, player) {
 					var evt = event.getParent();
 					if (evt.name != "orderingDiscard") return false;
-					return evt.relatedEvent.dcqianzheng && event.cards.filterInD("d").length;
+					return evt.relatedEvent.dcqianzheng && evt.relatedEvent.cards.filterInD("d").length;
 				},
 				charlotte: true,
 				forced: true,
 				popup: false,
 				content: function () {
-					player.gain(trigger.cards.filterInD("d"), "gain2");
+					const evt = trigger.getParent().relatedEvent;
+					player.gain(evt.cards.filterInD("d"), "gain2");
 				},
 			},
 		},

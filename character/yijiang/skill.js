@@ -450,6 +450,8 @@ const skills = {
 		},
 		derivation: ["wusheng", "paoxiao"],
 	},
+	wusheng_old_guanzhang: { audio: true },
+	paoxiao_old_guanzhang: { audio: true },
 	shiyong: {
 		audio: 2,
 		trigger: { player: "damageEnd" },
@@ -1639,7 +1641,7 @@ const skills = {
 		},
 	},
 	zhenjun: {
-		audio: "jieyue",
+		audio: ["jieyue", 2],
 		trigger: {
 			player: "phaseZhunbeiBegin",
 		},
@@ -1690,7 +1692,7 @@ const skills = {
 		},
 	},
 	rezhenjun: {
-		audio: "jieyue",
+		audio: ["jieyue", 2],
 		trigger: {
 			player: "phaseZhunbeiBegin",
 		},
@@ -5233,9 +5235,10 @@ const skills = {
 		},
 	},
 	jieyue: {
-		audio: 2,
+		audio: 4,
 		trigger: { player: "phaseJieshuBegin" },
 		direct: true,
+		logAudio: () => 2,
 		content: function () {
 			"step 0";
 			player.chooseCardTarget({
@@ -5295,7 +5298,7 @@ const skills = {
 		group: ["jieyue_wuxie", "jieyue_shan", "jieyue_gain"],
 		subSkill: {
 			wuxie: {
-				audio: true,
+				audio: "jieyue3.mp3",
 				enable: "chooseToUse",
 				filterCard: function (card) {
 					return get.color(card) == "black";
@@ -5311,7 +5314,7 @@ const skills = {
 				},
 			},
 			shan: {
-				audio: true,
+				audio: "jieyue4.mp3",
 				enable: ["chooseToRespond", "chooseToUse"],
 				filterCard: function (card) {
 					return get.color(card) == "red";
@@ -5337,6 +5340,7 @@ const skills = {
 			},
 			gain: {
 				audio: "jieyue",
+				logAudio: () => 2,
 				trigger: { player: "phaseZhunbeiBegin" },
 				filter: function (event, player) {
 					return player.getExpansions("jieyue").length;
@@ -11898,12 +11902,13 @@ const skills = {
 	},
 	enyuan: {
 		audio: 4,
+		audioname2: { boss_songdiwang: "boss_songdiwang_enyuan", },
 		locked: true,
 		group: ["enyuan1", "enyuan2"],
 	},
 	enyuan1: {
-		audio: "enyuan",
-		logAudio: () => ["enyuan3.mp3", "enyuan4.mp3"],
+		audio: ["enyuan3.mp3", "enyuan4.mp3"],
+		audioname2: { boss_songdiwang: "boss_songdiwang_enyuan", },
 		trigger: { player: "damageEnd" },
 		forced: true,
 		sourceSkill: "enyuan",
@@ -11943,8 +11948,8 @@ const skills = {
 		},
 	},
 	enyuan2: {
-		audio: "enyuan",
-		logAudio: () => ["enyuan1.mp3", "enyuan2.mp3"],
+		audio: ["enyuan1.mp3", "enyuan2.mp3"],
+		audioname2: { boss_songdiwang: "boss_songdiwang_enyuan", },
 		trigger: { player: "recoverEnd" },
 		forced: true,
 		logTarget: "source",

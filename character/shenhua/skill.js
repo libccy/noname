@@ -5421,6 +5421,7 @@ const skills = {
 		audio: 2,
 		audioname2: {
 			wangyuanji: "qc_weimu",
+			boss_chujiangwang: "boss_chujiangwang_weimu",
 		},
 		forced: true,
 		firstDo: true,
