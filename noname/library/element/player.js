@@ -8535,7 +8535,7 @@ export class Player extends HTMLDivElement {
 		} else {
 			var es = this.getVCards("e");
 			for (var i = 0; i < es.length; i++) {
-				this.removeEquipTrigger(es[i]);
+				this.removeEquipTrigger(es[i], hasMove);
 			}
 		}
 		_status.event.clearStepCache();
