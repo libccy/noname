@@ -8518,6 +8518,8 @@ export class Player extends HTMLDivElement {
 			const VEquips = this.getVCards("e");
 			VEquips.remove(card);
 			skills.addArray(get.skillsFromEquips(VEquips));
+			const cards = this.vcardsMap?.equips;
+			if (cards && cards.includes(card)) cards.remove(card);
 			if (info.skills) {
 				for (var j = 0; j < info.skills.length; j++) {
 					if (skills.includes(info.skills[j])) continue;
