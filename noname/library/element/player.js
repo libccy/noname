@@ -8505,12 +8505,12 @@ export class Player extends HTMLDivElement {
 		);
 		const cards = player.vcardsMap?.equips;
 		if (cards && cards.includes(VCard)) {
-			player.removeEquipTrigger(VCard);
+			player.removeEquipTrigger(VCard, true);
 			cards.remove(VCard);
 		}
 		if (lib.config.equip_span) player.$handleEquipChange();
 	}
-	removeEquipTrigger(card) {
+	removeEquipTrigger(card, hasMove) {
 		if (_status.video) return;
 		if (card) {
 			var info = get.info(card, false);
@@ -8518,6 +8518,8 @@ export class Player extends HTMLDivElement {
 			const VEquips = this.getVCards("e");
 			VEquips.remove(card);
 			skills.addArray(get.skillsFromEquips(VEquips));
+			const cards = this.vcardsMap?.equips;
+			if (cards && cards.includes(card) && hasMove !== true) cards.remove(card);
 			if (info.skills) {
 				for (var j = 0; j < info.skills.length; j++) {
 					if (skills.includes(info.skills[j])) continue;
@@ -8533,7 +8535,7 @@ export class Player extends HTMLDivElement {
 		} else {
 			var es = this.getVCards("e");
 			for (var i = 0; i < es.length; i++) {
-				this.removeEquipTrigger(es[i]);
+				this.removeEquipTrigger(es[i], hasMove);
 			}
 		}
 		_status.event.clearStepCache();
