@@ -1224,7 +1224,7 @@ export class Create {
 					packsource.classList.remove("thundertext");
 				}
 			}
-			updateFind();
+			updatePagination();
 			if (e) e.stopPropagation();
 		};
 		for (i = 0; i < namecapt.length; i++) {
@@ -1321,7 +1321,7 @@ export class Create {
 						}
 					}
 				}
-				updateFind();
+				updatePagination();
 			};
 			for (var i = 0; i < groups.length; i++) {
 				var span = ui.create.div(".tdnode.pointerdiv.shadowed.reduce_radius.reduce_margin");
@@ -1511,7 +1511,8 @@ export class Create {
 			_status.clicked2 = true;
 		});
 		if (heightset) {
-			dialog.style.height = (game.layout == "long2" || game.layout == "nova" ? 380 : 350) + "px";
+			//这里如果dialog的高度较低的话，会显示不全下面的分页按钮，所以我增加了50px，后面遇到高度问题，可以研究更完美的方案，在这里更改。
+			dialog.style.height = (game.layout == "long2" || game.layout == "nova" ? 380 : 350) + 50 + "px";
 			dialog._scrollset = true;
 		}
 		dialog.getCurrentCapt = function (link, capt, noalph) {
@@ -1543,7 +1544,11 @@ export class Create {
 			fontWeight: "bold",
 			fontSize: "21px"
 		});
+		const div = ui.create.div(".searcher.find");
 		input.placeholder = "支持正则搜索";
+		//使用click事件搜索，因为用input事件，难以解决按下a键会触发自动托管的bug
+		let find = ui.create.button(["find", "搜索"], "tdnodes");
+		find.style.display = "inline";
 		const updatePagination = () => {
 			if (dialog.paginationMaxCount.get("character")) {
 				const buttons = dialog.content.querySelector(".buttons");
@@ -1565,46 +1570,28 @@ export class Create {
 		};
 		const updateFind = () => {
 			const { value } = input;
-			const reg = new RegExp(value, "g");
-			// 搜索结果
-			const data = dialog.buttons.filter(item => {
-				if (value.length > 0) {
-					// @ts-ignore
-					return reg.test(get.translation(item.link)) || reg.test(lib.translate[`${item.link}_ab`]) || get.translation(item.link)?.includes(value) || lib.translate[`${item.link}_ab`]?.includes(value);
-				}
-				return false;
-			});
-			// 搜索结果从筛选条件中选取
-			for (const btn of dialog.buttons) {
-				restoreState(btn);
-				if (value.length > 0) {
-					if (!data.includes(btn)) {
-						btn.style.display = 'none';
-					}
+			const reg = new RegExp(value);
+			for (let btn of dialog.buttons) {
+				if (reg.test(get.translation(btn.link)) || reg.test(get.translation(btn.link + '_ab'))) {
+					btn.classList.remove("nodisplay");
+				} else {
+					btn.classList.add("nodisplay");
 				}
 			}
 			updatePagination();
 		};
-		
-		// 中文输入选取的兼容
-		let isComposing = false;
-		input.addEventListener('compositionstart', () => {
-			isComposing = true;
-		});
-		
-		input.addEventListener('compositionend', e => {
-			isComposing = false;
+		find.addEventListener('click', updateFind);
+		input.onkeydown = function (e) {
 			e.stopPropagation();
-			updateFind();
-		});
-		
-		input.addEventListener('input', e => {
-			if (!isComposing) {
-				e.stopPropagation();
+			if (e.code == "Enter") {
 				updateFind();
 			}
-		});
-		Searcher.appendChild(input);
+		};
+		//阻止冒泡以防止触发窗口被拖动而无法选中文字
+		input.onmousedown = function (e) {
+			e.stopPropagation();
+		};
+		Searcher.append(input, find);
 		container.prepend(Searcher);
 
 		if (str) {
@@ -2048,7 +2035,7 @@ export class Create {
 				});
 			}
 		}
-		lib.init.js(lib.assetURL + "game", "keyWords", function () {});
+		lib.init.js(lib.assetURL + "game", "keyWords", function () { });
 
 		lib.updateURL = lib.updateURLS[lib.config.update_link] || lib.updateURLS.coding;
 
