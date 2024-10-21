@@ -940,7 +940,7 @@ const skills = {
 				audio: "olsbliwen",
 				trigger: {
 					global: "phaseBefore",
-					player: ["useCard", "enterGame"],
+					player: ["useCardAfter", "enterGame"],
 				},
 				filter(event, player) {
 					if (player.countMark("olsbliwen") >= 5) return false;
