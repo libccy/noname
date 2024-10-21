@@ -610,7 +610,7 @@ export default () => {
 			},
 			getRoomInfo: function (uiintro) {
 				if (lib.configOL.versus_mode == "1v1") {
-					uiintro.add('<div class="text chat">侯选人数：' + lib.configOL.choice_num + "人");
+					uiintro.add('<div class="text chat">候选人数：' + lib.configOL.choice_num + "人");
 					uiintro.add('<div class="text chat">替补人数：' + lib.configOL.replace_number + "人");
 				}
 				if (lib.configOL.versus_mode == "2v2" || lib.configOL.versus_mode == "3v3") {
