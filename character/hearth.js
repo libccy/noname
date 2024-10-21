@@ -882,7 +882,7 @@ game.import("character", function () {
 							return event.player != player;
 						},
 						content() {
-							player.insertPhase(null, true);
+							player.insertPhase();
 						},
 					},
 				},
@@ -7561,7 +7561,7 @@ game.import("character", function () {
 					target.chooseCard("h", true, "重铸一张手牌", lib.filter.cardRecastable);
 					"step 1";
 					if (result.bool && result.cards.length) {
-						target.recast(result.cards, null, (player, cards) => {
+						target.recast(result.cards, void 0, (player, cards) => {
 							var type = get.type(cards[0], "trick"),
 								name = cards[0].name,
 								card2 = get.cardPile(

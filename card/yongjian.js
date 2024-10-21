@@ -513,19 +513,14 @@ game.import("card", function () {
 				forced: true,
 				equipSkill: true,
 				filter(event, player){
-					const baodaos = player.getVCards("e").filter(card => {
-						return card.name == "qixingbaodao";
-					});
-					return baodaos.length > 0 && player.hasCard(card => {
-						return !baodaos.some(baodao => baodao.cards?.includes(card)) && lib.filter.cardDiscardable(card, player, "qixingbaodao");
+					if(event.card.name!="qixingbaodao") return false;
+					return event.card?.cards.length > 0 && player.hasCard(card => {
+						return !event.card.cards.includes(card) && lib.filter.cardDiscardable(card, player, "qixingbaodao");
 					}, "ej");
 				},
 				async content(event, trigger, player) {
-					const baodaos = player.getVCards("e").filter(card => {
-						return card.name == "qixingbaodao";
-					});
 					const cards = player.getCards("ej", card => {
-						return !baodaos.some(baodao => baodao.cards?.includes(card)) && lib.filter.cardDiscardable(card, player, "qixingbaodao");
+						return !trigger.card.cards.includes(card) && lib.filter.cardDiscardable(card, player, "qixingbaodao");
 					});
 					if (cards.length > 0) await player.discard(cards);
 				},

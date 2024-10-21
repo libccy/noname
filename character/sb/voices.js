@@ -1,4 +1,11 @@
 export default {
+	"#sbhuanshi1": "济危以仁，泽国生春。",
+	"#sbhuanshi2": "谏而不犯，正而不毅。",
+	"#sbhongyuan1": "舍己以私，援君之危急！",
+	"#sbhongyuan2": "身为萤火之光，亦当照于天下！",
+	"#sbmingzhe1": "事事不求成功，但求尽善尽全。",
+	"#sbmingzhe2": "明可查冒进之失，哲以避险躁之性。",
+	"#sb_zhugejin:die": "君臣相托，生死不渝……",
 	"#sbgongqi1": "敌寇首级，且看吾一箭取之。",
 	"#sbgongqi2": "末将尤善骑射，今示于主公一观。",
 	"#sbjiefan1": "一箭可解之事，何使公忧烦至此。",

@@ -285,6 +285,19 @@
 	opacity: 0.6;
 }
 
+.menubg.charactercard > .ava > .changeskin2 {
+	bottom: 6px;
+	right: 6px;
+	font-family: "xinwei";
+	font-size: 16px;
+	z-index: 2;
+	color: white;
+	text-shadow: black 0 0 2px;
+	height: 16px;
+	line-height: 16px;
+	opacity: 0.6;
+}
+
 #window:not(.nopointer) .menubg.charactercard .menubutton:not(.ava):not(.intro):not(.unselectable),
 #window:not(.nopointer) .menubg.charactercard > .ava > .avatars > div {
 	cursor: pointer;

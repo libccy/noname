@@ -29,12 +29,24 @@ const dynamicTranslates = {
 		const storage = player.storage.xianmou;
 		var str = "转换技，①游戏开始时，你可以转换此技能状态；②你失去过牌的回合结束时，你可以：";
 		if (!storage) str += '<span class="bluetext">';
-		str += "阳，观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得〖遗计〗直到再发动此技能；";
+		str += "阳，观看牌堆顶五张牌并获得至多X张牌，若未获得X张牌则获得〖遗计〗直到再发动此项；";
 		if (!storage) str += "</span>";
 		if (storage) str += '<span class="bluetext">';
 		str += "阴，观看一名角色手牌并弃置其中至多X张牌，若弃置X张牌则你进行一次【闪电】判定。";
 		if (storage) str += "</span>";
 		return str+="（X为你本回合失去牌数）";
+	},
+	xiongjin(player){
+		const storage = player.storage.xiongjin;
+		var str = "转换技。";
+		if (!storage) str += '<span class="bluetext">';
+		str += "阳：出牌阶段开始时，你可以摸X张牌，然后本回合的弃牌阶段开始时，你弃置所有非基本牌";
+		if (!storage) str += "</span>";
+		str += "；";
+		if (storage) str += '<span class="bluetext">';
+		str += "阴，其他角色的出牌阶段开始时，你可以令其摸X张牌，然后本回合的弃牌阶段开始时，其弃置所有基本牌";
+		if (storage) str += "</span>";
+		return str+="（X为你已损失的体力值，至少为1，至多为3）。";
 	},
 };
 

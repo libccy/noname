@@ -124,6 +124,12 @@ export class Library {
 	cardPack = new Proxy(
 		{},
 		{
+			get(target, prop, receiver) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.get(target, prop, receiver);
+			},
 			set(target, prop, newValue) {
 				if (typeof prop == "string") {
 					if (!Reflect.has(target, prop)) {
@@ -132,7 +138,16 @@ export class Library {
 						});
 					}
 				}
+				if (prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
 				return Reflect.set(target, prop, newValue);
+			},
+			defineProperty(target, prop, descriptor) {
+				if (typeof prop == "string" && prop.startsWith("mode_extension_")) {
+					prop = prop.slice("mode_extension_".length);
+				}
+				return Reflect.defineProperty(target, prop, descriptor);
 			},
 		}
 	);
@@ -162,6 +177,7 @@ export class Library {
 		xiaosha_emotion: 20,
 		xiaotao_emotion: 20,
 		xiaojiu_emotion: 20,
+		biexiao_emotion: 18,
 	};
 	animate = {
 		skill: {},
@@ -228,7 +244,9 @@ export class Library {
 	//函数钩子
 	/**
 	 * 你可以往这里加入{钩子名:函数数组}，并在数组里增加你的自定义函数
+	 *
 	 * 这样当某个地方调用game.callHook(钩子名,[...函数参数])时，就会按顺序将对应数组中的每个函数运行一遍（传参为callHook的第二个参数）。
+	 *
 	 * 你可以将hook机制类比为event.trigger()，但是这里只能放同步代码
 	 */
 	hooks = freezeButExtensible({ ...defaultHooks });
@@ -369,28 +387,28 @@ export class Library {
 														return ai - get.value(cardx);
 													} else if (get.attitude(player, source) <= 0) return 0;
 													return 5 - get.value(cardx);
-												},
+											  },
 								});
 								if (!game.online) return;
 								_status.event._resultid = id;
 								game.resume();
 							};
-							("step 1");
+							"step 1";
 							var type = get.type2(card);
 							event.list = game.filterPlayer(current => current != player && current.countCards("h") && (_status.connectMode || current.hasCard(cardx => get.type2(cardx) == type, "h"))).sortBySeat(_status.currentPhase || player);
 							event.id = get.id();
-							("step 2");
+							"step 2";
 							if (!event.list.length) event.finish();
 							else if (_status.connectMode && (event.list[0].isOnline() || event.list[0] == game.me)) event.goto(4);
 							else event.send((event.current = event.list.shift()), event.card, player, trigger.targets, event.id, trigger.parent.id, trigger.yingbianZhuzhanAI);
-							("step 3");
+							"step 3";
 							if (result.bool) {
 								event.zhuzhanresult = event.current;
 								event.zhuzhanresult2 = result;
 								if (event.current != game.me) game.delayx();
 								event.goto(8);
 							} else event.goto(2);
-							("step 4");
+							"step 4";
 							var id = event.id,
 								sendback = (result, player) => {
 									if (result && result.id == id && !event.zhuzhanresult && result.bool) {
@@ -427,16 +445,16 @@ export class Library {
 									if (value != player) value.showTimer();
 								});
 							event.withol = withol;
-							("step 5");
+							"step 5";
 							if (!result || !result.bool || event.zhuzhanresult) return;
 							game.broadcast("cancel", event.id);
 							event.zhuzhanresult = game.me;
 							event.zhuzhanresult2 = result;
-							("step 6");
+							"step 6";
 							if (event.withol && !event.resultOL) game.pause();
-							("step 7");
+							"step 7";
 							game.players.forEach(value => value.hideTimer());
-							("step 8");
+							"step 8";
 							if (event.zhuzhanresult) {
 								var target = event.zhuzhanresult;
 								target.line(player, "green");
@@ -938,7 +956,7 @@ export class Library {
 				},
 				sync_speed: {
 					name: "限制结算速度",
-					intro: "在动画结算完成前不执行下一步操作，开启后游戏操作的间隔更长但画面更浏畅，在游戏较卡时建议开启",
+					intro: "在动画结算完成前不执行下一步操作，开启后游戏操作的间隔更长但画面更流畅，在游戏较卡时建议开启",
 					init: true,
 				},
 				enable_vibrate: {
@@ -1093,8 +1111,10 @@ export class Library {
 						game.saveConfig("dev", bool);
 						if (_status.connectMode) return;
 						if (bool) {
+							window.noname_shijianInterfaces?.showDebugButton?.();
 							lib.cheat.i();
 						} else {
+							window.noname_shijianInterfaces?.hideDebugButton?.();
 							delete window.cheat;
 							delete window.game;
 							delete window.ui;
@@ -3920,10 +3940,27 @@ export class Library {
 					intro: "自由选将对话框中最近使用武将的数量",
 					init: "12",
 					item: {
+						5: "5",
 						6: "6",
+						10: "10",
 						12: "12",
 						20: "20",
 						30: "30",
+					},
+					unfrequent: true,
+				},
+				showMax_character_number: {
+					name: "最大武将数显示",
+					intro: "设置自由选将对话框一页显示的最大武将数<br><span class=firetext>注意事项：<br><li>更改此选项后，需要重启游戏以使用新选项配置<br><li>推荐将此选项设置为偏小数值，可降低加载过多武将时导致的性能损耗</span>",
+					init: "10",
+					item: {
+						5: "5",
+						6: "6",
+						10: "10",
+						12: "12",
+						20: "20",
+						24: "24",
+						0: "∞",
 					},
 					unfrequent: true,
 				},
@@ -4125,6 +4162,36 @@ export class Library {
 					unfrequent: true,
 					onclick(bool) {
 						game.saveConfig("show_giveup", bool);
+					},
+				},
+				show_tip: {
+					name: "显示tip标记",
+					init: false,
+					unfrequent: true,
+					onclick(bool) {
+						game.saveConfig("show_tip", bool);
+						if (lib.config.show_tip) {
+							game.css({
+								".tipContainer": {
+									display: "flex !important",
+								},
+							});
+						} else {
+							game.css({ ".tipContainer": { display: "none !important" } });
+						}
+					},
+				},
+				show_deckMonitor: {
+					name: "显示记牌器",
+					init: true,
+					unfrequent: true,
+					onclick(bool) {
+						game.saveConfig("show_deckMonitor", bool);
+						if (lib.config.show_deckMonitor) {
+							ui.deckMonitor.style.display = "";
+						} else {
+							ui.deckMonitor.style.display = "none";
+						}
 					},
 				},
 				show_wuxie: {
@@ -6017,10 +6084,10 @@ export class Library {
 					name: "四号位获得【飞扬】",
 					init: true,
 					frequent: true,
-					intro: "最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）",
+					intro: "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
 				},
 				connect_choice_num: {
-					name: "侯选武将数",
+					name: "候选武将数",
 					init: "20",
 					frequent: true,
 					item: {
@@ -6295,7 +6362,7 @@ export class Library {
 					name: "四号位获得【飞扬】",
 					init: true,
 					frequent: true,
-					intro: "最后行动的角色获得技能【飞扬】（准备阶段，你可以弃置三张牌，然后弃置判定区的一张牌）",
+					intro: "最后行动的角色获得技能【飞扬】（限定技，准备阶段，你可以弃置两张牌，然后弃置判定区的一张牌）",
 				},
 				replace_character_two: {
 					name: "替补模式",
@@ -6583,6 +6650,21 @@ export class Library {
 					init: false,
 					frequent: true,
 					intro: "读取剪贴板以解析邀请链接自动加入联机房间",
+				},
+				reset_banBlacklist: {
+					name: "重置黑名单",
+					onclick() {
+						if (this.firstChild.innerHTML != "已重置") {
+							this.firstChild.innerHTML = "已重置";
+							var banBlacklist = [];
+							game.saveConfig("banBlacklist", banBlacklist);
+							var that = this;
+							setTimeout(function () {
+								that.firstChild.innerHTML = "重置黑名单";
+							}, 1000);
+						}
+					},
+					clear: true,
 				},
 			},
 		},
@@ -8173,7 +8255,7 @@ export class Library {
 					for (const content of item) {
 						yield content;
 					}
-				})()
+			  })()
 			: Promise.resolve(item);
 	}
 	gnc = {
@@ -9489,6 +9571,7 @@ export class Library {
 		western: "西",
 		key: "键",
 		jin: "晋",
+		ye: "野",
 		double: "双",
 		wei2: "魏国",
 		shu2: "蜀国",
@@ -9498,6 +9581,7 @@ export class Library {
 		western2: "西方",
 		key2: "KEY",
 		jin2: "晋朝",
+		ye2: "野心家",
 		double2: "双势力",
 		male: "男",
 		female: "女",
@@ -9562,6 +9646,7 @@ export class Library {
 		xiaotao_emotion: "小桃表情",
 		xiaojiu_emotion: "小酒表情",
 		xiaokuo_emotion: "小扩表情",
+		biexiao_emotion: "憋笑表情",
 
 		pause: "暂停",
 		config: "选项",
@@ -10244,6 +10329,14 @@ export class Library {
 			if (mod != "unchanged") return mod;
 			return true;
 		},
+		/**
+		 * target的card在event事件中能否被player弃置
+		 * @param { Card } card 考虑要被弃置的牌
+		 * @param { Player } player 考虑执行弃置牌的角色
+		 * @param { Player } target 被弃置牌的现持有者
+		 * @param { string } [event] 弃置牌事件的名称
+		 * @returns { boolean }
+		 */
 		canBeDiscarded: function (card, player, target, event) {
 			event = event || _status.event;
 			if (typeof event != "string") event = event.getParent().name;
@@ -10251,6 +10344,14 @@ export class Library {
 			if (mod != "unchanged") return mod;
 			return true;
 		},
+		/**
+		 * target的card在event事件中能否被player获得
+		 * @param { Card } card 考虑要被获得的牌
+		 * @param { Player } player 考虑获得牌的角色
+		 * @param { Player } target 被获得牌的现持有者
+		 * @param { string } [event] 获得牌事件的名称
+		 * @returns { boolean }
+		 */
 		canBeGained: function (card, player, target, event) {
 			event = event || _status.event;
 			if (typeof event != "string") event = event.getParent().name;
@@ -10761,7 +10862,7 @@ export class Library {
 								storage: {
 									stratagem_buffed: 1,
 								},
-							})
+						  })
 						: new lib.element.VCard();
 				}
 				return null;
@@ -10868,7 +10969,10 @@ export class Library {
 		charge: {
 			markimage: "image/card/charge.png",
 			intro: {
-				content: "当前蓄力点数：#",
+				content(storage, player) {
+					const max = player.getMaxCharge();
+					return `当前蓄力点数：${storage}/${max}`;
+				},
 			},
 		},
 		cooperation: {
@@ -10909,6 +11013,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						if (!event.source) return false;
@@ -10966,6 +11071,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						if (event.getParent().name != "draw") return false;
@@ -11023,6 +11129,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						if (event.type != "discard") return false;
@@ -11090,6 +11197,7 @@ export class Library {
 					forced: true,
 					charlotte: true,
 					popup: false,
+					nopop: true,
 					firstDo: true,
 					filter: function (event, player) {
 						var suit = get.suit(event.card);
@@ -11190,6 +11298,7 @@ export class Library {
 					charlotte: true,
 					forced: true,
 					popup: false,
+					nopop: true,
 					onremove: true,
 					filter: function (event, player) {
 						return player.isPhaseUsing() && player.storage.zhengsu_leijin !== false;
@@ -11252,6 +11361,7 @@ export class Library {
 					charlotte: true,
 					forced: true,
 					popup: false,
+					nopop: true,
 					onremove: true,
 					filter: function (event, player) {
 						return player.isPhaseUsing() && player.storage.zhengsu_bianzhen !== false;
@@ -11344,6 +11454,7 @@ export class Library {
 					charlotte: true,
 					forced: true,
 					popup: false,
+					nopop: true,
 					onremove: true,
 					filter: function (event, player) {
 						if (player.storage.zhengsu_mingzhi === false || event.type != "discard") return false;
@@ -11470,7 +11581,7 @@ export class Library {
 				"step 0";
 				player._groupChosen = true;
 				player.chooseControl(get.is.double(player.name1, true)).set("prompt", "请选择你的势力");
-				("step 1");
+				"step 1";
 				player.changeGroup(result.control);
 			},
 		},
@@ -11671,9 +11782,11 @@ export class Library {
 		fengyin: {
 			init: function (player, skill) {
 				player.addSkillBlocker(skill);
+				player.addTip(skill, "非锁定技失效");
 			},
 			onremove: function (player, skill) {
 				player.removeSkillBlocker(skill);
+				player.removeTip(skill);
 			},
 			charlotte: true,
 			skillBlocker: function (skill, player) {
@@ -11951,7 +12064,7 @@ export class Library {
 				"step 0";
 				event.dying = trigger.player;
 				if (!event.acted) event.acted = [];
-				("step 1");
+				"step 1";
 				if (trigger.player.isDead()) {
 					event.finish();
 					return;
@@ -12006,7 +12119,7 @@ export class Library {
 				} else {
 					event._result = { bool: false };
 				}
-				("step 2");
+				"step 2";
 				if (result.bool) {
 					var player = trigger.player;
 					if (player.hp <= 0 && !trigger.nodying && !player.nodying && player.isAlive() && !player.isOut() && !player.removed) event.goto(0);
@@ -12092,11 +12205,12 @@ export class Library {
 			logv: false,
 			forceDie: true,
 			silent: true,
+			forceOut: true,
 			//priority:-5,
 			content: function () {
 				"step 0";
 				event.logvid = trigger.getLogv();
-				("step 1");
+				"step 1";
 				event.targets = game.filterPlayer(function (current) {
 					return current != event.player && current.isLinked();
 				});
@@ -12106,7 +12220,7 @@ export class Library {
 				event._args = [trigger.num, trigger.nature, trigger.cards, trigger.card];
 				if (trigger.source) event._args.push(trigger.source);
 				else event._args.push("nosource");
-				("step 2");
+				"step 2";
 				if (event.targets.length) {
 					var target = event.targets.shift();
 					if (target.isLinked()) target.damage.apply(target, event._args.slice(0));
@@ -12177,7 +12291,9 @@ export class Library {
 			 * @this {import("./element/client.js").Client}
 			 */
 			init(version, config, banned_info) {
-				if (lib.node.banned.includes(banned_info)) {
+				this.onlineKey = config.onlineKey;
+				var banBlacklist = lib.config.banBlacklist === undefined ? [] : lib.config.banBlacklist;
+				if (lib.node.banned.includes(banned_info) || banBlacklist.includes(config.onlineKey)) {
 					this.send("denied", "banned");
 				} else if (config.id && lib.playerOL && lib.playerOL[config.id]) {
 					var player = lib.playerOL[config.id];
@@ -12501,6 +12617,7 @@ export class Library {
 					lib.versionOL,
 					{
 						id: game.onlineID,
+						onlineKey: game.onlineKey,
 						avatar: lib.config.connect_avatar,
 						nickname: get.connectNickname(),
 					},
@@ -13497,6 +13614,13 @@ export class Library {
 			},
 		],
 		[
+			"兴",
+			{
+				color: "#c3f9ff",
+				nature: "thundermm",
+			},
+		],
+		[
 			"梦",
 			{
 				color: "#6affe2",
@@ -13951,10 +14075,40 @@ export class Library {
 			},
 		],
 		[
-			"鼎",
+			"九鼎",
 			{
+				showName: "鼎",
 				color: "#ffccff",
 				nature: "black",
+			},
+		],
+		[
+			"SCL",
+			{
+				getSpan: () => {
+					const span = document.createElement("span"),
+						style = span.style;
+					style.writingMode = style.webkitWritingMode = "horizontal-tb";
+					style.fontFamily = "MotoyaLMaru";
+					style.transform = "scaleY(0.85)";
+					span.textContent = "SCL";
+					return span.outerHTML;
+				},
+			},
+		],
+		[
+			"忠",
+			{
+				color: "#ffd700",
+				nature: "metal",
+			},
+		],
+		[
+			"燕幽",
+			{
+				showName: "幽",
+				color: "#ff6a6a",
+				nature: "red",
 			},
 		],
 	]);

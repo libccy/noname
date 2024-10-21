@@ -184,9 +184,10 @@ game.import("card", function () {
 					return target == player;
 				},
 				modTarget: true,
-				content: function () {
-					target.chooseToGuanxing(2);
-					target.draw(2);
+				async content(event, trigger, player) {
+					const target = event.target;
+					await target.chooseToGuanxing(2);
+					await target.draw(2);
 				},
 				ai: {
 					basic: {

@@ -98,7 +98,7 @@ const dynamicTranslates = {
 	},
     oljinghua(player) {
         const storage = player.storage.oljinghua;
-        var str = "当其他角色获得你的牌后，其";
+        var str = "当其他角色获得你的牌后，或当你交给其他角色牌后，其";
         str += storage ? "失去" : "回复";
         str += "1点体力。";
         if (!storage) str += "当你失去最后的手牌后，你可以将此技能描述中的“回复”改为“失去”。";

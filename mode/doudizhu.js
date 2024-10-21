@@ -1990,7 +1990,7 @@ export default () => {
 			feiyang: "飞扬",
 			bahu: "跋扈",
 			feiyang_info:
-				"判定阶段开始时，若你的判定区有牌，则你可以弃置两张手牌，然后弃置你判定区的一张牌。每回合限一次。",
+				"判定阶段开始时，若你的判定区有牌，则你可以弃置两张牌，然后弃置你判定区的所有牌。",
 			bahu_info: "锁定技，准备阶段开始时，你摸一张牌。出牌阶段，你可以多使用一张【杀】。",
 			kaihei: "强易",
 			kaihei_info:
@@ -2551,17 +2551,17 @@ export default () => {
 						_status.mode != "binglin" &&
 						player == game.zhu &&
 						player.countCards("j") &&
-						player.countCards("h") > 1
+						player.countCards("he") > 1
 					);
 				},
 				content: function () {
 					"step 0";
 					player
 						.chooseToDiscard(
-							"h",
+							"he",
 							2,
 							get.prompt("feiyang"),
-							"弃置两张手牌，然后弃置判定区里的一张牌"
+							"弃置两张牌，然后弃置判定区里的所有牌"
 						)
 						.set("logSkill", "feiyang")
 						.set("ai", function (card) {
@@ -2599,7 +2599,7 @@ export default () => {
 						);
 					"step 1";
 					if (result.bool) {
-						player.discardPlayerCard(player, "j", true);
+						player.discardPlayerCard(player, "j", true, player.countCards("j"));
 					}
 				},
 			},

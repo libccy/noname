@@ -580,6 +580,7 @@ const skills = {
 		popup: false,
 		firstDo: true,
 		charlotte: true,
+		sourceSkill: "old_guhuo",
 		filter: function (event, player) {
 			return event.skill && event.skill.indexOf("old_guhuo_") == 0;
 		},

@@ -1,6 +1,19 @@
 import { lib, game, ui, get, ai, _status } from "../../noname.js";
 
 const dynamicTranslates = {
+	dcsbkongwu(player) {
+		let str = "转换技，出牌阶段限一次，你可以弃置至多体力上限张牌，选择一名其他角色：",
+			yin = "阴，弃置其至多等量张牌；",
+			yang = "阳，视为对其使用等量张【杀】。";
+		if (player.storage.dcsbkongwu) yang = `<span class="firetext">${yang}</span>`;
+		else yin = `<span class="bluetext">${yin}</span>`;
+		return str + yin + yang + "此阶段结束时，若其手牌数和体力值均不大于你，其下回合摸牌阶段摸牌数-1且装备区里的所有牌失效。";
+	},
+	dckengqiang(player) {
+		let str = player.storage.dcshangjue ? "每回合每项各限一次" : "每回合限一次";
+		str += "，当你造成伤害时，你可以：1.摸体力上限张牌；2.令此伤害+1并获得造成伤害的牌。";
+		return str;
+	},
 	xinlvli(player) {
 		var str = "每回合限一次";
 		if (player.storage.choujue) str += "（自己的回合内则改为限两次）";
@@ -24,7 +37,7 @@ const dynamicTranslates = {
 		return '转换技，出牌阶段限一次，<span class="bluetext">阴：你可以将至多两张手牌交给一名其他角色。</span>阳：你可以获得一名其他角色的至多两张手牌。若以此法移动的牌包含【酒】或♥牌，则你可令得到此牌的角色执行一项：①回复1点体力。②复原武将牌。';
 	},
 	zhiren(player) {
-		return "当你于" + (player.hasSkill("yaner_zhiren") ? "一" : "你的") + "回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张装备牌和延时锦囊牌。③回复1点体力。④摸三张牌。（X为此牌的名称的字数）";
+		return "当你于" + (player.hasSkill("yaner_zhiren") ? "一" : "你的") + "回合内使用第一张非转化牌时，你可依次执行以下选项中的前X项：①卜算X。②可弃置场上的一张" + (get.mode() == "guozhan" ? "牌" : "装备牌和延时锦囊牌") + "。③回复1点体力。④摸" + (get.mode() == "guozhan" ? "两" : "三") + "张牌。（X为此牌的名称的字数）";
 	},
 	yuqi(player) {
 		var info = lib.skill.yuqi.getInfo(player);

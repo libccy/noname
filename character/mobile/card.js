@@ -104,7 +104,6 @@ const cards = {
 		fullskin: true,
 		type: "equip",
 		subtype: "equip2",
-		//cardnature:"fire",
 		ai: {
 			equipValue: function (card, player) {
 				if (player.hasSkillTag("maixie") && player.hp > 1) return 0;

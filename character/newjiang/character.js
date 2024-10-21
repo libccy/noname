@@ -14,7 +14,7 @@ const characters = {
 	kebineng: ["male", "qun", 4, ["kousheng"], ["name:科比|罐头"]],
 	lukai: ["male", "wu", 4, ["lkbushi", "lkzhongzhuang"]],
 	linghuyu: ["male", "wei", 4, ["xvzhi"], ["name:令狐|愚"]],
-	yj_simafu: ["male", "wei", 4, ["beiyu", "duchi"], ["name:司马|孚"]],
+	yj_simafu: ["male", "wei", 4, ["beiyu", "duchi"], ["name:司马|孚", "border:jin"]],
 	yj_xuangongzhu: ["female", "wei", 3, ["yjqimei", "yjzhuiji"], ["name:司马|null"]],
 	xukun: ["male", "wu", 4, ["fazhu"]],
 	yj_zhangliao: ["male", "qun", 4, ["weifeng"]],
@@ -26,7 +26,9 @@ const characters = {
 	yj_zhoubuyi: ["male", "wei", 3, ["mbhuiyao", "mbquesong"]],
 	mp_wangrong: ["male", "wei", 3, ["mpjianlin", "mpsixiao"]],
 	mp_liuling: ["male", "jin", 3, ["mpjiusong", "mpmaotao", "mpbishi"], ["doublegroup:wei:qun:jin"]],
+	mp_xiangxiu: ["male", "jin", 3, ["mpmiaoxi", "mpsijiu"], ["doublegroup:wei:jin"]],
 	yj_majun: ["male", "wei", 3, ["yjgongqiao", "yjjingyi"]],
+	new_yj_dongzhuo: ["male", "qun", "4/5", ["xiongjin", "xiawei", "baoxi"]],
 };
 
 export default characters;

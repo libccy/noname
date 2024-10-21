@@ -1081,9 +1081,9 @@ export class GameEvent {
 	}
 	async loop() {
 		const trigger = async (trigger, to) => {
+			this._triggered = to;
 			if (this.type == "card") await this.trigger("useCardTo" + trigger);
 			await this.trigger(this.name + trigger);
-			this._triggered = to;
 		};
 		if (await this.checkSkipped()) return;
 		while (true) {
