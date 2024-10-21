@@ -13296,7 +13296,7 @@ const skills = {
 				if (type == "trick" || type == "delay") return true;
 			},
 			canBeDiscarded: function (card) {
-				if (get.position(card) == "e" && ["equip2", "equip5"].includes(get.subtype(card))) return false;
+				if (get.position(card) == "e" && get.subtypes(card).some(slot => slot == "equip2" || slot == "equip5")) return false;
 			},
 		},
 	},
@@ -13714,6 +13714,7 @@ const skills = {
 	},
 	refankui: {
 		audio: 2,
+		audioname2: { boss_chujiangwang: "boss_chujiangwang_fankui" },
 		trigger: { player: "damageEnd" },
 		filter: function (event, player) {
 			return event.source && event.source.countGainableCards(player, event.source != player ? "he" : "e") && event.num > 0;

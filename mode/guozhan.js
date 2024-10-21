@@ -435,7 +435,7 @@ export default () => {
 
 				gz_dengai: ["male", "wei", 4, ["tuntian", "ziliang", "gzjixi"], ["gzskin"]],
 				gz_caohong: ["male", "wei", 4, ["fakehuyuan", "heyi"], ["gzskin"]],
-				gz_jiangfei: ["male", "shu", 3, ["shengxi", "gzshoucheng"]],
+				gz_jiangfei: ["male", "shu", 3, ["shengxi", "gzshoucheng"], ["gzskin"]],
 				gz_jiangwei: ["male", "shu", 4, ["tiaoxin", "yizhi", "tianfu"], ["gzskin"]],
 				gz_xusheng: ["male", "wu", 4, ["gzyicheng_new"], ["gzskin"]],
 				//沟槽线上就使劲薅你的(A+C)/2大宝吧，我没意见（有也没用）
@@ -444,11 +444,11 @@ export default () => {
 				gz_hetaihou: ["female", "qun", 3, ["zhendu", "qiluan"], ["gzskin"]],
 
 				gz_re_lidian: ["male", "wei", 3, ["xunxun", "wangxi"]],
-				gz_zangba: ["male", "wei", 4, ["gzhengjiang"]],
+				gz_zangba: ["male", "wei", 4, ["gzhengjiang"], ["character:tw_zangba"]],
 				gz_madai: ["male", "shu", 4, ["mashu", "qianxi"], ["gzskin"]],
 				gz_mifuren: ["female", "shu", 3, ["gzguixiu", "gzcunsi"]],
 				gz_sunce: ["male", "wu", 4, ["jiang", "yingyang", "baka_hunshang"], ["gzskin"]],
-				gz_chendong: ["male", "wu", 4, ["duanxie", "fakefenming"]],
+				gz_chendong: ["male", "wu", 4, ["duanxie", "fakefenming"], ["gzskin"]],
 				gz_sp_dongzhuo: ["male", "qun", 4, ["hengzheng", "fakebaoling"]],
 				gz_zhangren: ["male", "qun", 4, ["chuanxin", "fengshi"]],
 
@@ -456,12 +456,12 @@ export default () => {
 				gz_jun_zhangjiao: ["male", "qun", 4, ["wuxin", "hongfa", "wendao"]],
 				gz_jun_sunquan: ["male", "wu", 4, ["jiahe", "lianzi", "jubao"]],
 
-				gz_liqueguosi: ["male", "qun", 4, ["gzxiongsuan"]],
+				gz_liqueguosi: ["male", "qun", 4, ["gzxiongsuan"], ["gzskin"]],
 				gz_zuoci: ["male", "qun", 3, ["fakeyigui", "fakejihun"], ["gzskin"]],
 				gz_bianfuren: ["female", "wei", 3, ["wanwei", "gzyuejian"], ["die:ol_bianfuren"]],
 				gz_xunyou: ["male", "wei", 3, ["gzqice", "zhiyu"], ["gzskin"]],
 				gz_lingtong: ["male", "wu", 4, ["xuanlve", "yongjin"], ["gzskin"]],
-				gz_lvfan: ["male", "wu", 3, ["xindiaodu", "gzdiancai"]],
+				gz_lvfan: ["male", "wu", 3, ["xindiaodu", "gzdiancai"], ["gzskin"]],
 				gz_masu: ["male", "shu", 3, ["gzsanyao", "gzzhiman"], ["gzskin"]],
 				gz_shamoke: ["male", "shu", 4, ["gzjili"], ["gzskin"]],
 
@@ -482,11 +482,11 @@ export default () => {
 				gz_lvlingqi: ["female", "qun", 4, ["guowu", "gzshenwei", "gzzhuangrong"], ["gzskin"]],
 				gz_dc_yanghu: ["male", "wei", 3, ["gzdeshao", "gzmingfa"]],
 
-				gz_cuimao: ["male", "wei", 3, ["gzzhengbi", "gzfengying"], []],
-				gz_yujin: ["male", "wei", 4, ["gzjieyue"], ["gzskin", "die:yujin.mp3"]],
+				gz_cuimao: ["male", "wei", 3, ["gzzhengbi", "gzfengying"], ["gzskin"]],
+				gz_yujin: ["male", "wei", 4, ["gzjieyue"], ["character:yujin_yujin", "die:yujin.mp3"]],
 				gz_wangping: ["male", "shu", 4, ["jianglue"], ["gzskin"]],
 				gz_fazheng: ["male", "shu", 3, ["gzxuanhuo", "gzenyuan"], ["gzskin", "die:xin_fazheng"]],
-				gz_wuguotai: ["female", "wu", 3, ["gzbuyi", "ganlu"], ["gzskin"]],
+				gz_wuguotai: ["female", "wu", 3, ["gzbuyi", "ganlu"], ["character:re_wuguotai"]],
 				gz_lukang: ["male", "wu", 4, ["fakejueyan", "fakekeshou"], ["gzskin"]],
 				gz_yuanshu: ["male", "qun", 4, ["gzweidi", "gzyongsi"], ["gzskin"]],
 				gz_zhangxiu: ["male", "qun", 4, ["gzfudi", "gzcongjian"], ["gzskin"]],
@@ -515,7 +515,7 @@ export default () => {
 				gz_zhugejin: ["male", "wu", 3, ["gzhuanshi", "gzhongyuan", "gzmingzhe"]],
 				gz_yangxiu: ["male", "wei", 3, ["gzdanlao", "gzjilei"]],
 				gz_zumao: ["male", "wu", 4, ["yinbing", "juedi"]],
-				gz_fuwan: ["male", "qun", 4, ["gzmoukui"]],
+				gz_fuwan: ["male", "qun", 4, ["gzmoukui"], ["character:tw_fuwan"]],
 				gz_chendao: ["male", "shu", 4, ["drlt_wanglie"], []],
 				gz_tw_tianyu: ["male", "wei", 4, ["gzzhenxi", "gzjiansu"], []],
 				gz_tw_liufuren: ["female", "qun", 3, ["gzzhuidu", "gzshigong"], []],
@@ -695,6 +695,8 @@ export default () => {
 				filterCard: () => false,
 				selectCard: -1,
 				filterTarget: true,
+				selectTarget: 1,
+				usable: 1,
 				async content(event, trigger, player) {
 					const target = event.targets[0];
 					const skill = get.info(event.name).derivation?.randomGet();
@@ -857,6 +859,7 @@ export default () => {
 									player.unmarkAuto("gzxionghuo_effect", [target]);
 								}
 								while (num > 0) {
+									num --;
 									switch (get.rand(1, 3)) {
 										case 1:
 											player.line(target, "fire");
@@ -1140,7 +1143,7 @@ export default () => {
 						},
 						async cost(event, trigger, player) {
 							event.result = await player
-								.chooseButton(["###" + get.prompt("sidi", trigger.player) + '###<div class="text center">将至多三张“驭”置入弃牌堆，然后执行等量条效果</div>', player.getExpansions("gzsidi")], 2)
+								.chooseButton(["###" + get.prompt("sidi", trigger.player) + '###<div class="text center">将至多三张“驭”置入弃牌堆，然后执行等量条效果</div>', player.getExpansions("gzsidi")], [1, 3])
 								.set("ai", button => {
 									const player = get.player(),
 										target = get.event().getTrigger().player;
@@ -6565,9 +6568,10 @@ export default () => {
 							}, "是否对" + get.translation(event.target) + "使用一张【杀】？")
 							.set("targetRequired", true)
 							.set("complexSelect", true)
+							.set("addCount", false)
 							.set("filterTarget", function (card, player, target) {
 								if (target != _status.event.sourcex && !ui.selected.targets.includes(_status.event.sourcex)) return false;
-								return lib.filter.filterTarget.apply(this, arguments);
+								return lib.filter.targetEnabled.apply(this, arguments);
 							})
 							.set("sourcex", event.target);
 					}
@@ -17078,7 +17082,7 @@ export default () => {
 					if (event.num >= 1 && !(player.hasSkill("reyingzi") || player.hasSkill("jiahe_reyingzi"))) list.push("reyingzi");
 					if (event.num >= 2 && !(player.hasSkill("haoshi") || player.hasSkill("jiahe_haoshi"))) list.push("haoshi");
 					if (event.num >= 3 && !(player.hasSkill("shelie") || player.hasSkill("jiahe_shelie"))) list.push("shelie");
-					if (event.num >= 4 && !player.hasSkill("fakeduoshi")) list.push("fakeduoshi");
+					if (event.num >= 4 && !(player.hasSkill("gzduoshi") || player.hasSkill("jiahe_duoshi"))) list.push("gzduoshi");
 					if (!list.length) {
 						event.finish();
 						return;
@@ -17113,8 +17117,8 @@ export default () => {
 							if (controls.includes("reyingzi")) {
 								return "reyingzi";
 							}
-							if (controls.includes("fakeduoshi")) {
-								return "fakeduoshi";
+							if (controls.includes("gzduoshi")) {
+								return "gzduoshi";
 							}
 							return controls.randomGet();
 						});
@@ -17124,25 +17128,26 @@ export default () => {
 							reyingzi: "jiahe_reyingzi",
 							haoshi: "jiahe_haoshi",
 							shelie: "jiahe_shelie",
-							fakeduoshi: "fakeduoshi",
+							gzduoshi: "jiahe_duoshi",
 						};
 						var skills = map[result.control];
 						player.addTempSkills(skills);
 
-						// 语音修复
-						if (skills == "fakeduoshi") {
-							var mapSkills = "jiahe_duoshi";
-							game.broadcastAll(function () {
-								var info = lib.skill[skills];
+						/* 语音修复
+						if (skills == "gzduoshi") {
+							game.broadcastAll(function (player) {
+								let info = lib.skill["gzduoshi"];
 								if (!info.audioname2) info.audioname2 = {};
-								info.audioname2[player.name1] = mapSkills;
-								info.audioname2[player.name2] = mapSkills;
-								var subSkillInfo = info.subSkill.global;
-								if (!subSkillInfo.audioname2) subSkillInfo.audioname2 = {};
-								subSkillInfo.audioname2[player.name1] = mapSkills;
-								subSkillInfo.audioname2[player.name2] = mapSkills;
-							}, skills);
-						}
+								info.audioname2[player.name1] = "jiahe_duoshi";
+								info.audioname2[player.name2] = "jiahe_duoshi";
+								let subSkillInfo = info?.subSkill?.global;
+								if (subSkillInfo) {
+									if (!subSkillInfo.audioname2) subSkillInfo.audioname2 = {};
+									subSkillInfo.audioname2[player.name1] = "jiahe_duoshi";
+									subSkillInfo.audioname2[player.name2] = "jiahe_duoshi";
+								}
+							}, player);
+						}*/
 
 						if (!event.done) player.logSkill("jiahe_put");
 						// game.log(player,'获得了技能','【'+get.translation(skill)+'】');
@@ -17167,7 +17172,7 @@ export default () => {
 			},
 			jiahe_duoshi: {
 				audio: 2,
-				inherit: "fakeduoshi",
+				inherit: "gzduoshi",
 			},
 			yuanjiangfenghuotu: {
 				audio: 4,
@@ -21207,7 +21212,7 @@ export default () => {
 			gzkuimang: "溃蟒",
 			gzkuimang_info: "锁定技。当你杀死与你势力不同且处于队列的角色时，你摸两张牌。",
 			gzyinpan: "引叛",
-			gzyinpan_info: "出牌阶段限一次。你可以选择一名其他角色，令所有与其势力不同的角色依次选择是否对其使用一张【杀】。然后其下回合使用【杀】的次数上限+X（X为其以此法受到的伤害次数），若其以此法进入过濒死状态，其回复1点体力。",
+			gzyinpan_info: "出牌阶段限一次。你可以选择一名其他角色，令所有与其势力不同的角色依次选择是否对其使用一张无距离次数限制的【杀】。然后其下回合使用【杀】的次数上限+X（X为其以此法受到的伤害次数），若其以此法进入过濒死状态，其回复1点体力。",
 			gzxingmou: "兴谋",
 			gzxingmou_info: "锁定技。①你杀死其他角色或其他角色杀死你均不执行奖惩。②其他角色因执行奖惩而摸牌时，你摸一张牌。",
 			//官正「十年踪迹十年心」
@@ -21403,7 +21408,7 @@ export default () => {
 			gzjinqu: "进趋",
 			gzjinqu_info: "结束阶段，你可以摸两张牌，若如此做，你将手牌弃置至X张。（X为你于此回合发动过〖奇制〗的次数）",
 			gzxionghuo: "凶镬",
-			gzxionghuo_info: "每局游戏限三次，出牌阶段限一次，你可以选择一名角色，然后你获得以下效果：①当你于每回合首次对其造成伤害时，你令此伤害+1；②其出牌阶段开始时，你移去此效果，然后随机执行以下一项：⒈对其造成1点火属性伤害，其本回合不能对你使用【杀】。⒉令其失去1点体力，其本回合手牌上限-1。⒊获得其装备区一张牌，然后获得其一张手牌。",
+			gzxionghuo_info: "每局游戏限三次，出牌阶段限一次，你可以选择一名角色，然后你获得以下效果：①当你于每回合首次对其使用牌造成伤害时，你令此伤害+1；②其出牌阶段开始时，你移去此效果，然后随机执行以下一项：⒈对其造成1点火属性伤害，其本回合不能对你使用【杀】。⒉令其失去1点体力，其本回合手牌上限-1。⒊获得其装备区一张牌，然后获得其一张手牌。",
 			gzkanji: "勘集",
 			gzkanji_info: "出牌阶段限一次，你可以展示所有手牌，若花色均不同，你摸两张牌。然后若你的手牌因此包含了四种花色，你本回合手牌上限+4。",
 			gzchenjian: "陈见",

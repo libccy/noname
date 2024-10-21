@@ -907,7 +907,7 @@ const skills = {
 	wusheng: {
 		audio: 2,
 		audioname2: {
-			old_guanzhang: "old_fuhun",
+			old_guanzhang: "wusheng_old_guanzhang",
 			old_guanyu: "wusheng_re_guanyu",
 			guanzhang: "wusheng_guanzhang",
 			guansuo: "wusheng_guansuo",
@@ -987,7 +987,7 @@ const skills = {
 		firstDo: true,
 		audioname: ["re_zhangfei", "xiahouba"],
 		audioname2: {
-			old_guanzhang: "old_fuhun",
+			old_guanzhang: "paoxiao_old_guanzhang",
 			dc_xiahouba: "paoxiao_xiahouba",
 			guanzhang: "paoxiao_guanzhang",
 		},
@@ -1756,6 +1756,7 @@ const skills = {
 		derivation: ["mashu", "shenji"],
 	},
 	shenji: {
+		audio: 2,
 		mod: {
 			selectTarget(card, player, range) {
 				if (range[1] == -1) return;
