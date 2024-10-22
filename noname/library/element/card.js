@@ -676,6 +676,34 @@ export class Card extends HTMLDivElement {
 		}
 		return this;
 	}
+	/**
+	 * 给此牌添加特定的cardtag（如添加应变条件）
+	 * @param { string } tag 
+	 */
+	addCardtag(tag) {
+		if (!_status.cardtag) {
+			_status.cardtag = {};
+		}
+		if (!_status.cardtag[tag]) {
+			_status.cardtag[tag] = [];
+		}
+		_status.cardtag[tag].add(this.cardid);
+		this.$init([this.suit, this.number, this.name, this.nature]);
+	}
+	/**
+	 * 给此牌移除特定的cardtag（如移除应变条件）
+	 * @param { string } tag 
+	 */
+	removeCardtag(tag) {
+		if (!_status.cardtag) {
+			_status.cardtag = {};
+		}
+		if (!_status.cardtag[tag]) {
+			_status.cardtag[tag] = [];
+		}
+		_status.cardtag[tag].remove(this.cardid);
+		this.$init([this.suit, this.number, this.name, this.nature]);
+	}
 	updateTransform(bool, delay) {
 		if (delay) {
 			var that = this;
