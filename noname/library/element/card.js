@@ -681,28 +681,34 @@ export class Card extends HTMLDivElement {
 	 * @param { string } tag 
 	 */
 	addCardtag(tag) {
-		if (!_status.cardtag) {
-			_status.cardtag = {};
-		}
-		if (!_status.cardtag[tag]) {
-			_status.cardtag[tag] = [];
-		}
-		_status.cardtag[tag].add(this.cardid);
-		this.$init([this.suit, this.number, this.name, this.nature]);
+		let card = this;
+		game.broadcastAll(function () {
+			if (!_status.cardtag) {
+				_status.cardtag = {};
+			}
+			if (!_status.cardtag[tag]) {
+				_status.cardtag[tag] = [];
+			}
+			_status.cardtag[tag].add(card.cardid);
+			card.$init([card.suit, card.number, card.name, card.nature]);
+		}, _status, card);
 	}
 	/**
 	 * 给此牌移除特定的cardtag（如移除应变条件）
 	 * @param { string } tag 
 	 */
 	removeCardtag(tag) {
-		if (!_status.cardtag) {
-			_status.cardtag = {};
-		}
-		if (!_status.cardtag[tag]) {
-			_status.cardtag[tag] = [];
-		}
-		_status.cardtag[tag].remove(this.cardid);
-		this.$init([this.suit, this.number, this.name, this.nature]);
+		let card = this;
+		game.broadcastAll(function () {
+			if (!_status.cardtag) {
+				_status.cardtag = {};
+			}
+			if (!_status.cardtag[tag]) {
+				_status.cardtag[tag] = [];
+			}
+			_status.cardtag[tag].remove(card.cardid);
+			card.$init([card.suit, card.number, card.name, card.nature]);
+		}, _status, card);
 	}
 	updateTransform(bool, delay) {
 		if (delay) {
