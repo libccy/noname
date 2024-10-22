@@ -16660,6 +16660,11 @@ const skills = {
 			if (player.hasSkill("weimu")) return false;
 			if (event.player == player) return false;
 			if (get.color(event.card) != "black" || get.type(event.card) != "trick") return false;
+			var es = player.getCards("e");
+			if (!es.length) return false;
+			for (var i = 0; i < es.length; i++) {
+				if (get.color(es[i]) != "black") return false;
+			}
 			var info = lib.card[event.card.name];
 			return info && info.selectTarget && info.selectTarget == -1 && !info.toself;
 		},
