@@ -37,8 +37,11 @@ const skills = {
 			effect: {
 				charlotte: true,
 				onremove(player, skill) {
-					let tags = player.getCards("h", card => card.gaintag?.some(tag => tag.startsWith("dcsblieji_" + skill)));
-					if (tags.length) tags.forEach(tag => player.removeGaintag(tag));
+					let tags = player.getCards("h", card => card.gaintag?.some(tag => tag.startsWith(skill)));
+					if (tags.length) {
+						tags = tags.slice().map(card => card.gaintag.find(tag => tag.startsWith(skill))).unique();
+						tags.forEach(tag => player.removeGaintag(tag));
+					}
 				},
 				trigger: { source: "damageBegin1" },
 				filter(event, player) {
