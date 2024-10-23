@@ -682,7 +682,7 @@ export class Card extends HTMLDivElement {
 	 */
 	addCardtag(tag) {
 		let card = this;
-		game.broadcastAll(function () {
+		game.broadcastAll(function (_status, card, tag) {
 			if (!_status.cardtag) {
 				_status.cardtag = {};
 			}
@@ -699,7 +699,7 @@ export class Card extends HTMLDivElement {
 	 */
 	removeCardtag(tag) {
 		let card = this;
-		game.broadcastAll(function () {
+		game.broadcastAll(function (_status, card, tag) {
 			if (!_status.cardtag) {
 				_status.cardtag = {};
 			}
