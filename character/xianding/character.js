@@ -1,4 +1,5 @@
 const characters = {
+	dc_sb_huanggai: ["male", "wu", 4, ["dcsblieji", "dcsbquzhou"]],
 	dc_sb_chenlin: ["male", "qun", 3, ["dcsbyaozuo", "dcsbzhuanwen"]],
 	wu_huangfusong: ["male", "qun", 4, ["dcchaozhen", "dclianjie", "dcjiangxian"], ["name:皇甫|嵩"]],
 	wenyuan: ["female", "shu", 3, ["dckengqiang", "dckuichi", "dcshangjue"]],
@@ -7,7 +8,7 @@ const characters = {
 	dc_zhangren: ["male", "qun", 4, ["dcchuanxin", "dcfengshi"], ["die:zhangren"]],
 	dc_sb_jushou: ["male", "qun", 3, ["dcsbzuojun", "dcsbmuwang"]],
 	dc_sb_chengyu: ["male", "wei", 3, ["dcshizha", "dcgaojian"]],
-	dc_lingcao: ["male", "wu", "3/5", ["dcdufeng"]],
+	dc_lingcao: ["male", "wu", "4/5", ["dcdufeng"]],
 	zhugejing: ["male", "qun", 4, ["dcyanzuo", "dczuyin", "dcpijian"], ["name:诸葛|京"]],
 	liutan: ["female", "shu", 3, ["dcjingyin", "dcchixing"]],
 	bianyue: ["female", "wei", 3, ["dcbizu", "dcwuxie"]],

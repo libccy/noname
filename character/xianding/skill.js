@@ -3,6 +3,149 @@ import cards from "../sp2/card.js";
 
 /** @type { importCharacterConfig['skill'] } */
 const skills = {
+	//谋黄盖
+	//时代的otto
+	dcsblieji: {
+		audio: 2,
+		trigger: { player: "useCard" },
+		filter(event, player) {
+			return get.type2(event.card) === "trick" && player.hasCard(card => get.tag(card, "damage") > 0.5, "h");
+		},
+		frequent: true,
+		content() {
+			const skill = "dcsblieji_effect";
+			player.addTempSkill(skill);
+			const cards = player.getCards("h", card => get.tag(card, "damage") > 0.5);
+			for (const card of cards) {
+				let tag = card.gaintag?.find(tag => tag.startsWith(skill));
+				if (tag) player.removeGaintag(tag, [card]);
+				tag = tag ? skill + parseFloat(parseInt(tag.slice(skill.length)) + 1) : "dcsblieji_effect1";
+				if (!lib.skill[tag]) {
+					game.broadcastAll(
+						(tag, str) => {
+							lib.skill[tag] = {};
+							lib.translate[tag] = "烈计+" + str;
+						},
+						tag,
+						tag.slice(skill.length)
+					);
+				}
+				player.addGaintag([card], tag);
+			}
+		},
+		subSkill: {
+			effect: {
+				charlotte: true,
+				onremove(player, skill) {
+					let tags = player.getCards("h", card => card.gaintag?.some(tag => tag.startsWith(skill)));
+					if (tags.length) {
+						tags = tags.slice().map(card => card.gaintag.find(tag => tag.startsWith(skill))).unique();
+						tags.forEach(tag => player.removeGaintag(tag));
+					}
+				},
+				trigger: { source: "damageBegin1" },
+				filter(event, player) {
+					if (!event.card) return false;
+					const evt = event.getParent("useCard");
+					if (!evt || evt.card !== event.card || evt.cards?.length !== 1) return false;
+					return player.hasHistory(
+						"lose",
+						evtx =>
+							evtx.getParent() === evt &&
+							Object.keys(evtx.gaintag_map).some(i => {
+								return evtx.gaintag_map[i].some(tag => tag.startsWith("dcsblieji_effect"));
+							})
+					);
+				},
+				forced: true,
+				logTarget: "player",
+				content() {
+					const skill = "dcsblieji_effect",
+						evt = trigger.getParent("useCard");
+					const evtx = player.getHistory(
+						"lose",
+						evtx =>
+							evtx.getParent() === evt &&
+							Object.keys(evtx.gaintag_map).some(i => {
+								return evtx.gaintag_map[i].some(tag => tag.startsWith(skill));
+							})
+					)[0];
+					trigger.num += Object.keys(evtx.gaintag_map).reduce((sum, i) => {
+						const tag = evtx.gaintag_map[i].find(tag => tag.startsWith(skill));
+						if (tag) sum += parseInt(tag.slice(skill.length));
+						return sum;
+					}, 0);
+				},
+			},
+		},
+	},
+	dcsbquzhou: {
+		enable: "phaseUse",
+		usable: 1,
+		frequent: true,
+		async content(event, trigger, player) {
+			let cards = [];
+			while (true) {
+				const card = get.cards()[0];
+				await game.cardsGotoOrdering(card);
+				const judgestr = get.translation(player) + "亮出的第" + get.cnNumber(cards.length + 1, true) + "张【趋舟】牌",
+					videoId = lib.status.videoId++;
+				game.addVideo("judge1", player, [get.cardInfo(card), judgestr, event.videoId]);
+				game.broadcastAll(
+					(player, card, str, id, cardid) => {
+						let event;
+						if (game.online) event = {};
+						else event = _status.event;
+						if (game.chess) event.node = card.copy("thrown", "center", ui.arena).addTempClass("start");
+						else event.node = player.$throwordered(card.copy(), true);
+						if (lib.cardOL) lib.cardOL[cardid] = event.node;
+						event.node.cardid = cardid;
+						event.node.classList.add("thrownhighlight");
+						ui.arena.classList.add("thrownhighlight");
+						event.dialog = ui.create.dialog(str);
+						event.dialog.classList.add("center");
+						event.dialog.videoId = id;
+					},
+					player,
+					card,
+					judgestr,
+					videoId,
+					get.id()
+				);
+				game.log(player, "亮出了牌堆顶的", card);
+				await game.delay(2);
+				game.broadcastAll(id => {
+					const dialog = get.idDialog(id);
+					if (dialog) dialog.close();
+					ui.arena.classList.remove("thrownhighlight");
+				}, videoId);
+				game.addVideo("judge2", null, videoId);
+				if (card.name === "sha" && player.hasUseTarget(card)) {
+					if (cards.length) {
+						game.broadcastAll(() => ui.clear());
+						await game.cardsDiscard(cards);
+					}
+					await player.chooseUseTarget(card, true, false);
+					break;
+				} else {
+					cards.add(card);
+					let result;
+					if (cards.length < game.countPlayer()) {
+						result = await player.chooseBool("是否继续亮出牌堆顶的牌？").set("frequentSkill", event.name).forResult();
+					} else result = { bool: false };
+					if (!result.bool) {
+						game.broadcastAll(() => ui.clear());
+						await player.gain(cards, "gain2");
+						break;
+					}
+				}
+			}
+		},
+		ai: {
+			order: 1,
+			result: { player: 1 },
+		},
+	},
 	//谋陈琳
 	dcsbyaozuo: {
 		audio: 2,
@@ -322,7 +465,7 @@ const skills = {
 				})
 			)
 				return false;
-			return true;//return !player.getStorage("dclianjie_used").includes(num);
+			return true; //return !player.getStorage("dclianjie_used").includes(num);
 		},
 		async cost(event, trigger, player) {
 			event.result = await player
@@ -346,8 +489,7 @@ const skills = {
 			const toLose = cards.filter(card => get.number(card) === minNumber);
 			if (target != player || toLose.length <= 1) {
 				await target.lose(toLose.randomGet(), ui.cardPile);
-			}
-			else {
+			} else {
 				const result = await player
 					.chooseCard("h", card => get.event("toLose")?.includes(card), true)
 					.set("toLose", toLose)
