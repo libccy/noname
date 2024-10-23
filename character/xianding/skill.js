@@ -135,7 +135,8 @@ const skills = {
 					} else result = { bool: false };
 					if (!result.bool) {
 						game.broadcastAll(() => ui.clear());
-						await player.gainPlayerCard(cards);
+						await player.gain(cards, "gain2");
+						break;
 					}
 				}
 			}
