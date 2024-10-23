@@ -733,6 +733,7 @@ window.noname_character_rank = {
 		"yue_diaochan",
 	],
 	bp: [
+		"dc_sb_huanggai",
 		"scl_zhenji",
 		"scl_maliang",
 		"scl_sunhanhua",
@@ -2054,6 +2055,7 @@ window.noname_character_rank = {
 			"jd_simayan",
 		],
 		epic: [
+			"dc_sb_huanggai",
 			"yy_quyi",
 			"yy_yuanshao",
 			"yy_simayi",
