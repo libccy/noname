@@ -691,7 +691,7 @@ export class Card extends HTMLDivElement {
 			}
 			_status.cardtag[tag].add(card.cardid);
 			card.$init([card.suit, card.number, card.name, card.nature]);
-		}, _status, card);
+		}, _status, card, tag);
 	}
 	/**
 	 * 给此牌移除特定的cardtag（如移除应变条件）
@@ -708,7 +708,7 @@ export class Card extends HTMLDivElement {
 			}
 			_status.cardtag[tag].remove(card.cardid);
 			card.$init([card.suit, card.number, card.name, card.nature]);
-		}, _status, card);
+		}, _status, card, tag);
 	}
 	updateTransform(bool, delay) {
 		if (delay) {
