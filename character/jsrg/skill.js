@@ -10200,6 +10200,7 @@ const skills = {
 	//贾南风
 	jsrgshanzheng: {
 		audio: 4,
+		logAudio: index => (typeof index === "number" ? "jsrgshanzheng" + index + ".mp3" : 2),
 		enable: "phaseUse",
 		usable: 1,
 		filter(event, player) {
@@ -10231,14 +10232,21 @@ const skills = {
 						})
 						.forResult();
 					if (resultx.bool) {
+						player.logSkill("jsrgshanzheng", resultx.targets, null, null, [3]);
 						player.line(resultx.targets.sortBySeat(), "green");
 						for (let target of resultx.targets.sortBySeat()) await target.damage();
 					}
 				} else if (result.opinion == "black") {
-					let cards = [];
+					let cards = [],
+						targets = [];
 					for (let color of result.opinions) {
-						if (result[color]?.length) cards.addArray(result[color].map(i => i[1]));
+						if (result[color]?.length) {
+							cards.addArray(result[color].map(i => i[1]));
+							targets.addArray(result[color].map(i => i[0]));
+						}
 					}
+					targets.remove(player);
+					player.logSkill("jsrgshanzheng", targets, null, null, [4]);
 					if (cards.length) {
 						await player.gain(cards, "giveAuto");
 					}
@@ -10260,7 +10268,9 @@ const skills = {
 			global: "chooseToDebateBegin",
 		},
 		filter(event, player) {
-			return event.list.includes(player) && player.countCards("h") > 1;
+			if (!event.list.includes(player)) return false;
+			if (event.fixedResult?.some(key => key[0] == player)) return false;
+			return player.countCards("h") > 1;
 		},
 		async cost(event, trigger, player) {
 			event.result = await player.chooseCard(get.prompt("jsrgxiongbao"), 2, "本次议事你展示两张手牌").forResult();
@@ -10302,7 +10312,7 @@ const skills = {
 	},
 	//文鸯
 	jsrgfuzhen: {
-		audio: 2,
+		audio: 4,
 		trigger: {
 			player: "phaseZhunbeiBegin",
 		},
@@ -10334,6 +10344,7 @@ const skills = {
 				};
 			} else event.result = { bool: false };
 		},
+		logAudio: index => (typeof index == "number" ? "jsrgfuzhen" + index + ".mp3" : 2),
 		async content(event, trigger, player) {
 			const targets = event.targets,
 				silentTarget = event.cost_data;
@@ -10343,6 +10354,7 @@ const skills = {
 				.when("useCardAfter")
 				.filter(evt => evt.getParent() == event)
 				.then(() => {
+					player.logSkill("jsrgfuzhen", null, null, null, [get.rand(3, 4)]);
 					const sum = player
 						.getHistory("sourceDamage", evt => evt.card && evt.card == trigger.card)
 						.reduce((num, evt) => {
@@ -10587,7 +10599,7 @@ const skills = {
 	},
 	//李密
 	jsrgciyin: {
-		audio: 2,
+		audio: 3,
 		enable: ["chooseToUse", "chooseToRespond"],
 		filter(event, player) {
 			if (!player.countCards("hes") || player.hasSkill("jsrgciyin_used")) return false;
@@ -10663,6 +10675,7 @@ const skills = {
 						return [num, Infinity];
 					},
 					audio: "jsrgciyin",
+					logAudio: () => ["jsrgciyin1.mp3", "jsrgciyin2.mp3"],
 					ai1(card) {
 						const suits = _status.event.ciyin_suits;
 						if (!suits.includes(get.suit(card))) return 15 - get.value(card);
@@ -10703,9 +10716,10 @@ const skills = {
 		group: "jsrgciyin_draw",
 		subSkill: {
 			draw: {
+				audio: "jsrgciyin",
+				logAudio: () => ["jsrgciyin3.mp3"],
 				trigger: { global: ["cardsDiscardAfter"] },
 				forced: true,
-				direct: true,
 				filter(event, player) {
 					const evt = event.getParent();
 					if (evt.name != "orderingDiscard") return false;
@@ -10837,7 +10851,8 @@ const skills = {
 	},
 	//司马昭
 	jsrgqiantun: {
-		audio: 2,
+		audio: 4,
+		logAudio: index => (typeof index === "number" ? "jsrgqiantun" + index + ".mp3" : 2),
 		enable: "phaseUse",
 		usable: 1,
 		filterTarget(card, player, target) {
@@ -10876,12 +10891,15 @@ const skills = {
 			const result3 = await next.forResult();
 			target.removeGaintag("jsrgqiantun_tag");
 			if (result3.winner == player) {
+				player.logSkill("jsrgqiantun", [target], null, null, [3]);
 				const cards = target.getCards("h", card => result.cards.includes(card));
 				if (cards.length) await target.give(cards, player);
 			} else {
+				player.logSkill("jsrgqiantun", [target], null, null, [4]);
 				const cards = target.getCards("h", card => !result.cards.includes(card));
 				if (cards.length) await target.give(cards, player);
 			}
+			await player.showHandcards(get.translation(player) + "发动了【谦吞】");
 		},
 		ai: {
 			order: 8,
@@ -10977,8 +10995,9 @@ const skills = {
 		derivation: ["jsrgweisi", "jsrgdangyi"],
 	},
 	jsrgweisi: {
-		audio: 2,
+		audio: 3,
 		enable: "phaseUse",
+		logAudio: index => (typeof index === "number" ? "jsrgweisi" + index + ".mp3" : 2),
 		usable: 1,
 		filterTarget(card, player, target) {
 			return target.countCards("h") && target != player;
@@ -11019,7 +11038,10 @@ const skills = {
 				.filter(evt => evt.getParent(event.name) == event)
 				.then(() => {
 					const cards = trigger.player.getCards("h");
-					if (cards.length) trigger.player.give(cards, player);
+					if (cards.length) {
+						trigger.player.give(cards, player);
+						player.logSkill("jsrgweisi", [trigger.player], null, null, [3]);
+					}
 				});
 			if (player.canUse(card, target)) await player.useCard(card, target);
 		},
@@ -11063,12 +11085,15 @@ const skills = {
 			player.removeMark("jsrgdangyi", 1, false);
 			trigger.num++;
 		},
+		audio: 2,
 		mark: true,
 		intro: {
 			content: "剩余可发动次数为$",
 		},
 	},
 	jsrgzuozhan: {
+		audio: 4,
+		logAudio: () => 2,
 		trigger: {
 			global: "phaseBefore",
 			player: "enterGame",
@@ -11122,13 +11147,17 @@ const skills = {
 		group: "jsrgzuozhan_gain",
 		subSkill: {
 			gain: {
+				audio: "jsrgzuozhan",
+				logAudio: () => ["jsrgzuozhan3.mp3", "jsrgzuozhan4.mp3"],
 				trigger: {
 					global: "dieAfter",
 				},
 				filter(event, player) {
+					if (!player.isIn() && event.player != player) return false;
 					if (!player.getStorage("jsrgzuozhan").includes(event.player)) return false;
 					return game.hasPlayer(current => current.isIn() && player.getStorage("jsrgzuozhan").includes(current));
 				},
+				forceDie: true,
 				async cost(event, trigger, player) {
 					event.result = await player
 						.chooseTarget("坐瞻：令一名“坐瞻”角色获得" + player.countMark("jsrgzuozhan_range") + "张不同牌名的基本牌", true)
@@ -11158,10 +11187,21 @@ const skills = {
 		},
 	},
 	jsrgcuibing: {
+		audio: 5,
 		trigger: {
 			player: "phaseUseEnd",
 		},
 		forced: true,
+		logAudio(event, player) {
+			const num = Math.min(
+				5,
+				game.countPlayer(current => player.inRange(current))
+			),
+			numx = player.countCards("h");
+			if (num > numx) return 2;
+			if (num == numx) return ["jsrgcuibing5.mp3"];
+			return ["jsrgcuibing3.mp3", "jsrgcuibing4.mp3"]
+		},
 		async content(event, trigger, player) {
 			const num = Math.min(
 					5,
@@ -11665,6 +11705,7 @@ const skills = {
 	},
 	//马隆
 	jsrgfennan: {
+		audio: 2,
 		enable: "phaseUse",
 		filter(event, player) {
 			const count = player.getStat("skill").jsrgfennan || 0;
@@ -11753,6 +11794,7 @@ const skills = {
 		},
 	},
 	jsrgxunji: {
+		audio: 2,
 		trigger: { player: "phaseJieshuBegin" },
 		filter(event, player) {
 			const targets = player

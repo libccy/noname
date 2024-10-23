@@ -473,6 +473,7 @@ const characters = {
 		group: "jin",
 		isZhugong: true,
 		hp: 4,
+		isUnseen: true,
 		skills: ["jsrgweisi", "jsrgxiezheng", "jsrgdangyi"],
 		names: "司马|昭",
 	},
