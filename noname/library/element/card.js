@@ -682,7 +682,7 @@ export class Card extends HTMLDivElement {
 	 */
 	addCardtag(tag) {
 		let card = this;
-		game.broadcastAll(function (_status, card, tag) {
+		game.broadcastAll(function (card, tag) {
 			if (!_status.cardtag) {
 				_status.cardtag = {};
 			}
@@ -691,7 +691,7 @@ export class Card extends HTMLDivElement {
 			}
 			_status.cardtag[tag].add(card.cardid);
 			card.$init([card.suit, card.number, card.name, card.nature]);
-		}, _status, card, tag);
+		}, card, tag);
 	}
 	/**
 	 * 给此牌移除特定的cardtag（如移除应变条件）
@@ -699,7 +699,7 @@ export class Card extends HTMLDivElement {
 	 */
 	removeCardtag(tag) {
 		let card = this;
-		game.broadcastAll(function (_status, card, tag) {
+		game.broadcastAll(function (card, tag) {
 			if (!_status.cardtag) {
 				_status.cardtag = {};
 			}
@@ -708,7 +708,7 @@ export class Card extends HTMLDivElement {
 			}
 			_status.cardtag[tag].remove(card.cardid);
 			card.$init([card.suit, card.number, card.name, card.nature]);
-		}, _status, card, tag);
+		}, card, tag);
 	}
 	updateTransform(bool, delay) {
 		if (delay) {
