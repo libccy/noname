@@ -80,6 +80,7 @@ const skills = {
 		},
 	},
 	dcsbquzhou: {
+		audio: 2,
 		enable: "phaseUse",
 		usable: 1,
 		frequent: true,
