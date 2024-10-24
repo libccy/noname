@@ -8087,7 +8087,7 @@ const skills = {
 		audio: 2,
 		trigger: { target: "useCardToTargeted" },
 		filter: function (event, player) {
-			return event.card.name == "sha" && (get.color(event.card) == "red" ? event.player.getEquips(1).length > 0 : player.countCards("he") > 0);
+			return event.card.name == "sha" && player.countCards("he") > 0;
 		},
 		async cost(event, trigger, player) {
 			let prompt = "弃置一张牌，然后", cards = trigger.player.getEquips(1).filter(card => {

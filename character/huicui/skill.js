@@ -11587,13 +11587,11 @@ const skills = {
 			if (get.color(event.card, false) != "red") return false;
 			var evt = event.getParent("phaseUse");
 			if (!evt || evt.player != event.player) return false;
-			return (
-				event.player
-					.getHistory("useCard", function (event) {
-						return event.getParent("phaseUse") == evt;
-					})
-					.indexOf(event) == 0
-			);
+			return event.player
+				.getHistory("useCard", function (event) {
+					return event.getParent("phaseUse") == evt;
+				})
+				.indexOf(event) === 0;
 		},
 		content: function () {
 			"step 0";

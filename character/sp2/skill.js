@@ -688,13 +688,19 @@ const skills = {
 				trigger: {
 					source: "damageBegin2",
 				},
+				filter(event, player) {
+					let evt = event.getParent("phaseUse");
+					return evt && player.hasHistory("sourceDamage", evt2 => {
+						return evt2.source === player && evt2.player === event.player && evt2.getParent("phaseUse") === evt;
+					});
+				},
 				charlotte: true,
 				forced: true,
 				onremove: true,
 				async content(event, trigger, player) {
 					let num = 1;
 					const evts = player.getHistory("sourceDamage", evt => {
-						return evt.source === player && evt.player === trigger.player;
+						return evt.source === player && evt.player === trigger.player && evt.getParent("phaseUse") === trigger.getParent("phaseUse");
 					});
 					if (evts.length) num += evts.lastItem.num;
 					trigger.num = Math.min(5, num);
@@ -5423,15 +5429,17 @@ const skills = {
 		audio: 2,
 		trigger: { global: "useCardAfter" },
 		filter: function (event, player) {
+			if (player === event.player || !event.player.isIn() || player.hasSkill("tianze_block")) return false;
+			let evt = event.getParent("phaseUse");
+			if (!evt || evt.player !== event.player) return false;
 			return (
-				player != event.player &&
-				event.player.isIn() &&
-				get.color(event.card) == "black" &&
-				event.player.hasHistory("lose", function (evt) {
-					return evt && evt.hs.length && evt.getParent() == event;
+				get.color(event.card) === "black" &&
+				event.player.hasHistory("lose", event2 => {
+					return event2 && event2.hs.length && event2.getParent() === event;
 				}) &&
-				event.player.isPhaseUsing() &&
-				!player.hasSkill("tianze_block") &&
+				event.player.getHistory("useCard", event2 => {
+					return event2.getParent("phaseUse") === evt;
+				}).indexOf(event) === 0 &&
 				player.hasCard(card => {
 					if (_status.connectMode && get.position(card) == "h") return true;
 					return get.color(card, player) == "black";
