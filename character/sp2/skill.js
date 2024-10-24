@@ -689,6 +689,7 @@ const skills = {
 					source: "damageBegin2",
 				},
 				filter(event, player) {
+					if (!player.getStorage("starruijun_effect").includes(event.player)) return false;
 					let evt = event.getParent("phaseUse");
 					return evt && player.hasHistory("sourceDamage", evt2 => {
 						return evt2.source === player && evt2.player === event.player && evt2.getParent("phaseUse") === evt;
