@@ -688,13 +688,19 @@ const skills = {
 				trigger: {
 					source: "damageBegin2",
 				},
+				filter(event, player) {
+					let evt = event.getParent("phaseUse");
+					return evt && player.hasHistory("sourceDamage", evt2 => {
+						return evt2.source === player && evt2.player === event.player && evt2.getParent("phaseUse") === evt;
+					});
+				},
 				charlotte: true,
 				forced: true,
 				onremove: true,
 				async content(event, trigger, player) {
 					let num = 1;
 					const evts = player.getHistory("sourceDamage", evt => {
-						return evt.source === player && evt.player === trigger.player;
+						return evt.source === player && evt.player === trigger.player && evt.getParent("phaseUse") === trigger.getParent("phaseUse");
 					});
 					if (evts.length) num += evts.lastItem.num;
 					trigger.num = Math.min(5, num);
