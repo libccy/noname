@@ -3,7 +3,7 @@ const characters = {
 	guanzhang: ["male", "shu", 4, ["fuhun"], ["name:关|兴-张|苞"]],
 	wangyi: ["female", "wei", 3, ["zhenlie", "miji"]],
 	caozhang: ["male", "wei", 4, ["new_jiangchi"]],
-	guohuai: ["male", "wei", 4, ["rejingce"]],
+	guohuai: ["male", "wei", 3, ["rejingce"]],
 	zhangchunhua: ["female", "wei", 3, ["jueqing", "shangshi"]],
 	caozhi: ["male", "wei", 3, ["luoying", "jiushi"]],
 	caochong: ["male", "wei", 3, ["chengxiang", "renxin"]],
@@ -55,10 +55,10 @@ const characters = {
 	gongsunyuan: ["male", "qun", 4, ["huaiyi"], ["name:公孙|渊"]],
 	guotufengji: ["male", "qun", 3, ["jigong", "shifei"], ["name:郭|图-逢|纪"]],
 
-	xin_liru: ["male", "qun", 3, ["xinjuece", "xinmieji", "xinfencheng"]],
+	xin_liru: ["male", "qun", 3, ["xinjuece", "xinmieji", "xinfencheng"], ["die:liru"]],
 
 	guohuanghou: ["female", "wei", 3, ["jiaozhao", "danxin"], ["name:郭|null"]],
-	liuyu: ["male", "qun", 2, ["xinzhige", "xinzongzuo"]],
+	liuyu: ["male", "qun", 2, ["zhige", "zongzuo", "twchongwang"], ["zhu"]],
 	liyan: ["male", "shu", 3, ["dcduliang", "fulin"]],
 	sundeng: ["male", "wu", 4, ["kuangbi"]],
 

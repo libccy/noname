@@ -1,16 +1,3 @@
-/**
- * @typedef { {
- * useCard: GameEventPromise[],
- * respond: GameEventPromise[],
- * skipped: GameEventPromise[],
- * lose: GameEventPromise[],
- * gain: GameEventPromise[],
- * 	sourceDamage: GameEventPromise[],
- * 	damage: GameEventPromise[],
- * 	custom: GameEventPromise[],
- * 	useSkill: GameEventPromise[],
- * }} ActionHistory
- */
 
 import { ai } from "../../ai/index.js";
 import { get } from "../../get/index.js";
@@ -240,10 +227,11 @@ export class Player extends HTMLDivElement {
 	 */
 	judging;
 	/**
-	 * @type { { card:{}, skill: {} }[] }
+	 * @type {Stat[]}
 	 */
 	stat;
 	/**
+	 * 玩家的行动历史，每个回合对应一个历史。
 	 * @type { ActionHistory[] }
 	 */
 	actionHistory;
@@ -369,6 +357,92 @@ export class Player extends HTMLDivElement {
 	 * @type { boolean }
 	 */
 	removed;
+	/**
+	 * @type {Map<string,HTMLDivElement>}
+	 */
+	tips;
+
+	/**
+	 * 设置提示文字，有则更改，无则加之。
+	 * @param {string} index 给标记起一个名字，名字任意
+	 * @param {string} message 设置提示标记的内容,标记中的\n代表换行符
+	 * @param { SkillTrigger | SAAType<Signal> | boolean } isTemp 是否是临时的tip。默认为false,表示一直存在；若为true,则回合结束自动失去。也可以填一个具体的自定义时机。
+	 * @param { object } [css] 自定义的样式
+	 * @returns { void }
+	 * @author Curpond
+	 */
+	addTip(index, message, isTemp = false, css = {}) {
+		const player = this;
+		game.broadcastAll(
+			(player, index, message, css) => {
+				player.node.tipContainer ??= ui.create.div(".tipContainer", player);
+				player.tips ??= new Map();
+				if (!player.tips.has(index)) player.tips.set(index, ui.create.div(".tip", player.node.tipContainer));
+				player.tips.get(index).innerHTML = message.replace(/ /g, "&nbsp;").replace(/[♥︎♦︎]/g, '<span style="color: red; ">$&</span>').replace(/\n/g, '<br>');
+				player.tips.get(index).css(css);
+
+				let double = player.classList.contains('fullskin2') && lib.config.layout !== 'long2';
+
+				const width = player.node.avatar.clientWidth;
+				let w = width * (double ? 2 : 1);
+				player.style.setProperty('--w', `${w}px`);
+
+				//检查tip的高度，使其不覆盖装备
+				game.callHook("checkTipBottom", [player]);
+			},
+			player,
+			index,
+			message,
+			css
+		);
+		if (isTemp && !player.storage[`temp_tip_${index}`]) {
+			player.storage[`temp_tip_${index}`] = true;
+			let expire;
+			if (isTemp === true) expire = { global: ["phaseAfter", "phaseBeforeStart"] };
+			else if (typeof isTemp == "string" || Array.isArray(isTemp)) expire = { global: isTemp };
+			player
+				.when(expire, false)
+				.assign({
+					firstDo: true,
+					priority: Infinity,
+				})
+				.vars({
+					index,
+				})
+				.then(() => {
+					delete player.storage[`temp_tip_${index}`];
+					player.removeTip(index);
+				})
+				.finish();
+		}
+
+	}
+	/**
+	 * 清除标记，不传参数可以清空所有标记
+	 * @param {string} [index] 标记的名字，不传则清空所有标记
+	 * @author Curpond
+	 */
+	removeTip(index) {
+		game.broadcastAll(
+			(player, index) => {
+				if (index == undefined) {
+					player.tips?.clear();
+				} else {
+					if (player.tips?.has(index)) {
+						player.tips.get(index).remove();
+						player.tips.delete(index);
+					}
+				}
+				if (!player.tips?.size) {
+					player.node.tipContainer?.remove();
+					delete player.node.tipContainer;
+				}
+
+			},
+			this,
+			index
+		);
+	}
 	//新函数
 	/**
 	 * 怒气
@@ -387,24 +461,21 @@ export class Player extends HTMLDivElement {
 		this.markSkill("stratagem_fury");
 	}
 	/**
-	 * version 1.7
-	 *
-	 * 链式创建一次性技能的api。
-	 *
-	 * 使用者只需要关注技能的效果，而不是技能的本身。
-	 *
-	 * v1.7 可传递作用域
-	 * @example
-	 * ```js
-	 * (function () {
-	 * 	let _var = 1;
-	 * 	let me = player;
-	 * 	player.when('drawAfter')
-	 * 		.apply(code => eval(code))
-	 * 		.then(() => console.log(_var))
-	 * 		.then('me.gainMaxHp(5)');
-	 * })();
-	 * ```
+	 * 
+	 * 链式创建一次性的API。
+	 * 
+	 * 使用者只需关注技能的效果，而不是技能本身
+	 * 
+	 *  @example
+	 * when('xxx') when([xxx1,xxx2])//均会被解析为：player:xxx或player:[xxx1,xxx2]
+	 * 
+	 * when({player:xxx})或when({gloal:[xxx]})//对象类型将直接应用
+	 * 
+	 * when(xxx1,xxx2)//解析为player:[xxx1,xxx2]
+	 * 
+	 * when({player: 'xxAfter'}, {global: 'yyBegin'})//合并解析
+	 * @param  {[Signal[]]|Signal[]|SkillTrigger[]} triggerNames 
+	 * @returns {When}
 	 */
 	when(...triggerNames) {
 		const player = this;
@@ -1033,10 +1104,10 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					return num + get.numOf(types, type);
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				return num + get.numOf(types, type);
+			}, 0)
 		);
 	}
 	/**
@@ -1065,11 +1136,11 @@ export class Player extends HTMLDivElement {
 		return Math.max(
 			0,
 			this.countEnabledSlot(type) -
-				this.getVEquips(type).reduce((num, card) => {
-					let types = get.subtypes(card, false);
-					if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
-					return num;
-				}, 0)
+			this.getVEquips(type).reduce((num, card) => {
+				let types = get.subtypes(card, false);
+				if (!lib.filter.canBeReplaced(card, this)) num += get.numOf(types, type);
+				return num;
+			}, 0)
 		);
 	}
 	/**
@@ -1382,6 +1453,10 @@ export class Player extends HTMLDivElement {
 		} else {
 			rangex.push(...new Set(ranges));
 		}
+		if (get.itemtype(name) == "card") {
+			const owner = get.owner(name, "judge");
+			if (owner && !lib.filter.canBeGained(name, this, owner)) return false;
+		}
 		for (let range of rangex) {
 			let num = this.countEquipableSlot(range);
 			let num2 = get.numOf(rangex, range);
@@ -1413,11 +1488,11 @@ export class Player extends HTMLDivElement {
 	/**
 	 * @deprecated
 	 */
-	$disableEquip() {}
+	$disableEquip() { }
 	/**
 	 * @deprecated
 	 */
-	$enableEquip() {}
+	$enableEquip() { }
 	//装备区End
 	chooseToDebate() {
 		var next = game.createEvent("chooseToDebate");
@@ -1910,6 +1985,25 @@ export class Player extends HTMLDivElement {
 		};
 		return next;
 	}
+	chooseToMove_new() {
+		var next = game.createEvent("chooseToMove_new");
+		next.player = this;
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] == "boolean") {
+				next.forced = arguments[i];
+			} else if (typeof arguments[i] == "string") {
+				next.prompt = arguments[i];
+			}
+		}
+		next.setContent("chooseToMove_new");
+		next.filterOk = function () {
+			return true;
+		};
+		next.filterMove = function () {
+			return true;
+		};
+		return next;
+	}
 	chooseToGuanxing(num) {
 		var next = game.createEvent("chooseToGuanxing");
 		next.num = num || 1;
@@ -1968,7 +2062,7 @@ export class Player extends HTMLDivElement {
 	tryJudgeAnimate(bool) {
 		game.broadcast(
 			function (player, bool) {
-				player.trySkillAnimate(bool);
+				player.tryJudgeAnimate(bool);
 			},
 			this,
 			bool
@@ -2131,10 +2225,10 @@ export class Player extends HTMLDivElement {
 		m = game.checkMod(from, to, m, "attackFrom", from);
 		m = game.checkMod(from, to, m, "attackTo", to);
 		const equips1 = from.getVCards("e", function (card) {
-				return !card.cards?.some(card => {
-					return ui.selected.cards?.includes(card);
-				});
-			}),
+			return !card.cards?.some(card => {
+				return ui.selected.cards?.includes(card);
+			});
+		}),
 			equips2 = to.getVCards("e", function (card) {
 				return !card.cards?.some(card => {
 					return ui.selected.cards?.includes(card);
@@ -2579,6 +2673,7 @@ export class Player extends HTMLDivElement {
 			map = { skill: map };
 		}
 		for (const i of ["name", "name1", "name2"]) {
+			if (i == "name" && get.mode() == "guozhan") continue;
 			if (i == "name1" && this.name === this.name1) continue;
 			const list = lib.characterSubstitute[this[i]];
 			if (this[i] && list) {
@@ -2689,52 +2784,58 @@ export class Player extends HTMLDivElement {
 				this.serving = true;
 			}
 		} else {
-			var config = info[2];
-			this.key = info[4];
-			this.roomempty = false;
-			str += get.modetrans(config);
-			str += " 模式　";
-			for (var i = str.length; i < 11; i++) str += "　";
-			this.version = config.version;
-			if (config.gameStarted) {
-				str += '<span class="firetext">游戏中</span>　';
-				if (config.observe && config.observeReady && this.version == lib.versionOL) {
-					this.classList.remove("exclude");
+			if (info.length) {
+				var config = info[2];
+				this.key = info[4];
+				this.roomempty = false;
+				str += get.modetrans(config);
+				str += " 模式　";
+				for (var i = str.length; i < 11; i++) str += "　";
+				this.version = config.version;
+				if (config.gameStarted) {
+					str += '<span class="firetext">游戏中</span>　';
+					if (config.observe && config.observeReady && this.version == lib.versionOL) {
+						this.classList.remove("exclude");
+					} else {
+						this.classList.add("exclude");
+					}
 				} else {
-					this.classList.add("exclude");
+					str += '<span class="greentext">等待中</span>　';
+					if (this.version != lib.versionOL) {
+						this.classList.add("exclude");
+					} else {
+						this.classList.remove("exclude");
+					}
 				}
-			} else {
-				str += '<span class="greentext">等待中</span>　';
-				if (this.version != lib.versionOL) {
-					this.classList.add("exclude");
-				} else {
-					this.classList.remove("exclude");
-				}
-			}
-			this.maxHp = parseInt(config.number);
-			this.hp = Math.min(this.maxHp, info[3]);
-			if (this.hp < this.maxHp || config.gameStarted) str += "人数：" + this.hp + "/" + this.maxHp;
-			else str += '人数：<span class="firetext">' + this.hp + "/" + this.maxHp + "</span>";
+				this.maxHp = parseInt(config.number);
+				this.hp = Math.min(this.maxHp, info[3]);
+				if (this.hp < this.maxHp || config.gameStarted) str += "人数：" + this.hp + "/" + this.maxHp;
+				else str += '人数：<span class="firetext">' + this.hp + "/" + this.maxHp + "</span>";
 
-			str += "　(" + info[0].slice(0, 12) + " 的房间)";
-			if (config.mode != "guozhan" && (config.mode != "doudizhu" || config.doudizhu_mode != "online")) {
-				str += "【";
-				for (var i = 0; i < config.cardPack.length; i++) {
-					str += get.translation(config.cardPack[i] + "_card_config").slice(0, 2);
-					if (i < config.cardPack.length - 1) str += "+";
+				str += "　(" + info[0].slice(0, 12) + " 的房间)";
+				if (config.mode != "guozhan" && (config.mode != "doudizhu" || config.doudizhu_mode != "online")) {
+					str += "【";
+					for (var i = 0; i < config.cardPack.length; i++) {
+						str += get.translation(config.cardPack[i] + "_card_config").slice(0, 2);
+						if (i < config.cardPack.length - 1) str += "+";
+					}
+					str += "】";
 				}
-				str += "】";
-			}
-			this.config = config;
-			if (this.hp == this.maxHp && !config.gameStarted) {
+				this.config = config;
+				if (this.hp == this.maxHp && !config.gameStarted) {
+					this.roomfull = true;
+				} else {
+					this.roomfull = false;
+				}
+				if (config.gameStarted && (!config.observe || !config.observeReady)) {
+					this.roomgaming = true;
+				} else {
+					this.roomgaming = false;
+				}
+			} else {
+				str = "异常房间";
 				this.roomfull = true;
-			} else {
-				this.roomfull = false;
-			}
-			if (config.gameStarted && (!config.observe || !config.observeReady)) {
-				this.roomgaming = true;
-			} else {
-				this.roomgaming = false;
+				this.classList.add("exclude");
 			}
 		}
 		this.firstChild.innerHTML = str;
@@ -3378,10 +3479,13 @@ export class Player extends HTMLDivElement {
 			const maxHp = hidden ? 1 : this.maxHp;
 			if (maxHp == Infinity) {
 				hp.innerHTML = this.hp == Infinity ? "∞" : this.hp + "<br>/<br>" + "∞" + "<div></div>";
+				/*
 			} else if (game.layout == "default" && maxHp > 14) {
 				hp.innerHTML = this.hp + "/" + maxHp;
 				hp.classList.add("text");
 			} else if (get.is.newLayout() && (maxHp > 9 || (maxHp > 5 && this.classList.contains("minskin")) || ((game.layout == "mobile" || game.layout == "long") && this.dataset.position == 0 && maxHp > 7))) {
+			 */
+			} else if (maxHp > 5) {
 				hp.innerHTML = this.hp + "<br>/<br>" + maxHp + "<div></div>";
 				if (this.hp == 0) {
 					hp.lastChild.classList.add("lost");
@@ -3462,6 +3566,7 @@ export class Player extends HTMLDivElement {
 			game.addVideo("update", this, [this.countCards("h"), this.hp, this.maxHp, this.hujia]);
 		}
 		this.updateMarks();
+		game.callHook("checkTipBottom", [this]);
 		return this;
 	}
 	/**
@@ -3608,6 +3713,50 @@ export class Player extends HTMLDivElement {
 		for (var i in this.marks) {
 			this.updateMark(i);
 		}
+	}
+	/**
+	 * 获得蓄力点
+	 * @param { number } [num = 1] 获得蓄力点数
+	 * @param { boolean } [log] false: 不进行广播
+	 */
+	addCharge(num, log) {
+		if (typeof num != "number" || !num) num = 1;
+		let maxCharge = this.getMaxCharge();
+		num = Math.min(num, maxCharge - this.countMark("charge"));
+		if (num > 0) this.addMark("charge", num, log);
+	}
+	/**
+	 * 移去蓄力点
+	 * @param { number } [num = 1] 移去蓄力点数
+	 * @param { boolean } [log] false: 不进行广播
+	 */
+	removeCharge(num, log) {
+		if (typeof num != "number" || !num) num = 1;
+		num = Math.min(num, this.countMark("charge"));
+		if (num > 0) this.removeMark("charge", num, log);
+	}
+	/**
+	 * 返回玩家的蓄力点数
+	 * @param { boolean } [max] true: 返回当前蓄力点与上限之差
+	 * @returns { number }
+	 */
+	countCharge(max) {
+		if (max) return this.getMaxCharge() - this.countMark("charge");
+		return this.countMark("charge");
+	}
+	/**
+	 * 获取蓄力点上限
+	 */
+	getMaxCharge() {
+		let skills = game.expandSkills(this.getSkills().concat(lib.skill.global));
+		let max = 0;
+		for (let skill of skills) {
+			let info = get.info(skill);
+			if (!info || !info.chargeSkill || typeof info.chargeSkill != "number") continue;
+			max += info.chargeSkill;
+		}
+		max = game.checkMod(this, max, "maxCharge", this);
+		return max;
 	}
 	/**
 	 * @deprecated
@@ -5110,6 +5259,43 @@ export class Player extends HTMLDivElement {
 		next.setContent("chooseDrawRecover");
 		return next;
 	}
+	/**
+	 * 选择一或多个数值
+	 */
+	chooseNumbers() {
+		const next = game.createEvent("chooseNumbers");
+		next.player = this;
+		next.list = [];
+		for (const argument of arguments) {
+			if (typeof argument == "string") {
+				get.evtprompt(next, argument);
+			} else if (typeof argument == "number") {
+				next.terminal = argument;
+			} else if (typeof argument == "boolean") {
+				next.forced = argument;
+			} else if (typeof argument == "object" && Array.isArray(argument)) {
+				next.list.push(...argument);
+			}
+		}
+		if (!next.list.length) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}
+		if (!next.filterSelect)
+			next.filterSelect = function (num, index, event) {
+				if (event.terminal) return num + event.numbers.reduce((sum, num) => sum + num, 0) - (event.numbers[index] || 0) <= event.terminal;
+				return true;
+			};
+		if (!next.filterOk)
+			next.filterOk = function (event) {
+				if (event.terminal) return event.numbers.reduce((sum, num) => sum + num, 0) <= event.terminal;
+				return true;
+			};
+		if (!next.forced) next.forced = false;
+		next.setContent("chooseNumbers");
+		next._args = Array.from(arguments);
+		return next;
+	}
 	choosePlayerCard() {
 		var next = game.createEvent("choosePlayerCard");
 		next.player = this;
@@ -5817,7 +6003,7 @@ export class Player extends HTMLDivElement {
 	}
 	directequip(cards) {
 		for (var i = 0; i < cards.length; i++) {
-			this.addVirtualEquip(cards[i]);
+			this.addVirtualEquip(cards[i], cards[i].cards);
 		}
 		if (!_status.video) {
 			game.addVideo("directequip", this, get.cardsInfo(cards));
@@ -7349,6 +7535,12 @@ export class Player extends HTMLDivElement {
 		if (mark) this.markAuto(name);
 		return value;
 	}
+	/**
+	 * 获取this.storage[name]的值
+	 * @param { string } name
+	 * @param { any } defaultValue 预设值，默认为[]（不修改原storage）
+	 * @returns
+	 */
 	getStorage(name, defaultValue = []) {
 		return this.storage[name] || defaultValue;
 	}
@@ -8077,6 +8269,7 @@ export class Player extends HTMLDivElement {
 					this.markSkill(skill, null, null, nobroadcast);
 				}
 			}
+			game.callHook("addSkillCheck", [skill, this]);
 		}
 		if (checkConflict) this.checkConflict();
 		return skill;
@@ -8219,7 +8412,7 @@ export class Player extends HTMLDivElement {
 		if (!nounmark) this.unmarkSkill(skill);
 		this.disableSkill(skill + "_awake", skill);
 		this.awakenedSkills.add(skill);
-		if (this.storage[skill] === false) this.storage[skill] = true;
+		if (!this.storage[skill]) this.storage[skill] = true;
 		_status.event.clearStepCache();
 		return this;
 	}
@@ -8349,12 +8542,12 @@ export class Player extends HTMLDivElement {
 		);
 		const cards = player.vcardsMap?.equips;
 		if (cards && cards.includes(VCard)) {
-			player.removeEquipTrigger(VCard);
+			player.removeEquipTrigger(VCard, true);
 			cards.remove(VCard);
 		}
 		if (lib.config.equip_span) player.$handleEquipChange();
 	}
-	removeEquipTrigger(card) {
+	removeEquipTrigger(card, hasMove) {
 		if (_status.video) return;
 		if (card) {
 			var info = get.info(card, false);
@@ -8362,6 +8555,8 @@ export class Player extends HTMLDivElement {
 			const VEquips = this.getVCards("e");
 			VEquips.remove(card);
 			skills.addArray(get.skillsFromEquips(VEquips));
+			const cards = this.vcardsMap?.equips;
+			if (cards && cards.includes(card) && hasMove !== true) cards.remove(card);
 			if (info.skills) {
 				for (var j = 0; j < info.skills.length; j++) {
 					if (skills.includes(info.skills[j])) continue;
@@ -8377,7 +8572,7 @@ export class Player extends HTMLDivElement {
 		} else {
 			var es = this.getVCards("e");
 			for (var i = 0; i < es.length; i++) {
-				this.removeEquipTrigger(es[i]);
+				this.removeEquipTrigger(es[i], hasMove);
 			}
 		}
 		_status.event.clearStepCache();
@@ -8485,9 +8680,16 @@ export class Player extends HTMLDivElement {
 				}
 			}
 			this.enableSkill(skill + "_awake");
+			game.callHook("removeSkillCheck", [skill, this]);
 		}
 		return skill;
 	}
+	/**
+	 * 
+	 * @param {SAAType<string>} skillsToAdd 
+	 * @param {SAAType<Signal>|SkillTrigger} [expire] 
+	 * @returns 
+	 */
 	addTempSkills(skillsToAdd, expire) {
 		//请注意，该方法的底层实现并非tempSkill，而是additionalSkills和player.when！
 		if (typeof skillsToAdd == "string") skillsToAdd = [skillsToAdd];
@@ -8532,7 +8734,7 @@ export class Player extends HTMLDivElement {
 	 * 添加临时技能
 	 * @overload
 	 * @param { string | string[] } skill 技能名(数组)
-	 * @param { SkillTrigger | string | (event:GameEventPromise, player:Player, name:string) => boolean } [expire]
+	 * @param { SkillTrigger |SAAType<Signal> } [expire]
 	 * @param { boolean } [checkConflict]
 	 */
 	addTempSkill(skill, expire, checkConflict) {
@@ -8670,19 +8872,13 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * 快速获取一名角色当前轮次/前X轮次的历史
-	 *
-	 * 第一个参数填写获取的动作
-	 *
-	 * 第二个参数填写获取历史的筛选条件
-	 *
-	 * 第三个参数填写数字（不填默认为0），获取上X轮的历史（X为0则为本轮历史），第四个参数若为true，则获取从上X轮开始至现在
-	 *
-	 * 第四个参数若为true，则获取从上X轮开始至现在所有符合条件的历史
-	 *
-	 * 第五个参数填写event，获取此event之前所有符合条件的历史
-	 *
-	 * @param { string | function | number | boolean | object } map
+	 * 快速获取一名角色当前轮次/倒数第X轮次的历史
+	 *	@template {Exclude< keyof ActionHistory, 'isRound'|'isMe'>} T
+	 * @param {T} key 
+	 * @param {(event:GameEventPromise)=>boolean} filter 筛选条件
+	 * @param {number} [num] 获取倒数第num轮的历史，默认为0，表示当前轮
+	 * @param {boolean} [keep] 若为true,则获取倒数第num轮到现在的所有历史
+	 * @param {GameEventPromise} last 代表最后一个事件，获取该事件之前的历史
 	 */
 	getRoundHistory(key, filter, num, keep, last) {
 		if (!num) num = 0;
@@ -8709,15 +8905,22 @@ export class Player extends HTMLDivElement {
 		return evts;
 	}
 	/**
+	 * 不填参数，直接获得最后一个回合的改玩家的整个历史对象。
 	 * @overload
 	 * @returns { ActionHistory }
 	 */
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 
+	 * @overload
+	 * @param { 'isRound'|'isMe' } key
+	 * @returns { boolean}
+	 */
+	/**
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @overload
 	 * @param { T } key
-	 * @param { (event: GameEventPromise) => boolean } [filter]
-	 * @param { GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => boolean } [filter] 过滤条件
+	 * @param { GameEventPromise } [last] 若有改参数，则该参数事件之后的将被排除掉
 	 * @returns { ActionHistory[T] }
 	 */
 	getHistory(key, filter, last) {
@@ -8736,10 +8939,11 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 遍历历史
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
-	 * @param { (event: GameEventPromise) => boolean } filter
-	 * @param { GameEventPromise } [last]
+	 * @param { (event: GameEventPromise) => void } filter 遍历过程需要执行的函数
+	 * @param { GameEventPromise } [last] 
 	 */
 	checkHistory(key, filter, last) {
 		if (!key || !filter) return;
@@ -8757,7 +8961,7 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } [filter]
 	 * @param { GameEventPromise } [last]
@@ -8776,12 +8980,17 @@ export class Player extends HTMLDivElement {
 		return history.some(filter);
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 不填参数，直接获得最后一个回合的改玩家的整个历史对象。
 	 * @overload
-	 * @param { T } [key]
-	 * @param { (event: GameEventPromise) => boolean } [filter]
-	 * @param { GameEventPromise } [last]
-	 * @returns { null | ActionHistory[T] | boolean }
+	 * @returns { ActionHistory }
+	 */
+	/**
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
+	 * @overload
+	 * @param { T } key
+	 * @param { (event: GameEventPromise) => boolean } [filter] 过滤条件
+	 * @param { GameEventPromise } [last] 若有改参数，则该参数事件之后的将被排除掉
+	 * @returns { ActionHistory[T] }
 	 */
 	getLastHistory(key, filter, last) {
 		let history = false;
@@ -8806,9 +9015,10 @@ export class Player extends HTMLDivElement {
 		}
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * 遍历整局游戏该玩家的历史
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
-	 * @param { (event: GameEventPromise) => boolean } filter
+	 * @param { (event: GameEventPromise) => void } filter
 	 * @param { GameEventPromise } [last]
 	 */
 	checkAllHistory(key, filter, last) {
@@ -8827,8 +9037,15 @@ export class Player extends HTMLDivElement {
 		});
 	}
 	/**
-	 * @template { keyof ActionHistory } T
-	 * @param { T } [key]
+	 * 获得整局游戏该玩家的行动历史
+	 * @overload
+	 * @returns { ActionHistory[] }
+	 */
+	/**
+	 * 获得整局游戏该玩家的某个指定行为的历史
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
+	 * @overload
+	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } [filter]
 	 * @param { GameEventPromise } [last]
 	 * @returns { ActionHistory[T] }
@@ -8855,7 +9072,7 @@ export class Player extends HTMLDivElement {
 		return history;
 	}
 	/**
-	 * @template { keyof ActionHistory } T
+	 * @template { Exclude<keyof ActionHistory,'isRound'|'isMe'> } T
 	 * @param { T } key
 	 * @param { (event: GameEventPromise) => boolean } filter
 	 * @param { GameEventPromise } [last]
@@ -8885,10 +9102,31 @@ export class Player extends HTMLDivElement {
 		if (history.length <= num) return null;
 		return history[history.length - num - 1];
 	}
+	/**
+	 * @overload
+	 * @returns {Stat}
+	 */
+	/**
+	 * @template {keyof Stat} T
+	 * @overload
+	 * @param {T} key 
+	 * @returns {Stat[T]}
+	 */
 	getStat(key) {
 		if (!key) return this.stat[this.stat.length - 1];
 		return this.stat[this.stat.length - 1][key];
 	}
+	/**
+	 * 用法同getStat，区别是获得自己的回合的统计
+	 * @overload
+	 * @returns {Stat}
+	 */
+	/**
+	 * @template {keyof Stat} T
+	 * @overload
+	 * @param {T} key 
+	 * @returns {Stat[T]}
+	 */
 	getLastStat(key) {
 		var stat = false;
 		for (var i = this.stat.length - 1; i >= 0; i--) {
@@ -9051,17 +9289,18 @@ export class Player extends HTMLDivElement {
 		num = game.checkMod(this, num, "maxHandcardFinal", this);
 		return Math.max(0, num);
 	}
-	getEnemies(func) {
+	getEnemies(func, includeDie) {
 		var player = this;
 		var targets;
 		var mode = get.mode();
+		let method = includeDie ? "filterPlayer2" : "filterPlayer";
 		if (mode == "identity") {
 			if (_status.mode == "purple") {
 				switch (player.identity) {
 					case "bZhu":
 					case "bZhong":
 					case "rNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["rZhu", "rZhong", "bNei"].includes(target.identity);
 						});
@@ -9069,14 +9308,14 @@ export class Player extends HTMLDivElement {
 					case "rZhu":
 					case "rZhong":
 					case "bNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["bZhu", "bZhong", "rNei"].includes(target.identity);
 						});
 						break;
 					case "rYe":
 					case "bYe":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return !["rYe", "bYe"].includes(target.identity);
 						});
@@ -9088,14 +9327,14 @@ export class Player extends HTMLDivElement {
 					case "zhu":
 					case "zhong":
 					case "mingzhong":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							if (num >= 3) return target.identity == "fan";
 							return target.identity == "nei" || target.identity == "fan";
 						});
 						break;
 					case "nei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							if (num >= 3) return target.identity == "fan";
 							if (game.players.length == 2) return target != player;
@@ -9103,13 +9342,13 @@ export class Player extends HTMLDivElement {
 						});
 						break;
 					case "fan":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return target.identity != "fan";
 						});
 						break;
 					case "commoner":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							if (num >= 3) return target.identity != "fan";
 							return target.identity == "fan";
@@ -9119,24 +9358,24 @@ export class Player extends HTMLDivElement {
 			}
 		} else if (mode == "guozhan") {
 			if (player.identity == "ye") {
-				targets = game.filterPlayer(function (target) {
+				targets = game[method](function (target) {
 					if (func && !func(target)) return false;
 					return true;
 				});
 			} else {
 				var group = lib.character[player.name1][1];
-				targets = game.filterPlayer(function (target) {
+				targets = game[method](function (target) {
 					if (func && !func(target)) return false;
 					return target.identity == "ye" || lib.character[target.name1][1] != group;
 				});
 			}
 		} else if (mode == "doudizhu") {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.identity != player.identity;
 			});
 		} else {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.side != player.side;
 			});
@@ -9144,7 +9383,7 @@ export class Player extends HTMLDivElement {
 		targets.remove(player);
 		return targets;
 	}
-	getFriends(func) {
+	getFriends(func, includeDie) {
 		var player = this;
 		var targets = [];
 		var mode = get.mode();
@@ -9153,13 +9392,14 @@ export class Player extends HTMLDivElement {
 			func = null;
 			self = true;
 		}
+		let method = includeDie ? "filterPlayer2" : "filterPlayer";
 		if (mode == "identity") {
 			if (_status.mode == "purple") {
 				switch (player.identity) {
 					case "rZhu":
 					case "rZhong":
 					case "bNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["rZhu", "rZhong", "bNei"].includes(target.identity);
 						});
@@ -9167,14 +9407,14 @@ export class Player extends HTMLDivElement {
 					case "bZhu":
 					case "bZhong":
 					case "rNei":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["bZhu", "bZhong", "rNei"].includes(target.identity);
 						});
 						break;
 					case "rYe":
 					case "bYe":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["rYe", "bYe"].includes(target.identity);
 						});
@@ -9185,7 +9425,7 @@ export class Player extends HTMLDivElement {
 					case "zhu":
 					case "zhong":
 					case "mingzhong":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return ["zhu", "zhong", "mingzhong"].includes(target.identity);
 						});
@@ -9194,13 +9434,13 @@ export class Player extends HTMLDivElement {
 						targets = [];
 						break;
 					case "fan":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return target.identity == "fan";
 						});
 						break;
 					case "commoner":
-						targets = game.filterPlayer(function (target) {
+						targets = game[method](function (target) {
 							if (func && !func(target)) return false;
 							return true;
 						});
@@ -9212,18 +9452,18 @@ export class Player extends HTMLDivElement {
 				targets = [];
 			} else {
 				var group = lib.character[player.name1][1];
-				targets = game.filterPlayer(function (target) {
+				targets = game[method](function (target) {
 					if (func && !func(target)) return false;
 					return target.identity != "ye" && lib.character[target.name1][1] == group;
 				});
 			}
 		} else if (mode == "doudizhu") {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.identity == player.identity;
 			});
 		} else {
-			targets = game.filterPlayer(function (target) {
+			targets = game[method](function (target) {
 				if (func && !func(target)) return false;
 				return target.side == player.side;
 			});
@@ -9254,11 +9494,11 @@ export class Player extends HTMLDivElement {
 		}
 		return this == player;
 	}
-	isFriendsOf(player) {
-		return player.getFriends(true).includes(this);
+	isFriendsOf(player, includeDie) {
+		return player.getFriends(true, includeDie).includes(this);
 	}
-	isEnemiesOf(player) {
-		return player.getEnemies().includes(this);
+	isEnemiesOf(player, includeDie) {
+		return player.getEnemies(null, includeDie).includes(this);
 	}
 	isAlive() {
 		return this.classList.contains("dead") == false;
@@ -9779,6 +10019,11 @@ export class Player extends HTMLDivElement {
 		}
 		return false;
 	}
+	/**
+	 * 场上是否有至少num/1个不明身份角色
+	 * @param { number } [num] 允许最多有num个不明身份角色
+	 * @returns { boolean }
+	 */
 	hasUnknown(num) {
 		var mode = get.mode();
 		if (typeof num != "number") {
@@ -9886,7 +10131,7 @@ export class Player extends HTMLDivElement {
 			return false;
 		}).length;
 		if (count && rvt !== "count") return rvt === "odds" ? 1 : true;
-		let hs = this.getCards("hs").filter(i => !cards.includes(i)).length;
+		let hs = this.getCards("hs").filter(i => !cards.includes(i) && !selected.includes(i)).length;
 		if (!hs) {
 			if (rvt === "count") return count;
 			else if (rvt === "odds") return 0;
@@ -9934,7 +10179,7 @@ export class Player extends HTMLDivElement {
 			return false;
 		}).length;
 		if (count && rvt !== "count") return rvt === "odds" ? 1 : true;
-		let hs = this.getCards("hs").filter(i => !cards.includes(i)).length;
+		let hs = this.getCards("hs").filter(i => !cards.includes(i) && !selected.includes(i)).length;
 		if (!hs) {
 			if (rvt === "count") return count;
 			else if (rvt === "odds") return 0;
@@ -11068,7 +11313,9 @@ export class Player extends HTMLDivElement {
 		}
 		const cardx = isViewAsCard ? game.createCard(card.name, cards.length == 1 ? get.suit(cards[0]) : "none", cards.length == 1 ? get.number(cards[0]) : 0) : cards[0];
 		cardx.fix();
-		cardx.card = card;
+		const cardSymbol = Symbol("card");
+		cardx.cardSymbol = cardSymbol;
+		cardx[cardSymbol] = card;
 		if (card.subtypes) cardx.subtypes = card.subtypes;
 		cardx.style.transform = "";
 		cardx.classList.remove("drawinghidden");

@@ -284,7 +284,7 @@ export default () => {
 	
 				xiahouyuan: ["male", "wei", 4, ["shensu", "suzi"]],
 				old_caoren: ["male", "wei", 4, ["jushou"]],
-				huangzhong: ["male", "shu", 4, ["liegong"]],
+				huangzhong: ["male", "shu", 4, ["sgliegong"]],
 				weiyan: ["male", "shu", 4, ["sgkuanggu"]],
 				xiaoqiao: ["female", "wu", 3, ["tianxiang", "hongyan"]],
 				old_zhoutai: ["male", "wu", 4, ["gzbuqu"]],
@@ -1569,6 +1569,29 @@ export default () => {
 					player.chooseUseTarget("shuiyanqijunx", get.prompt("huwei"), "视为使用一张【水淹七军】").logSkill = "huwei";
 				},
 			},
+			sgliegong: {
+				audio: "liegong",
+				audioname: ["re_huangzhong"],
+				trigger: { player: "useCardToPlayered" },
+				filter(event, player) {
+					if (event.card.name != "sha" || !player.enemy) return false;
+					return player.enemy.countCards("h") >= player.hp;
+				},
+				check(event, player) {
+					return get.attitude(player, event.target) <= 0;
+				},
+				logTarget: "target",
+				async content(event, trigger, player) {
+					trigger.getParent().directHit.push(trigger.target);
+				},
+				ai: {
+					directHit_ai: true,
+					skillTagFilter(player, tag, arg) {
+						if (get.attitude(player, arg.target) > 0 || arg.card.name != "sha") return false;
+						return player.enemy && player.enemy.countCards("h") >= player.hp;
+					},
+				},
+			},
 			sgkuanggu: {
 				audio: "kuanggu",
 				trigger: { source: "damageSource" },
@@ -2036,7 +2059,7 @@ export default () => {
 							for (let k = 0; k < list2.length; k++) {
 								let info = lib.skill[list2[k]];
 								if (!info || info.silent || info.juexingji || info.hiddenSkill || info.dutySkill || info.zhuSkill || info.unique || info.groupSkill) continue;
-								if (info.ai && (info.ai.combo || info.ai.notemp || info.ai.neg)) continue;
+								if (info.ai && (info.ai.combo || info.ai.neg)) continue;
 								list.add(name);
 								if (!map[name]) map[name] = [];
 								map[name].push(skills2[j]);
@@ -2133,6 +2156,8 @@ export default () => {
 			xiechan_info: "限定技，出牌阶段，你可以和对手拼点。若你赢/没赢，你/其视为对其/你使用一张【决斗】。",
 			huwei: "虎威",
 			huwei_info: "当你登场时，你可以视为使用一张【水淹七军】。",
+			sgliegong: "烈弓",
+			sgliegong_info: "当你使用【杀】指定目标后，若对手的手牌数大于等于你的体力值，你可令此【杀】不可被【闪】响应。",
 			sgkuanggu: "狂骨",
 			sgkuanggu_info: "当你造成伤害后，若你已受伤，你可以进行判定：若结果为黑色，你回复1点体力。",
 			suzi: "肃资",

@@ -94,7 +94,7 @@ export function sendUpdate() {
 				fs.writeFileSync(path.join(__dirname, "Home", "saveProtocol.txt"), "");
 				// 启动http
 				const cp = require("child_process");
-				cp.exec(`start /min ${__dirname}\\noname-server.exe -platform=electron`, (err, stdout, stderr) => {});
+				cp.exec(`start /min ${__dirname}\\noname-server.exe -platform=electron`, (err, stdout, stderr) => { });
 				return `http://localhost:8089/app.html?sendUpdate=true`;
 			}
 		}
@@ -551,7 +551,8 @@ export async function boot() {
 	} else {
 		Reflect.get(ui, "css").phone = lib.init.css();
 	}
-
+	ui.css._others = lib.init.css(lib.assetURL + "layout/" + "others", "dialog");
+	ui.css._skill = lib.init.css(lib.assetURL + "layout/" + "others", "skill");
 	initSheet(Reflect.get(lib, "config"));
 
 	config.set("duration", 500);
@@ -858,7 +859,7 @@ async function loadCss() {
  * @deprecated
  * @return {Promise<void>}
  */
-async function onWindowReady() {}
+async function onWindowReady() { }
 
 function setBackground() {
 	let htmlbg = localStorage.getItem(lib.configprefix + "background");

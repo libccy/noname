@@ -6,7 +6,7 @@ const characterSort = {
 	extra_yin: ["shen_liubei", "shen_luxun"],
 	extra_lei: ["shen_ganning", "shen_zhangliao"],
 	extra_decade: ["shen_huangzhong", "shen_jiangwei", "shen_machao", "shen_zhangfei", "shen_zhangjiao", "shen_dengai", "shen_xuzhu", "dc_shen_huatuo"],
-	extra_ol: ["ol_zhangliao", "shen_caopi", "shen_zhenji", "shen_sunquan"],
+	extra_ol: ["ol_zhangliao", "shen_caopi", "shen_zhenji", "shen_sunquan", "junk_sunquan", "junk_zhangjiao"],
 	extra_mobilezhi: ["shen_guojia", "shen_xunyu"],
 	extra_mobilexin: ["shen_taishici", "shen_sunce"],
 	extra_mobileren: ["shen_huatuo", "shen_lusu"],

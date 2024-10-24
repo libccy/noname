@@ -1572,6 +1572,7 @@ game.import("card", function () {
 				},
 			},
 			mutoumianju_skill: {
+				equipSkill: true,
 				enable: "chooseToUse",
 				filterCard: true,
 				usable: 1,
@@ -1595,6 +1596,7 @@ game.import("card", function () {
 				},
 			},
 			gjyuheng_skill: {
+				equipSkill: true,
 				enable: "phaseUse",
 				usable: 1,
 				filterCard: { suit: "spade" },
@@ -1646,6 +1648,7 @@ game.import("card", function () {
 			},
 			gjyuheng_plus_temp: {},
 			gjyuheng_plus_skill: {
+				equipSkill: true,
 				enable: "phaseUse",
 				usable: 1,
 				filterCard: { color: "black" },
@@ -1696,6 +1699,7 @@ game.import("card", function () {
 				},
 			},
 			gjyuheng_pro_skill: {
+				equipSkill: true,
 				enable: "phaseUse",
 				filterCard: { color: "black" },
 				check: function (card) {

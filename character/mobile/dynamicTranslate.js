@@ -31,8 +31,8 @@ const dynamicTranslates = {
 		} else if (status === 1) {
 			return lib.translate.mbxuetu_achieve_info;
 		} else {
-			if (!xuetu) return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以回复1点体力，然后令一名角色弃置两张牌；</span>阳：你可以摸一张牌，然后对一名角色造成1点伤害。';
-			return '转换技。出牌阶段限一次，阴：你可以回复1点体力，然后令一名角色弃置两张牌；<span class="bluetext">阳：你可以摸一张牌，然后对一名角色造成1点伤害。</span>';
+			if (!xuetu) return '转换技。出牌阶段限一次，<span class="bluetext">阴：你可以回复1点体力，然后令一名其他角色弃置两张牌；</span>阳：你可以摸一张牌，然后对一名其他角色造成1点伤害。';
+			return '转换技。出牌阶段限一次，阴：你可以回复1点体力，然后令一名其他角色弃置两张牌；<span class="bluetext">阳：你可以摸一张牌，然后对一名其他角色造成1点伤害。</span>';
 		}
 	},
 	mbzuoyou(player) {

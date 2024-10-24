@@ -1,4 +1,11 @@
 export default {
+	"#huituo_re_caorui1": "谁有权利，谁就拥有天下。",
+	"#huituo_re_caorui2": "严法度，以拓疆土。",
+	"#remingjian1": "以卿之才学，何愁此战不胜。",
+	"#remingjian2": "用人自当不疑，卿大可放心。",
+	"#rexingshuai1": "有皇权在身，竟半点儿不自由。",
+	"#rexingshuai2": "只要魏国还在，我定保你等周全。",
+	"#re_caorui:die": "愧为人主，何颜见父。",
 	"#zhuhai1": "善恶有报，天道轮回！",
 	"#zhuhai2": "早知今日，何必当初！",
 	"#qianxin1": "既遇明主，天下可图！",

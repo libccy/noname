@@ -2853,6 +2853,7 @@ export default () => {
 				},
 			},
 			boss_panguan: {
+				audio: true,
 				mod: {
 					targetEnabled: function (card) {
 						if (get.type(card) == "delay") return false;
@@ -2860,6 +2861,7 @@ export default () => {
 				},
 			},
 			boss_juhun: {
+				audio: true,
 				trigger: { player: "phaseJieshuBegin" },
 				forced: true,
 				content: function () {
@@ -2874,6 +2876,7 @@ export default () => {
 				},
 			},
 			boss_wangxiang: {
+				audio: true,
 				trigger: { player: "die" },
 				forced: true,
 				forceDie: true,
@@ -3094,6 +3097,7 @@ export default () => {
 				},
 			},
 			boss_bingfeng: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3105,7 +3109,10 @@ export default () => {
 					trigger.source.turnOver();
 				},
 			},
+			boss_chujiangwang_weimu: { audio: true },
+			boss_chujiangwang_fankui: { audio: true },
 			boss_heisheng: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3117,6 +3124,7 @@ export default () => {
 				},
 			},
 			boss_shengfu: {
+				audio: true,
 				trigger: { player: "phaseJieshuBegin" },
 				forced: true,
 				popup: false,
@@ -3135,7 +3143,9 @@ export default () => {
 					}
 				},
 			},
+			boss_songdiwang_enyuan: { audio: true },
 			boss_zhiwang: {
+				audio: true,
 				derivation: "boss_zhiwang_planetarian",
 				trigger: { global: "gainEnd" },
 				filter: function (event, player) {
@@ -3161,6 +3171,7 @@ export default () => {
 				subSkill: { planetarian: {} },
 			},
 			boss_gongzheng: {
+				audio: true,
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				filter: function (event, player) {
@@ -3171,6 +3182,7 @@ export default () => {
 				},
 			},
 			boss_xuechi: {
+				audio: true,
 				trigger: { player: "phaseJieshuBegin" },
 				forced: true,
 				content: function () {
@@ -3195,6 +3207,7 @@ export default () => {
 				equipSkill: false,
 			},
 			boss_zhuxin: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3226,6 +3239,7 @@ export default () => {
 				},
 			},
 			boss_leizhou: {
+				audio: true,
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				content: function () {
@@ -3239,6 +3253,7 @@ export default () => {
 				},
 			},
 			boss_leifu: {
+				audio: true,
 				trigger: { player: "phaseJieshuBegin" },
 				forced: true,
 				content: function () {
@@ -3252,6 +3267,7 @@ export default () => {
 				},
 			},
 			boss_leizhu: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3268,6 +3284,7 @@ export default () => {
 				},
 			},
 			boss_fudu: {
+				audio: true,
 				trigger: { global: "useCard" },
 				forced: true,
 				filter: function (event, player) {
@@ -3283,6 +3300,7 @@ export default () => {
 				},
 			},
 			boss_kujiu: {
+				audio: true,
 				trigger: { global: "phaseZhunbeiBegin" },
 				forced: true,
 				filter: function (event, player) {
@@ -3297,6 +3315,7 @@ export default () => {
 				},
 			},
 			boss_renao: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3311,7 +3330,6 @@ export default () => {
 				},
 			},
 			boss_remen: {
-				equipSkill: true,
 				trigger: { target: ["useCardToBefore"] },
 				forced: true,
 				priority: 6,
@@ -3340,6 +3358,7 @@ export default () => {
 				},
 			},
 			boss_zhifen: {
+				audio: true,
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				content: function () {
@@ -3358,6 +3377,7 @@ export default () => {
 			},
 	
 			boss_huoxing: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3374,6 +3394,7 @@ export default () => {
 				},
 			},
 			boss_suozu: {
+				audio: true,
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				content: function () {
@@ -3389,6 +3410,7 @@ export default () => {
 				},
 			},
 			boss_abi: {
+				audio: true,
 				trigger: { player: "damageEnd" },
 				forced: true,
 				filter: function (event) {
@@ -3400,6 +3422,7 @@ export default () => {
 				},
 			},
 			boss_pingdeng: {
+				audio: true,
 				trigger: { player: "die" },
 				forceDie: true,
 				forced: true,
@@ -3435,6 +3458,7 @@ export default () => {
 				},
 			},
 			boss_lunhui: {
+				audio: true,
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				filter: function (event, player) {
@@ -3463,6 +3487,7 @@ export default () => {
 				},
 			},
 			boss_wangsheng: {
+				audio: true,
 				trigger: { player: "phaseUseBegin" },
 				forced: true,
 				content: function () {
@@ -3477,6 +3502,7 @@ export default () => {
 				},
 			},
 			boss_zlfanshi: {
+				audio: true,
 				trigger: { player: "damageEnd" },
 				forced: true,
 				content: function () {
@@ -5487,14 +5513,16 @@ export default () => {
 				equipSkill: true,
 				inherit: "cixiong_skill",
 				filter: function (event, player) {
-					return game.hasNature(event.card, "linked");
+					return get.natureList(event.card).some(i => {
+						return i === "thunder" || i === "fire";
+					});
 				},
 			},
 			qicaishenlu: {
 				trigger: { source: "damageBegin1" },
 				forced: true,
 				filter: function (event, player) {
-					return game.hasNature(event.card, "linked");
+					return event.hasNature("linked");
 				},
 				content: function () {
 					trigger.num++;
@@ -8130,6 +8158,7 @@ export default () => {
 				},
 			},
 			boss_modao: {
+				audio: true,
 				trigger: { player: "phaseZhunbeiBegin" },
 				forced: true,
 				content: function () {
@@ -10538,7 +10567,7 @@ export default () => {
 			jinwuluorigong: "金乌落日弓",
 			iwasawa_crowbow: "金乌落日弓",
 			lingsheji_info:
-				"出牌阶段结束时，你可选择：1.摸一张牌。2.将一张武将牌置于武将牌上，并于回合结束后获得此牌。",
+				"出牌阶段结束时，你可选择：1.摸一张牌。2.将一张牌置于武将牌上，并于回合结束后获得此牌。",
 			shanrangzhaoshu_info:
 				"其他角色于回合外得到牌后，若是其本回合内第一次得到牌，则你可以选择一项：交给其一张牌，或令其交给你一张牌。",
 			xingtianpojunfu_info:
@@ -10568,7 +10597,46 @@ export default () => {
 			mode_boss_character_config: "挑战武将",
 	
 			// 台词部分
-			"#boss_lvbu1:die": "虎牢关，失守了……",
+			"#boss_modao": "魔道影阵，助我法力。",
+			"#boss_lunhui": "轮回反复，此法无解。",
+			"#boss_wangsheng": "前生今世，不过皆苦。",
+			"#boss_zlfanshi": "敢忤逆我，你是不知道真正的代价！",
+			"#boss_zhuanlunwang:die": "你居然走到了最后！",
+			"#boss_tiemian": "铁面无私，刚正不阿！",
+			"#boss_zhadao": "铡刀之下，皆是恶徒！",
+			"#boss_zhuxin": "诛人心魄，灭人心智。",
+			"#boss_zhiwang": "罔顾伦常，必受其害！",
+			"#boss_gongzheng": "公正以待，显其威法。",
+			"#boss_xuechi": "炼狱血池，需要你的奉献。",
+			"#boss_wuguanwang:die": "我的法阵，居然被破了！",
+			"#boss_fudu": "服药止血，反被毒伤。",
+			"#boss_kujiu": "此酒虽苦，酒效不减。",
+			"#boss_renao": "惹恼我的代价，你可承受不起！",
+			"#boss_heisheng": "想跑？痴人说梦！",
+			"#boss_shengfu": "此绳索，是你无法逃脱的噩梦。",
+			"#boss_songdiwang_enyuan": "有恩有惠，有伤有报。",
+			"#boss_panguan": "世俗杂事，吾皆可判。",
+			"#boss_juhun": "勾魂索命，拘魄入狱。",
+			"#boss_wangxiang": "还是别望他乡了！",
+			"#boss_suozu": "困其身，锁其足。",
+			"#boss_abi": "阿鼻地狱，雷火皆来。",
+			"#boss_pingdeng": "众生平等，你也难逃此罚！",
+			"#boss_shiyou": "忧愁可拾，烦苦可消。",
+			"#boss_wanghun": "忘情断爱，心魂可劫。",
+			"#boss_wangshi": "红尘往事，再无牵挂。",
+			"#boss_remen": "这燥热，真让人烦闷！",
+			"#boss_zhifen": "焚身燃躯，日炙火烧！",
+			"#boss_huoxing": "火海炼狱，普世之刑！",
+			"#boss_bufo": "地狱未空，誓不成佛。",
+			"#boss_wuliang": "无量劫难，众生度尽。",
+			"#boss_dayuan": "地狱众生，发愿救度。",
+			"#boss_diting": "静虑深密，犹如秘藏。",
+			"#boss_chujiangwang_weimu": "暗涌掩身，查无踪迹。",
+			"#boss_chujiangwang_fankui": "伤我，可是要有付出的！",
+			"#boss_bingfeng": "接受这寒冰的封冻吧！",
+			"#boss_leifu": "想出此阵，不要妄想！",
+			"#boss_leizhou": "术法诅咒，显灵加威。",
+			"#boss_leizhu": "你们皆要受到诛连罪行！",
 			"#xiuluo1": "准备受死吧！",
 			"#xiuluo2": "鼠辈！螳臂当车！",
 			"#shenwei1": "萤烛之火，也敢与日月争辉？",

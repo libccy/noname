@@ -822,9 +822,9 @@ game.import("card", function () {
 						},
 					},
 					tag: {
-						// damage:1,
-						// natureDamage:1,
-						// fireDamage:1,
+						damage: 0.15,
+						natureDamage: 0.15,
+						fireDamage: 0.15,
 					},
 				},
 			},
@@ -892,6 +892,7 @@ game.import("card", function () {
 			toulianghuanzhu_ai1: {},
 			toulianghuanzhu_ai2: {},
 			suolianjia: {
+				equipSkill: true,
 				trigger: { player: "damageBefore" },
 				filter: function (event, player) {
 					if (
@@ -903,7 +904,7 @@ game.import("card", function () {
 						})
 					)
 						return;
-					if (event.nature) return true;
+					if (event.hasNature()) return true;
 				},
 				forced: true,
 				content: function () {
@@ -928,8 +929,7 @@ game.import("card", function () {
 								})
 							)
 								return;
-							if (card.name == "tiesuo" || get.tag(card, "natureDamage"))
-								return "zeroplayertarget";
+							if (card.name == "tiesuo" || get.tag(card, "natureDamage")) return "zeroplayertarget";
 						},
 					},
 				},

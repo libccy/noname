@@ -3384,7 +3384,7 @@ export default () => {
 				},
 			},
 			content: {
-				stratagemInsight: (event) => {
+				stratagemInsight: () => {
 					"step 0";
 					game.log(player, "洞察了", target, "与其的阵营关系");
 					"step 1";
