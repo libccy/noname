@@ -39,7 +39,10 @@ const skills = {
 				onremove(player, skill) {
 					let tags = player.getCards("h", card => card.gaintag?.some(tag => tag.startsWith(skill)));
 					if (tags.length) {
-						tags = tags.slice().map(card => card.gaintag.find(tag => tag.startsWith(skill))).unique();
+						tags = tags
+							.slice()
+							.map(card => card.gaintag.find(tag => tag.startsWith(skill)))
+							.unique();
 						tags.forEach(tag => player.removeGaintag(tag));
 					}
 				},
@@ -4622,7 +4625,7 @@ const skills = {
 	dczhangji: {
 		audio: 2,
 		trigger: { global: "useCardToTargeted" },
-		filter: function (event, player) {
+		filter(event, player) {
 			if (!event.targets || event.targets.length <= 1) return false;
 			if (event.targets.length != event.getParent().triggeredTargets4.length) return false;
 			return event.targets.includes(player);
@@ -4634,17 +4637,28 @@ const skills = {
 			evt.targets = [player, ...evt.targets.remove(player)];
 			evt.triggeredTargets4 = [player, ...evt.triggeredTargets4.remove(player)];
 			player
-				.when({ target: ["useCardToEnd", "useCardToExcluded"] })
-				.filter(evt => evt.targets?.length && evt.getParent() == trigger.getParent())
+				.when({
+					global: "eventNeutralized",
+					target: ["useCardToEnd", "useCardToExcluded", "useCardToIgnored"],
+				})
+				.filter((evt, current, name) => {
+					if (trigger.targets.length <= 1) return false;
+					if (name === "evtNeutralized") {
+						if (evt._neutralize_event.type != "card" || evt.type != "card") return false;
+						return evt._neutralize_event.card === trigger.card;
+					}
+					return evt.getParent() == trigger.getParent();
+				})
 				.then(() => {
-					player.draw(trigger.targets.length);
-				});
+					player.draw(num);
+				})
+				.vars({ num: trigger.targets.length - 1 });
 		},
 	},
 	dczengou: {
 		audio: 2,
 		enable: "phaseUse",
-		filter: function (event, player) {
+		filter(event, player) {
 			return player.maxHp > 0 && player.countCards("he") > 0;
 		},
 		filterCard: true,
@@ -4655,11 +4669,11 @@ const skills = {
 		lose: false,
 		delay: false,
 		usable: 1,
-		check: function (card) {
+		check(card) {
 			if (card.name == "tao" || card.name == "jiu") return 0;
 			return 1 / (get.value(card) || 0.5);
 		},
-		content: function* (event, map) {
+		*content(event, map) {
 			const player = map.player,
 				cards = event.cards,
 				target = event.target;
@@ -4679,25 +4693,25 @@ const skills = {
 					content: "下次体力值增加或使用牌结算完毕后展示所有手牌，然后失去手牌中“谮构”牌数的体力值",
 				},
 				trigger: { player: ["changeHp", "useCardAfter"] },
-				filter: function (event, player) {
+				filter(event, player) {
 					return event.name == "useCard" || event.num > 0;
 				},
 				forced: true,
 				popup: false,
-				content: function () {
+				content() {
 					player.removeSkill("dczengou_debuff");
 					const cards = player.getCards("h", card => card.hasGaintag("dczengou_debuff"));
 					player.showHandcards();
 					if (cards.length) player.loseHp(cards.length);
 				},
 				mod: {
-					aiValue: function (player, card, num) {
+					aiValue(player, card, num) {
 						if (get.itemtype(card) == "card" && card.hasGaintag("dczengou_debuff")) return -1;
 					},
-					aiUseful: function () {
+					aiUseful() {
 						return lib.skill.dczengou.subSkill.debuff.mod.aiValue.apply(this, arguments);
 					},
-					aiOrder: function (player, card, num) {
+					aiOrder(player, card, num) {
 						if (get.itemtype(card) == "card" && card.hasGaintag("dczengou_debuff")) {
 							const cards = player.getCards("h", card => card.hasGaintag("dczengou_debuff"));
 							if (cards.length == 1) return num + 10;

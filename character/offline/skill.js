@@ -779,7 +779,7 @@ const skills = {
 		},
 		filter(event, player) {
 			if (player.hasHistory("sourceDamage", evt => evt.player && !evt.player.hasSkill("xk_qiyijun"))) return false;
-			if (!player.hasHistory("useCard", evt => evt.card.name == "sha" && evt.targets?.some(target => {
+			if (player.hasHistory("useCard", evt => evt.card.name == "sha" && evt.targets?.some(target => {
 				return !target.hasSkill("xk_qiyijun");
 			}))) return false;
 			return true;

@@ -7505,7 +7505,18 @@ export const Content = {
 		if (targets[num] && targets[num].isDead()) return;
 		if (targets[num] && targets[num].isOut()) return;
 		if (targets[num] && targets[num].removed) return;
-		if (targets[num] && info.ignoreTarget && info.ignoreTarget(card, player, targets[num])) return;
+		if (targets[num] && info.ignoreTarget && info.ignoreTarget(card, player, targets[num])) {
+			var next = game.createEvent("useCardToIgnored", false);
+			next.setContent("emptyEvent");
+			next.targets = targets;
+			next.target = targets[num];
+			next.num = num;
+			next.card = card;
+			next.cards = cards;
+			next.player = player;
+			return;
+			return;
+		}
 		if (targets.length == 0 && !info.notarget) return;
 		if (targets[num] && event.excluded.includes(targets[num])) {
 			var next = game.createEvent("useCardToExcluded", false);
