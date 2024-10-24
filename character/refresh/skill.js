@@ -10043,51 +10043,28 @@ const skills = {
 		limited: true,
 		audio: 2,
 		enable: "phaseUse",
-		filter: function (event, player) {
-			return !player.storage.reqimou;
-		},
-		init: function (player) {
-			player.storage.reqimou = false;
-		},
-		mark: true,
-		intro: {
-			content: "limited",
-		},
 		skillAnimation: true,
 		animationColor: "orange",
-		content: function () {
-			"step 0";
-			var num = player.hp - 1;
-			if (player.countCards("hs", { name: ["tao", "jiu"] })) {
-				num = player.hp;
-			}
-			var map = {};
-			var list = [];
-			for (var i = 1; i <= player.hp; i++) {
-				var cn = get.cnNumber(i, true);
-				map[cn] = i;
-				list.push(cn);
-			}
-			event.map = map;
-			player.awakenSkill("reqimou");
-			player.storage.reqimou = true;
-			player
-				.chooseControl(list, function () {
-					return get.cnNumber(_status.event.goon, true);
-				})
-				.set("prompt", "失去任意点体力")
-				.set("goon", num);
-			"step 1";
-			var num = event.map[result.control] || 1;
-			player.storage.reqimou2 = num;
-			player.loseHp(num);
-			player.draw(num);
+		async content(event, trigger, player) {
+			player.awakenSkill(event.name);
+			const { result } = await player.chooseNumbers(get.prompt(event.name), [{ prompt: "请选择你要失去的体力值", min: 1, max: player.getHp() }], true).set("processAI", () => {
+				const player = get.player();
+				let num = player.getHp() - 1;
+				if (player.countCards("hs", { name: ["tao", "jiu"] })) {
+					num = player.getHp();
+				}
+				return [num];
+			});
+			const number = result.numbers[0];
+			player.storage.reqimou2 = number;
+			await player.loseHp(number);
+			await player.draw(number);
 			player.addTempSkill("reqimou2");
 		},
 		ai: {
 			order: 14,
 			result: {
-				player: function (player) {
+				player(player) {
 					if (player.hp < 3) return false;
 					var mindist = player.hp;
 					if (player.countCards("hs", card => player.canSaveCard(card, player))) mindist++;
