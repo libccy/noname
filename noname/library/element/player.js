@@ -5259,6 +5259,43 @@ export class Player extends HTMLDivElement {
 		next.setContent("chooseDrawRecover");
 		return next;
 	}
+	/**
+	 * 选择一或多个数值
+	 */
+	chooseNumbers() {
+		const next = game.createEvent("chooseNumbers");
+		next.player = this;
+		next.list = [];
+		for (const argument of arguments) {
+			if (typeof argument == "string") {
+				get.evtprompt(next, argument);
+			} else if (typeof argument == "number") {
+				next.terminal = argument;
+			} else if (typeof argument == "boolean") {
+				next.forced = argument;
+			} else if (typeof argument == "object" && Array.isArray(argument)) {
+				next.list.push(...argument);
+			}
+		}
+		if (!next.list.length) {
+			_status.event.next.remove(next);
+			next.resolve();
+		}
+		if (!next.filterSelect)
+			next.filterSelect = function (num, index, event) {
+				if (event.terminal) return num + event.numbers.reduce((sum, num) => sum + num, 0) - (event.numbers[index] || 0) <= event.terminal;
+				return true;
+			};
+		if (!next.filterOk)
+			next.filterOk = function (event) {
+				if (event.terminal) return event.numbers.reduce((sum, num) => sum + num, 0) <= event.terminal;
+				return true;
+			};
+		if (!next.forced) next.forced = false;
+		next.setContent("chooseNumbers");
+		next._args = Array.from(arguments);
+		return next;
+	}
 	choosePlayerCard() {
 		var next = game.createEvent("choosePlayerCard");
 		next.player = this;
