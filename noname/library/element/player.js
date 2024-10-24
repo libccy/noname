@@ -5295,7 +5295,7 @@ export class Player extends HTMLDivElement {
 		next.setContent("chooseNumbers");
 		next._args = Array.from(arguments);
 		return next;
-	},
+	}
 	choosePlayerCard() {
 		var next = game.createEvent("choosePlayerCard");
 		next.player = this;
